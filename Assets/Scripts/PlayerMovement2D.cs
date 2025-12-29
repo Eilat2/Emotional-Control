@@ -26,14 +26,14 @@ public class PlayerMovement2D : MonoBehaviour
     void Move()
     {
         float x = Input.GetAxisRaw("Horizontal"); // A/D או חצים
-        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
+        rb.velocity = new Vector2(x * moveSpeed, rb.velocity.y);
     }
 
     void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
 
