@@ -13,6 +13,9 @@ public class PlayerJoyJump : MonoBehaviour
     public float normalGravity = 4f;
     public float glideGravity = 1.2f;
 
+    [Header("Stamina (Joy)")]
+    public float glideCostPerSecond = 15f; // כמה סטאמינה יורדת בשנייה בזמן ריחוף
+
     [Header("Float Up (2nd press)")]
     public float floatUpImpulse = 8f;      // דחיפה למעלה בלחיצה השנייה
 
@@ -22,6 +25,7 @@ public class PlayerJoyJump : MonoBehaviour
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
+    private Stamina stamina;
 
     private bool jumpedFromGround = false; // האם כבר קפצנו מהרצפה
     private bool glideEnabled = false;     // האם הריחוף הופעל (בלחיצה שנייה)
@@ -29,6 +33,7 @@ public class PlayerJoyJump : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        stamina = GetComponent<Stamina>();   // סטאמינה נמצאת על אותו Player
         rb.gravityScale = normalGravity;
     }
 
@@ -70,17 +75,35 @@ public class PlayerJoyJump : MonoBehaviour
         // לחיצה שנייה: מפעילה ריחוף + דחיפה למעלה (רק באוויר, פעם אחת בכל קפיצה)
         if (Input.GetKeyDown(KeyCode.Space) && !grounded && jumpedFromGround && !glideEnabled)
         {
-            glideEnabled = true;
+            // אם אין סטאמינה - לא מתחילים ריחוף
+            if (stamina != null && stamina.currentStamina <= 0f)
+            {
+                glideEnabled = false;
+            }
+            else
+            {
+                glideEnabled = true;
 
-            // דחיפה למעלה (כדי שזה יהיה "מרחף כלפי מעלה" ולא רק נופל לאט)
-            rb.velocity = new Vector2(rb.velocity.x, 0f);
-            rb.AddForce(Vector2.up * floatUpImpulse, ForceMode2D.Impulse);
+                // דחיפה למעלה
+                rb.velocity = new Vector2(rb.velocity.x, 0f);
+                rb.AddForce(Vector2.up * floatUpImpulse, ForceMode2D.Impulse);
+            }
         }
 
-        // ריחוף: אם הופעל בלחיצה השנייה — כבידה חלשה
+        // ריחוף: אם הופעל בלחיצה השנייה — כבידה חלשה + צריכת סטאמינה
         if (glideEnabled)
         {
-            rb.gravityScale = glideGravity;
+            // צורכים סטאמינה לפי זמן
+            if (stamina != null && !stamina.Use(glideCostPerSecond * Time.deltaTime))
+            {
+                // נגמרה סטאמינה -> מפסיקים ריחוף
+                glideEnabled = false;
+                rb.gravityScale = normalGravity;
+            }
+            else
+            {
+                rb.gravityScale = glideGravity;
+            }
         }
         else
         {
