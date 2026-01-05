@@ -25,7 +25,9 @@ public class PlayerJoyJump : MonoBehaviour
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private Stamina stamina;
+
+    // סטאמינה של שמחה בלבד (Joy)
+    private Stamina joyStamina;
 
     private bool jumpedFromGround = false; // האם כבר קפצנו מהרצפה
     private bool glideEnabled = false;     // האם הריחוף הופעל (בלחיצה שנייה)
@@ -33,8 +35,12 @@ public class PlayerJoyJump : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        stamina = GetComponent<Stamina>();   // סטאמינה נמצאת על אותו Player
         rb.gravityScale = normalGravity;
+
+        // ⚠️ חשוב: עכשיו שיש 2 סטאמינות על ה-Player,
+        // GetComponent<Stamina>() יחזיר "סתם" את הראשונה.
+        // לכן אנחנו מחפשים במפורש את הסטאמינה מסוג Joy.
+        joyStamina = GetStamina(Stamina.StaminaType.Joy);
     }
 
     void Update()
@@ -45,14 +51,14 @@ public class PlayerJoyJump : MonoBehaviour
 
         bool grounded = IsGrounded();
 
-        // ✅ חדש: אם עזבנו את הרווח בזמן ריחוף — מפסיקים מיד ונופלים
+        // אם עזבנו את הרווח בזמן ריחוף — מפסיקים מיד ונופלים
         if (glideEnabled && Input.GetKeyUp(KeyCode.Space))
         {
             glideEnabled = false;
             rb.gravityScale = normalGravity;
         }
 
-        // ✅ איפוס רק כשבאמת "נחתנו" (על הקרקע + לא עולים)
+        // איפוס רק כשבאמת "נחתנו" (על הקרקע + לא עולים)
         if (grounded && rb.velocity.y <= 0.01f)
         {
             jumpedFromGround = false;
@@ -75,8 +81,8 @@ public class PlayerJoyJump : MonoBehaviour
         // לחיצה שנייה: מפעילה ריחוף + דחיפה למעלה (רק באוויר, פעם אחת בכל קפיצה)
         if (Input.GetKeyDown(KeyCode.Space) && !grounded && jumpedFromGround && !glideEnabled)
         {
-            // אם אין סטאמינה - לא מתחילים ריחוף
-            if (stamina != null && stamina.currentStamina <= 0f)
+            // אם אין סטאמינה של שמחה - לא מתחילים ריחוף
+            if (joyStamina != null && joyStamina.currentStamina <= 0f)
             {
                 glideEnabled = false;
             }
@@ -94,7 +100,7 @@ public class PlayerJoyJump : MonoBehaviour
         if (glideEnabled)
         {
             // צורכים סטאמינה לפי זמן
-            if (stamina != null && !stamina.Use(glideCostPerSecond * Time.deltaTime))
+            if (joyStamina != null && !joyStamina.Use(glideCostPerSecond * Time.deltaTime))
             {
                 // נגמרה סטאמינה -> מפסיקים ריחוף
                 glideEnabled = false;
@@ -124,5 +130,21 @@ public class PlayerJoyJump : MonoBehaviour
             groundRadius,
             groundLayer
         );
+    }
+
+    /// <summary>
+    /// מחפש על ה-Player סטאמינה לפי סוג (Joy / Rage)
+    /// </summary>
+    Stamina GetStamina(Stamina.StaminaType wantedType)
+    {
+        Stamina[] staminas = GetComponents<Stamina>();
+
+        foreach (Stamina s in staminas)
+        {
+            if (s.type == wantedType)
+                return s;
+        }
+
+        return null;
     }
 }
