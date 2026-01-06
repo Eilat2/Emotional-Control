@@ -1,58 +1,88 @@
-using UnityEngine;
+ο»Ώusing UnityEngine;
 
 public class BreakOnTouch : MonoBehaviour
 {
     private EmotionController emotion;
 
-    // δρθΰξιπδ ωμ ζςν αμαγ
+    // Χ”Χ΅ΧΧΧΧ™Χ Χ” Χ©Χ Χ–ΧΆΧ Χ‘ΧΧ‘Χ“
     private Stamina rageStamina;
 
-    // λξδ ρθΰξιπδ ιεψγϊ ςμ λμ ωαιψδ
+    // Χ›ΧΧ” Χ΅ΧΧΧΧ™Χ Χ” Χ™Χ•Χ¨Χ“Χª ΧΆΧ Χ›Χ Χ©Χ‘Χ™Χ¨Χ”
     public float breakCost = 20f;
+
+    [Header("VFX")]
+    public ParticleSystem breakVfxPrefab;   // ΧΧ’Χ¨Χ•Χ¨ ΧΧ›ΧΧ ΧΧª BreakParticles (Prefab)
+    public float vfxDestroyAfter = 1.5f;    // ΧΧ—Χ¨Χ™ Χ›ΧΧ” Χ–ΧΧ ΧΧΧ—Χ•Χ§ ΧΧª Χ”-VFX
 
     void Awake()
     {
-        // ψτψπρ μαχψ δψβωεϊ
+        // Χ¨Χ¤Χ¨Χ Χ΅ ΧΧ‘Χ§Χ¨ Χ”Χ¨Χ’Χ©Χ•Χª
         emotion = GetComponent<EmotionController>();
 
-        // ξεφΰιν ΰϊ δρθΰξιπδ ξρεβ Rage αμαγ
+        // ΧΧ•Χ¦ΧΧ™Χ ΧΧª Χ”Χ΅ΧΧΧΧ™Χ Χ” ΧΧ΅Χ•Χ’ Rage Χ‘ΧΧ‘Χ“
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // ΰν ΰπηπε μΰ αξφα Rage – μΰ ωεαψιν αλμμ
+        // ΧΧ ΧΧ Χ—Χ Χ• ΧΧ Χ‘ΧΧ¦Χ‘ Rage β€“ ΧΧ Χ©Χ•Χ‘Χ¨Χ™Χ Χ‘Χ›ΧΧ
         if (emotion != null && emotion.current != EmotionController.Emotion.Rage)
             return;
 
-        // ΰν ΰιο ρθΰξιπδ ωμ Rage – μΰ ωεαψιν
+        // Χ©Χ•Χ‘Χ¨Χ™Χ Χ¨Χ§ ΧΧ•Χ‘Χ™Χ™Χ§ΧΧ™Χ ΧΆΧ ΧªΧ’ Breakable
+        if (!collision.gameObject.CompareTag("Breakable"))
+            return;
+
+        // ΧΧ ΧΧ™Χ ΧΧ΅Χ¤Χ™Χ§ Χ΅ΧΧΧΧ™Χ Χ” Χ©Χ Rage β€“ ΧΧ Χ©Χ•Χ‘Χ¨Χ™Χ
+        // (ΧΧ rageStamina ΧΧ©Χ•Χ ΧΧ” ΧΧ Χ ΧΧ¦Χ -> Χ Χ©Χ‘Χ•Χ¨ Χ‘ΧΧ™ Χ΅ΧΧΧΧ™Χ Χ”, Χ›Χ“Χ™ Χ©ΧΧ "Χ™ΧªΧ§ΧΆ" ΧΧ Χ“Χ™Χ‘ΧΧ’)
         if (rageStamina != null && !rageStamina.Use(breakCost))
             return;
 
-        // ωαιψδ ωμ ΰεαιιχθιν ςν ϊβ Breakable
-        if (collision.gameObject.CompareTag("Breakable"))
-        {
-            Debug.Log("Broke breakable!");
-            Destroy(collision.gameObject);
-        }
+        // π’¥ ΧΧ¤ΧΆΧ™ΧΧ™Χ Particles Χ‘ΧΧ§Χ•Χ Χ”Χ©Χ‘Χ™Χ¨Χ”
+        SpawnVfx(collision);
+
+        Debug.Log("Broke breakable!");
+        Destroy(collision.gameObject);
+    }
+
+    void SpawnVfx(Collision2D collision)
+    {
+        if (breakVfxPrefab == null) return;
+
+        // Χ Χ§Χ•Χ“Χª ΧΧ’ΧΆ (Χ Χ¨ΧΧ” Χ™Χ•ΧªΧ¨ ΧΧ•Χ‘ Χ-center)
+        Vector3 spawnPos = collision.transform.position;
+
+        // Χ”Χ’Χ Χ”: ΧΧ¤ΧΆΧΧ™Χ ΧΧ™Χ contacts (Χ Χ“Χ™Χ¨ ΧΧ‘Χ Χ§Χ•Χ¨Χ”)
+        if (collision.contactCount > 0)
+            spawnPos = collision.GetContact(0).point;
+
+        ParticleSystem vfx = Instantiate(breakVfxPrefab, spawnPos, Quaternion.identity);
+
+        // Χ—Χ©Χ•Χ‘ Χ‘-2D: ΧΧ©Χ™Χ Z=0 Χ›Χ“Χ™ Χ©ΧΧ "Χ™Χ™ΧΆΧΧ" ΧΧΧ—Χ•Χ¨Χ™ Χ”ΧΧ¦ΧΧΧ”/ΧΧ•Χ‘Χ™Χ™Χ§ΧΧ™Χ
+        Vector3 p = vfx.transform.position;
+        p.z = 0f;
+        vfx.transform.position = p;
+
+        // ΧΧ Χ‘Χ¤Χ¨ΧΧ‘ Χ™Χ© Play On Awake Χ›Χ‘Χ•Χ™ - Χ Χ¨Χ™Χ¥ Χ™Χ“Χ Χ™Χª (ΧΧ ΧΧ–Χ™Χ§ Χ’Χ ΧΧ Χ“Χ•ΧΧ§)
+        vfx.Play();
+
+        // ΧΧ•Χ—Χ§Χ™Χ ΧΧ—Χ¨Χ™ Χ–ΧΧ Χ§Χ¦Χ¨ Χ›Χ“Χ™ Χ©ΧΧ Χ™Χ¦ΧΧ‘Χ¨Χ• ΧΧ•Χ‘Χ™Χ™Χ§ΧΧ™Χ
+        Destroy(vfx.gameObject, vfxDestroyAfter);
     }
 
     /// <summary>
-    /// ξητω ςμ δ-Player ρθΰξιπδ μτι ρεβ (Joy / Rage)
+    /// ΧΧ—Χ¤Χ© ΧΆΧ Χ”-Player Χ΅ΧΧΧΧ™Χ Χ” ΧΧ¤Χ™ Χ΅Χ•Χ’ (Joy / Rage)
     /// </summary>
     Stamina GetStamina(Stamina.StaminaType wantedType)
     {
-        // ξχαμιν ΰϊ λμ δ-Stamina ωςμ δ-Player
         Stamina[] staminas = GetComponents<Stamina>();
 
-        // ξητωιν ΰϊ ζε ωξϊΰιξδ μρεβ ωαιχωπε
         foreach (Stamina s in staminas)
         {
             if (s.type == wantedType)
                 return s;
         }
 
-        // ΰν μΰ πξφΰδ ρθΰξιπδ ξϊΰιξδ
         return null;
     }
 }
