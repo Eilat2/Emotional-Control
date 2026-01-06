@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class EmotionController : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class EmotionController : MonoBehaviour
     public MonoBehaviour joyMovement;   // הסקריפט של שמחה (תנועה/קפיצה/רחיפה)
 
     [Header("Rage scripts (enable in Rage)")]
-    public MonoBehaviour rageMovement;  // הסקריפט של תזוזת זעם (A/D)
+    public MonoBehaviour rageMovement;  // הסקריפט של תזוזת זעם
     public MonoBehaviour rageBreak;     // BreakOnTouch
 
     [Header("Visual")]
@@ -19,18 +20,27 @@ public class EmotionController : MonoBehaviour
 
     void Start()
     {
-        // אם לא חיברת ידנית באינספקטור - ניקח אוטומטית מהאובייקט
         if (playerRenderer == null)
             playerRenderer = GetComponent<SpriteRenderer>();
 
         Apply(current);
     }
 
-    void Update()
+    // ---------- New Input System ----------
+
+    // Action בשם "Joy"
+    public void OnJoy()
     {
-        if (Input.GetKeyDown(KeyCode.Q)) Apply(Emotion.Joy);
-        if (Input.GetKeyDown(KeyCode.E)) Apply(Emotion.Rage);
+        Apply(Emotion.Joy);
     }
+
+    // Action בשם "Anger"
+    public void OnAnger()
+    {
+        Apply(Emotion.Rage);
+    }
+
+    // -------------------------------------
 
     void Apply(Emotion e)
     {
@@ -49,7 +59,6 @@ public class EmotionController : MonoBehaviour
         if (playerRenderer != null)
             playerRenderer.color = (e == Emotion.Joy) ? joyColor : rageColor;
 
-        // בדיקת מקשים (אפשר למחוק אחרי שזה עובד לך)
         Debug.Log("Switched to: " + e);
     }
 }
