@@ -25,6 +25,8 @@ public class BreakOnTouch : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("HIT: " + collision.gameObject.name); // ✅ ADDED: בדיקה שההתנגשות בכלל נקראת
+
         // אם אנחנו לא במצב Rage – לא שוברים בכלל
         if (emotion != null && emotion.current != EmotionController.Emotion.Rage)
             return;
@@ -56,6 +58,8 @@ public class BreakOnTouch : MonoBehaviour
         if (collision.contactCount > 0)
             spawnPos = collision.GetContact(0).point;
 
+        Debug.Log("SPAWN VFX at: " + spawnPos); // ✅ הוספה לבדיקה
+
         ParticleSystem vfx = Instantiate(breakVfxPrefab, spawnPos, Quaternion.identity);
 
         // חשוב ב-2D: לשים Z=0 כדי שלא "ייעלם" מאחורי המצלמה/אובייקטים
@@ -69,6 +73,7 @@ public class BreakOnTouch : MonoBehaviour
         // מוחקים אחרי זמן קצר כדי שלא יצטברו אובייקטים
         Destroy(vfx.gameObject, vfxDestroyAfter);
     }
+
 
     /// <summary>
     /// מחפש על ה-Player סטאמינה לפי סוג (Joy / Rage)

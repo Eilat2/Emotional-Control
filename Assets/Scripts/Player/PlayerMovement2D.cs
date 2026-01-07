@@ -19,6 +19,11 @@ public class PlayerMovement2D : MonoBehaviour
     private bool jumpPressedThisFrame;
     // ---------------------------------
 
+    // ===== ADDED: Emotion =====
+    [Header("Emotion")]
+    public EmotionType currentEmotion = EmotionType.Neutral;
+    // ==========================
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -38,6 +43,14 @@ public class PlayerMovement2D : MonoBehaviour
         // מאפסים "ירייה" בסוף פריים
         jumpPressedThisFrame = false;
     }
+
+    // ===== ADDED: helper function =====
+    // מאפשר לאובייקטים אחרים לבדוק אם השחקן במצב זעם
+    public bool IsRage()
+    {
+        return currentEmotion == EmotionType.Rage;
+    }
+    // ================================
 
     // -------- Input System callbacks (Send Messages) --------
 
