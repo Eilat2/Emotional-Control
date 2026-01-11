@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BreakOnTouch : MonoBehaviour
 {
@@ -14,6 +15,12 @@ public class BreakOnTouch : MonoBehaviour
     public ParticleSystem breakVfxPrefab;   // לגרור לכאן את BreakParticles (Prefab)
     public float vfxDestroyAfter = 1.5f;    // אחרי כמה זמן למחוק את ה-VFX
 
+    // נשמור את האובייקט שאפשר לשבור כשאנחנו לידו
+    private GameObject breakableInRange;
+
+    // האקשן מה-Input Actions (Space) בשם Jump_Break
+    private InputAction jumpBreakAction;
+
     void Awake()
     {
         // רפרנס לבקר הרגשות
@@ -21,59 +28,92 @@ public class BreakOnTouch : MonoBehaviour
 
         // מוצאים את הסטאמינה מסוג Rage בלבד
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
+
+        // תופסים את האקשן מתוך PlayerInput
+        PlayerInput playerInput = GetComponent<PlayerInput>();
+        if (playerInput != null)
+        {
+            jumpBreakAction = playerInput.actions["Jump_Break"]; // השם עם קו תחתון
+        }
+        else
+        {
+            Debug.LogError("BreakOnTouch: No PlayerInput found on Player! (needed for Jump_Break action)");
+        }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnEnable()
     {
-        Debug.Log("HIT: " + collision.gameObject.name); // ✅ ADDED: בדיקה שההתנגשות בכלל נקראת
+        if (jumpBreakAction != null) jumpBreakAction.Enable();
+    }
 
-        // אם אנחנו לא במצב Rage – לא שוברים בכלל
+    void OnDisable()
+    {
+        if (jumpBreakAction != null) jumpBreakAction.Disable();
+    }
+
+    void Update()
+    {
+        // חייבים להיות ליד משהו שביר
+        if (breakableInRange == null) return;
+
+        // חייבים להיות במצב Rage
         if (emotion != null && emotion.current != EmotionController.Emotion.Rage)
             return;
 
-        // שוברים רק אובייקטים עם תג Breakable
-        if (!collision.gameObject.CompareTag("Breakable"))
-            return;
+        // רק בלחיצה על האקשן Jump_Break (Space)
+        if (jumpBreakAction != null && jumpBreakAction.WasPressedThisFrame())
+        {
+            // אם אין מספיק סטאמינה של Rage – לא שוברים
+            if (rageStamina != null && !rageStamina.Use(breakCost))
+                return;
 
-        // אם אין מספיק סטאמינה של Rage – לא שוברים
-        // (אם rageStamina משום מה לא נמצא -> נשבור בלי סטאמינה, כדי שלא "יתקע" לך דיבאג)
-        if (rageStamina != null && !rageStamina.Use(breakCost))
-            return;
+            // מפעילים Particles
+            SpawnVfxAt(breakableInRange.transform.position);
 
-        // 💥 מפעילים Particles במקום השבירה
-        SpawnVfx(collision);
-
-        Debug.Log("Broke breakable!");
-        Destroy(collision.gameObject);
+            Debug.Log("Broke breakable with Jump_Break!");
+            Destroy(breakableInRange);
+            breakableInRange = null;
+        }
     }
 
-    void SpawnVfx(Collision2D collision)
+    // ✅ Trigger מה-BreakZone (Child)
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // BreakZone הוא Child → הקיר הוא ה-Parent
+        Transform wall = other.transform.parent;
+        if (wall == null) return;
+
+        // הקיר צריך להיות Breakable
+        if (!wall.CompareTag("Breakable"))
+            return;
+
+        Debug.Log("IN BREAK RANGE: " + wall.gameObject.name);
+        breakableInRange = wall.gameObject;
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        Transform wall = other.transform.parent;
+        if (wall == null) return;
+
+        if (breakableInRange != null && wall.gameObject == breakableInRange)
+        {
+            Debug.Log("OUT OF BREAK RANGE: " + wall.gameObject.name);
+            breakableInRange = null;
+        }
+    }
+
+    // VFX לפי מיקום
+    void SpawnVfxAt(Vector3 spawnPos)
     {
         if (breakVfxPrefab == null) return;
 
-        // נקודת מגע (נראה יותר טוב מ-center)
-        Vector3 spawnPos = collision.transform.position;
-
-        // הגנה: לפעמים אין contacts (נדיר אבל קורה)
-        if (collision.contactCount > 0)
-            spawnPos = collision.GetContact(0).point;
-
-        Debug.Log("SPAWN VFX at: " + spawnPos); // ✅ הוספה לבדיקה
+        spawnPos.z = 0f;
 
         ParticleSystem vfx = Instantiate(breakVfxPrefab, spawnPos, Quaternion.identity);
-
-        // חשוב ב-2D: לשים Z=0 כדי שלא "ייעלם" מאחורי המצלמה/אובייקטים
-        Vector3 p = vfx.transform.position;
-        p.z = 0f;
-        vfx.transform.position = p;
-
-        // אם בפראב יש Play On Awake כבוי - נריץ ידנית (לא מזיק גם אם דולק)
         vfx.Play();
-
-        // מוחקים אחרי זמן קצר כדי שלא יצטברו אובייקטים
         Destroy(vfx.gameObject, vfxDestroyAfter);
     }
-
 
     /// <summary>
     /// מחפש על ה-Player סטאמינה לפי סוג (Joy / Rage)

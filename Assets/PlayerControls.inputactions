@@ -16,7 +16,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Jump",
+                    "name": "Jump_Break",
                     "type": "Button",
                     "id": "f6ef94e7-c149-441e-8d77-2d27694b0c22",
                     "expectedControlType": "",
@@ -106,7 +106,7 @@
                     "interactions": "Press(behavior=2)",
                     "processors": "",
                     "groups": "",
-                    "action": "Jump",
+                    "action": "Jump_Break",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
