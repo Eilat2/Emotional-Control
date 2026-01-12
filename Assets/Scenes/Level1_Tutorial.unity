@@ -544,6 +544,11 @@ MonoBehaviour:
   breakCost: 20
   breakVfxPrefab: {fileID: 8880641151752846562, guid: 2547654629af135448bffd7889426cb4, type: 3}
   vfxDestroyAfter: 1.5
+  debrisPiecePrefab: {fileID: 8693446288054368926, guid: 69eac51b2b85f3e4faa91946f5df1ae7, type: 3}
+  debrisCount: 12
+  debrisForce: 4
+  debrisTorque: 200
+  debrisLifeTime: 3
 --- !u!114 &194889410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,6 +603,9 @@ MonoBehaviour:
   type: 0
   maxStamina: 100
   currentStamina: 0
+  regenPerSecond: 1
+  regenDelay: 0.4
+  idleSpeedThreshold: 0.05
 --- !u!114 &194889413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -613,6 +621,9 @@ MonoBehaviour:
   type: 1
   maxStamina: 100
   currentStamina: 0
+  regenPerSecond: 1
+  regenDelay: 0.4
+  idleSpeedThreshold: 0.05
 --- !u!114 &194889414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2397,7 +2408,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Breakable '
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5697769405013517842, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
