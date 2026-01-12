@@ -41,16 +41,6 @@ public class BreakOnTouch : MonoBehaviour
         }
     }
 
-    void OnEnable()
-    {
-        if (jumpBreakAction != null) jumpBreakAction.Enable();
-    }
-
-    void OnDisable()
-    {
-        if (jumpBreakAction != null) jumpBreakAction.Disable();
-    }
-
     void Update()
     {
         // חייבים להיות ליד משהו שביר

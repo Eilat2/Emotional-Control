@@ -55,6 +55,10 @@ public class StaminaUI : MonoBehaviour
     {
         if (stamina == null) return;
 
+        // אופציונלי: אם maxStamina משתנה, נשמור שהפס מתאים
+        if (slider.maxValue != stamina.maxStamina)
+            slider.maxValue = stamina.maxStamina;
+
         // כל פריים מעדכנים את הפס לפי הסטאמינה
         slider.value = stamina.currentStamina;
     }

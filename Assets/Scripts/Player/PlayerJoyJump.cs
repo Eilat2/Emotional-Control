@@ -147,7 +147,8 @@ public class PlayerJoyJump : MonoBehaviour
         moveInput = value.Get<Vector2>();
     }
 
-    public void OnJump(InputValue value)
+    // ✅ חייב להיות ככה כי האקשן נקרא Jump_Break
+    public void OnJump_Break(InputValue value)
     {
         bool pressed = value.isPressed;
 
