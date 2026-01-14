@@ -343,11 +343,11 @@ GameObject:
   - component: {fileID: 194889404}
   - component: {fileID: 194889408}
   - component: {fileID: 194889409}
+  - component: {fileID: 194889410}
   - component: {fileID: 194889411}
   - component: {fileID: 194889412}
   - component: {fileID: 194889413}
   - component: {fileID: 194889414}
-  - component: {fileID: 194889415}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -478,7 +478,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
+  m_Color: {r: 0.9206633, g: 0.96981126, b: 0.020128137, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -510,7 +510,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194889403}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53d8cca46c04b484f929b1eef9de8b92, type: 3}
   m_Name: 
@@ -536,7 +536,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194889403}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3572a2b0f20688d4ba766bb6966ca212, type: 3}
   m_Name: 
@@ -548,7 +548,27 @@ MonoBehaviour:
   debrisCount: 12
   debrisForce: 4
   debrisTorque: 200
-  debrisLifeTime: 3
+  debrisLifeTime: 1.5
+--- !u!114 &194889410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194889403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6913d602f224a043b2a26bc3c70d0b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 6
+  jumpForce: 12
+  groundCheck: {fileID: 148671516}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  currentEmotion: 0
 --- !u!114 &194889411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -563,10 +583,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   current: 0
   joyMovement: {fileID: 194889408}
-  rageMovement: {fileID: 194889415}
+  rageMovement: {fileID: 194889410}
   rageBreak: {fileID: 194889409}
   playerRenderer: {fileID: 0}
-  neutralColor: {r: 1, g: 1, b: 1, a: 1}
   joyColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   rageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &194889412
@@ -635,19 +654,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &194889415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 194889403}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cc1576486cc11d46a780051592a072a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRageMove
-  moveSpeed: 6
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

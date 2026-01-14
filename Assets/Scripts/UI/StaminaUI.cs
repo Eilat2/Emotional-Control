@@ -63,3 +63,4 @@ public class StaminaUI : MonoBehaviour
         slider.value = stamina.currentStamina;
     }
 }
+

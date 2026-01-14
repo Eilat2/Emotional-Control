@@ -5,26 +5,24 @@ public class BreakOnTouch : MonoBehaviour
 {
     private EmotionController emotion;
 
-    // הסטאמינה של זעם בלבד
+    // סטאמינה של זעם בלבד
     private Stamina rageStamina;
 
     // כמה סטאמינה יורדת על כל שבירה
     public float breakCost = 20f;
 
     [Header("VFX")]
-    public ParticleSystem breakVfxPrefab;   // לגרור לכאן את BreakParticles (Prefab)
-    public float vfxDestroyAfter = 3.5f;    // אחרי כמה זמן למחוק את ה-VFX
+    public ParticleSystem breakVfxPrefab; // לגרור לכאן את BreakParticles (Prefab)
+    public float vfxDestroyAfter = 3.5f;  // אחרי כמה זמן למחוק את ה-VFX
 
-    // ====== ✅ ADDED: Debris (Real Pieces) ======
     [Header("Debris (Real Pieces)")]
-    public GameObject debrisPiecePrefab;    // לגרור לכאן את DebrisPiece (Prefab)
-    public int debrisCount = 12;            // כמה חתיכות יוצאות
-    public float debrisForce = 4f;          // כוח פיזור
-    public float debrisTorque = 200f;       // סיבוב חתיכות
-    public float debrisLifeTime = 1.5f;       // אחרי כמה שניות חתיכה נעלמת
-    // ===========================================
+    public GameObject debrisPiecePrefab; // לגרור לכאן את DebrisPiece (Prefab)
+    public int debrisCount = 12;         // כמה חתיכות יוצאות
+    public float debrisForce = 4f;       // כוח פיזור
+    public float debrisTorque = 200f;    // סיבוב חתיכות
+    public float debrisLifeTime = 1.5f;  // אחרי כמה שניות חתיכה נעלמת
 
-    // נשמור את האובייקט שאפשר לשבור כשאנחנו לידו
+    // האובייקט השביר שנמצא כרגע בטווח השבירה
     private GameObject breakableInRange;
 
     // האקשן מה-Input Actions (Space) בשם Jump_Break
@@ -42,7 +40,7 @@ public class BreakOnTouch : MonoBehaviour
         PlayerInput playerInput = GetComponent<PlayerInput>();
         if (playerInput != null)
         {
-            jumpBreakAction = playerInput.actions["Jump_Break"]; // השם עם קו תחתון
+            jumpBreakAction = playerInput.actions["Jump_Break"]; // שם האקשן בקובץ inputactions
         }
         else
         {
@@ -59,19 +57,18 @@ public class BreakOnTouch : MonoBehaviour
         if (emotion != null && emotion.current != EmotionController.Emotion.Rage)
             return;
 
-        // רק בלחיצה על האקשן Jump_Break (Space)
+        // שוברים רק בלחיצה על Jump_Break (Space)
         if (jumpBreakAction != null && jumpBreakAction.WasPressedThisFrame())
         {
             // אם אין מספיק סטאמינה של Rage – לא שוברים
             if (rageStamina != null && !rageStamina.Use(breakCost))
                 return;
 
-            // מפעילים Particles
+            // אם את חוזרת ל-Particles בעתיד:
             // SpawnVfxAt(breakableInRange.transform.position);
 
-            // ====== ✅ ADDED: מפעילים שברים אמיתיים במקום Particles ======
+            // מפעילים שברים "אמיתיים" (Debris)
             SpawnDebrisAt(breakableInRange.transform.position);
-            // ===========================================================
 
             Debug.Log("Broke breakable with Jump_Break!");
             Destroy(breakableInRange);
@@ -79,7 +76,7 @@ public class BreakOnTouch : MonoBehaviour
         }
     }
 
-    // ✅ Trigger מה-BreakZone (Child)
+    // Trigger מה-BreakZone (Child)
     void OnTriggerEnter2D(Collider2D other)
     {
         // BreakZone הוא Child → הקיר הוא ה-Parent
@@ -118,7 +115,7 @@ public class BreakOnTouch : MonoBehaviour
         Destroy(vfx.gameObject, vfxDestroyAfter);
     }
 
-    // ====== ✅ ADDED: שברים אמיתיים (GameObjects) לפי מיקום ======
+    // שברים "אמיתיים" (GameObjects) לפי מיקום
     void SpawnDebrisAt(Vector3 spawnPos)
     {
         if (debrisPiecePrefab == null) return;
@@ -142,7 +139,7 @@ public class BreakOnTouch : MonoBehaviour
             Rigidbody2D rb2d = piece.GetComponent<Rigidbody2D>();
             if (rb2d != null)
             {
-                // כוח אקראי אבל עם נטייה קצת למעלה כדי שיראה “פיצוץ”
+                // כוח אקראי עם נטייה למעלה כדי שיראה כמו "פיצוץ"
                 Vector2 dir = new Vector2(
                     Random.Range(-1f, 1f),
                     Random.Range(0.3f, 1f)
@@ -153,7 +150,6 @@ public class BreakOnTouch : MonoBehaviour
             }
         }
     }
-    // ============================================================
 
     /// <summary>
     /// מחפש על ה-Player סטאמינה לפי סוג (Joy / Rage)

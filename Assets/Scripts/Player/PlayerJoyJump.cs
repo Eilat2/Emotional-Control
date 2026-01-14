@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem; // חשוב! New Input System
+using UnityEngine.InputSystem; // New Input System
 
 public class PlayerJoyJump : MonoBehaviour
 {
     public float moveSpeed = 6f;
 
-    public float normalJumpForce = 3f;     // קפיצה רגילה
-    public float joyJumpForce = 6f;        // קפיצה עם שמחה
+    public float normalJumpForce = 3f;  // קפיצה רגילה
+    public float joyJumpForce = 6f;     // קפיצה עם שמחה
 
     [Header("Joy Mode")]
     public bool joyActive = true;
 
     // אם true: לחיצה אחת מדליקה/מכבה שמחה (Toggle)
-    // אם false: שמחה פעילה רק בזמן שמחזיקים את הכפתור
+    // אם false: שמחה פעילה רק בזמן שמחזיקים את הכפתור (Hold)
     public bool joyToggleMode = true;
 
     [Header("Glide (Joy)")]
@@ -23,7 +23,7 @@ public class PlayerJoyJump : MonoBehaviour
     public float glideCostPerSecond = 15f; // כמה סטאמינה יורדת בשנייה בזמן ריחוף
 
     [Header("Float Up (2nd press)")]
-    public float floatUpImpulse = 8f;      // דחיפה למעלה בלחיצה השנייה
+    public float floatUpImpulse = 8f; // דחיפה למעלה בלחיצה השנייה
 
     [Header("Ground Check")]
     public Transform groundCheck;
@@ -35,12 +35,14 @@ public class PlayerJoyJump : MonoBehaviour
     // סטאמינה של שמחה בלבד (Joy)
     private Stamina joyStamina;
 
-    private bool jumpedFromGround = false; // האם כבר קפצנו מהרצפה
-    private bool glideEnabled = false;     // האם הריחוף הופעל (בלחיצה שנייה)
+    private bool jumpedFromGround = false; // האם כבר קפצנו מהרצפה (לחיצה ראשונה)
+    private bool glideEnabled = false;     // האם ריחוף פעיל כרגע
 
     // ----------- New Input System state -----------
     private Vector2 moveInput;
     private bool jumpHeld = false;
+
+    // אירועים רגעיים: true רק בפריים שבו הכפתור נלחץ/שוחרר
     private bool jumpPressedThisFrame = false;
     private bool jumpReleasedThisFrame = false;
 
@@ -58,17 +60,17 @@ public class PlayerJoyJump : MonoBehaviour
 
     void Update()
     {
-        // ---------------- תנועה ----------------
+        // ---------- תנועה ----------
         float move = moveInput.x;
         rb.linearVelocity = new Vector2(move * moveSpeed, rb.linearVelocity.y);
 
         bool grounded = IsGrounded();
 
-        // אם Joy במצב "החזקה" - joyActive נקבע לפי האם הכפתור מוחזק
+        // ---------- Joy Mode (Toggle / Hold) ----------
         if (!joyToggleMode)
             joyActive = joyHeld;
 
-        // אם שחררנו את כפתור הקפיצה בזמן ריחוף — מפסיקים מיד ונופלים
+        // אם שחררנו את כפתור הקפיצה בזמן ריחוף — מפסיקים מיד
         if (glideEnabled && jumpReleasedThisFrame)
         {
             glideEnabled = false;
@@ -83,7 +85,7 @@ public class PlayerJoyJump : MonoBehaviour
             rb.gravityScale = normalGravity;
         }
 
-        // ---------------- לחיצה ראשונה: קפיצה (רק על הקרקע) ----------------
+        // ---------- לחיצה ראשונה: קפיצה (רק על הקרקע) ----------
         if (jumpPressedThisFrame && grounded)
         {
             float jumpForce = joyActive ? joyJumpForce : normalJumpForce;
@@ -95,7 +97,7 @@ public class PlayerJoyJump : MonoBehaviour
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
 
-        // ---------------- לחיצה שנייה: ריחוף + דחיפה למעלה ----------------
+        // ---------- לחיצה שנייה: ריחוף + דחיפה למעלה ----------
         if (jumpPressedThisFrame && !grounded && jumpedFromGround && !glideEnabled)
         {
             if (joyStamina != null && joyStamina.currentStamina <= 0f)
@@ -111,7 +113,7 @@ public class PlayerJoyJump : MonoBehaviour
             }
         }
 
-        // ---------------- ריחוף: כבידה חלשה + צריכת סטאמינה ----------------
+        // ---------- ריחוף: כבידה חלשה + צריכת סטאמינה ----------
         if (glideEnabled)
         {
             if (joyStamina != null && !joyStamina.Use(glideCostPerSecond * Time.deltaTime))
@@ -129,25 +131,19 @@ public class PlayerJoyJump : MonoBehaviour
             rb.gravityScale = normalGravity;
         }
 
-        // דיבאג
-        if (jumpPressedThisFrame)
-        {
-            Debug.Log($"JUMP DOWN | grounded={grounded} | jumpedFromGround={jumpedFromGround} | glideEnabled={glideEnabled} | velY={rb.linearVelocity.y} | joyActive={joyActive}");
-        }
-
-        // מאפסים "יריות"
+        // איפוס אירועי קלט – כדי שלא יופעלו שוב בפריים הבא
         jumpPressedThisFrame = false;
         jumpReleasedThisFrame = false;
     }
 
-    // ------------ New Input System callbacks (Send Messages) ------------
+    // ------------ New Input System callbacks ------------
 
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
     }
 
-    // ✅ חייב להיות ככה כי האקשן נקרא Jump_Break
+    // חייב להיות ככה כי האקשן נקרא Jump_Break
     public void OnJump_Break(InputValue value)
     {
         bool pressed = value.isPressed;
@@ -161,35 +157,26 @@ public class PlayerJoyJump : MonoBehaviour
         jumpHeld = pressed;
     }
 
-    // Action בשם "Joy" יפעיל את זה
+    // Action בשם "Joy"
     public void OnJoy(InputValue value)
     {
         bool pressed = value.isPressed;
 
         if (joyToggleMode)
         {
-            // Toggle רק על "Down"
             if (pressed)
-            {
                 joyActive = !joyActive;
-                Debug.Log("JOY TOGGLE: " + joyActive);
-            }
         }
         else
         {
-            // מצב החזקה
             joyHeld = pressed;
         }
     }
 
-    // Action בשם "Anger" יפעיל את זה
-    public void OnAnger()
-    {
-        Debug.Log("ANGER pressed!");
-        // פה נחבר את ה"גשר" / כוח זעם כשתגידי מה בדיוק צריך לעשות
-    }
+    // Action בשם "Anger" – כרגע לא בשימוש (מנוהל ע"י EmotionController)
+    public void OnAnger() { }
 
-    // -------------------------------------------------------------------
+    // ---------------------------------------------------
 
     bool IsGrounded()
     {

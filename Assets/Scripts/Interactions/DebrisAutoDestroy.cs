@@ -9,3 +9,4 @@ public class DebrisAutoDestroy : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 }
+//האובייקט שמוחק את החתיכות של השברים 
