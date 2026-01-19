@@ -12,7 +12,7 @@ public class ElectricPlatform : MonoBehaviour
     public float knockbackForceY = 2f;
 
     [Header("Underside Check")]
-    public float undersideMargin = 0.05f; // ��� "���� ������" ���� ����
+    public float undersideMargin = 0.05f; 
 
     private float nextHitTime = 0f;
     private Collider2D myCol;
@@ -34,17 +34,17 @@ public class ElectricPlatform : MonoBehaviour
 
     private void TryShock(Collision2D collision)
     {
-        // DEBUG: ����� ����� ���� ���� ����������
+        
         // Debug.Log("Collision with: " + collision.collider.name);
 
         if (Time.time < nextHitTime) return;
         if (!collision.collider.CompareTag("Player")) return;
         if (myCol == null) return;
 
-        // ����� ��������� �����
+
         float undersideY = myCol.bounds.min.y;
 
-        // ��� �� ����� ��� ����� ������? �� �� -> �� ����� �����
+        
         bool hitFromBelow = false;
         for (int i = 0; i < collision.contactCount; i++)
         {
@@ -60,7 +60,7 @@ public class ElectricPlatform : MonoBehaviour
 
         nextHitTime = Time.time + hitCooldown;
 
-        // 1) ����� ������
+        // 1) 
         Stamina[] staminas = collision.collider.GetComponents<Stamina>();
         for (int i = 0; i < staminas.Length; i++)
         {
@@ -78,8 +78,8 @@ public class ElectricPlatform : MonoBehaviour
         }
 
 
-        // 2) Knockback ���
-        // 2) Knockback ��� ������
+        // 2) Knockback 
+        
         Rigidbody2D rb = collision.rigidbody;
         if (rb != null)
         {
