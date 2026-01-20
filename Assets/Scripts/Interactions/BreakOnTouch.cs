@@ -9,18 +9,18 @@ public class BreakOnTouch : MonoBehaviour
     private Stamina rageStamina;
 
     // כמה סטאמינה יורדת על כל שבירה
-    public float breakCost = 20f;
+    [SerializeField] float breakCost = 20f;
 
     [Header("VFX")]
-    public ParticleSystem breakVfxPrefab; // לגרור לכאן את BreakParticles (Prefab)
-    public float vfxDestroyAfter = 3.5f;  // אחרי כמה זמן למחוק את ה-VFX
+    [SerializeField] ParticleSystem breakVfxPrefab; // לגרור לכאן את BreakParticles (Prefab)
+    [SerializeField] float vfxDestroyAfter = 3.5f;  // אחרי כמה זמן למחוק את ה-VFX
 
     [Header("Debris (Real Pieces)")]
-    public GameObject debrisPiecePrefab; // לגרור לכאן את DebrisPiece (Prefab)
-    public int debrisCount = 12;         // כמה חתיכות יוצאות
-    public float debrisForce = 4f;       // כוח פיזור
-    public float debrisTorque = 200f;    // סיבוב חתיכות
-    public float debrisLifeTime = 1.5f;  // אחרי כמה שניות חתיכה נעלמת
+    [SerializeField] GameObject debrisPiecePrefab; // לגרור לכאן את DebrisPiece (Prefab)
+    [SerializeField] int debrisCount = 12;         // כמה חתיכות יוצאות
+    [SerializeField] float debrisForce = 4f;       // כוח פיזור
+    [SerializeField] float debrisTorque = 200f;    // סיבוב חתיכות
+    [SerializeField] float debrisLifeTime = 1.5f;  // אחרי כמה שניות חתיכה נעלמת
 
     // האובייקט השביר שנמצא כרגע בטווח השבירה
     private GameObject breakableInRange;

@@ -12,22 +12,22 @@ public class EmotionController : MonoBehaviour
     // ---------- סקריפטים של ניטרלי ----------
     // תנועה בסיסית שתעבוד רק במצב Neutral
     [Header("Neutral scripts")]
-    public MonoBehaviour neutralMovement;
+    [SerializeField] MonoBehaviour neutralMovement;
 
     // ---------- סקריפטים של שמחה ----------
     // הסקריפט הזה יעבוד רק במצב Joy
     [Header("Joy scripts")]
-    public MonoBehaviour joyMovement;
+    [SerializeField] MonoBehaviour joyMovement;
 
     // ---------- סקריפטים של זעם ----------
     // הסקריפטים האלה יעבדו רק במצב Rage
     [Header("Rage scripts")]
-    public MonoBehaviour rageMovement;
-    public MonoBehaviour rageBreak;
+    [SerializeField] MonoBehaviour rageMovement;
+    [SerializeField] MonoBehaviour rageBreak;
 
     // ---------- ויזואל ----------
     [Header("Visual")]
-    public SpriteRenderer playerRenderer;
+    [SerializeField] SpriteRenderer playerRenderer;
 
     public Color neutralColor = Color.white;
     public Color joyColor = Color.yellow;

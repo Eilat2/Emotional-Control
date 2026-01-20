@@ -6,7 +6,7 @@ using UnityEngine.InputSystem; // מערכת הקלט החדשה של Unity
 public class PlayerNeutralMove : MonoBehaviour
 {
     // מהירות התנועה האופקית של השחקן
-    public float moveSpeed = 6f;
+    [SerializeField] float moveSpeed = 6f;
 
     // רפרנס ל־Rigidbody2D של השחקן
     private Rigidbody2D rb;

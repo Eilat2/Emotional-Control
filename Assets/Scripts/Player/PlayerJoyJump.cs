@@ -3,32 +3,32 @@ using UnityEngine.InputSystem; // New Input System
 
 public class PlayerJoyJump : MonoBehaviour
 {
-    public float moveSpeed = 6f;
+    [SerializeField] float moveSpeed = 6f;
 
-    public float normalJumpForce = 3f;  // קפיצה רגילה
-    public float joyJumpForce = 6f;     // קפיצה עם שמחה
+    [SerializeField] float normalJumpForce = 3f;  // קפיצה רגילה
+    [SerializeField] float joyJumpForce = 6f;     // קפיצה עם שמחה
 
     [Header("Joy Mode")]
-    public bool joyActive = true;
+    [SerializeField] bool joyActive = true;
 
     // אם true: לחיצה אחת מדליקה/מכבה שמחה (Toggle)
     // אם false: שמחה פעילה רק בזמן שמחזיקים את הכפתור (Hold)
-    public bool joyToggleMode = true;
+    [SerializeField] bool joyToggleMode = true;
 
     [Header("Glide (Joy)")]
-    public float normalGravity = 4f;
-    public float glideGravity = 1.2f;
+    [SerializeField] float normalGravity = 4f;
+    [SerializeField] float glideGravity = 1.2f;
 
     [Header("Stamina (Joy)")]
-    public float glideCostPerSecond = 15f; // כמה סטאמינה יורדת בשנייה בזמן ריחוף
+    [SerializeField] float glideCostPerSecond = 15f; // כמה סטאמינה יורדת בשנייה בזמן ריחוף
 
     [Header("Float Up (2nd press)")]
-    public float floatUpImpulse = 8f; // דחיפה למעלה בלחיצה השנייה
+    [SerializeField] float floatUpImpulse = 8f; // דחיפה למעלה בלחיצה השנייה
 
     [Header("Ground Check")]
-    public Transform groundCheck;
-    public float groundRadius = 0.15f;
-    public LayerMask groundLayer;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] float groundRadius = 0.15f;
+    [SerializeField] LayerMask groundLayer;
 
     private Rigidbody2D rb;
 

@@ -4,8 +4,8 @@ using UnityEngine.UI;
 public class StaminaUI : MonoBehaviour
 {
     [Header("חיבורים ידניים")]
-    public GameObject player;              // הפלייר שעליו יושבות הסטאמינות
-    public Stamina.StaminaType staminaType; // Joy או Rage – לבחור באינספקטור
+    [SerializeField] GameObject player;              // הפלייר שעליו יושבות הסטאמינות
+    [SerializeField] Stamina.StaminaType staminaType; // Joy או Rage – לבחור באינספקטור
 
     private Stamina stamina;               // הסטאמינה שנמצאה בפועל
     private Slider slider;

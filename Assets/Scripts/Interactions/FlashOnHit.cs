@@ -23,8 +23,9 @@ public class FlashOnHit : MonoBehaviour
 
     private IEnumerator FlashRoutine()
     {
+        var lastColor = sr.color;
         sr.color = Color.white;
         yield return new WaitForSeconds(flashDuration);
-        sr.color = originalColor;
+        sr.color = lastColor;
     }
 }

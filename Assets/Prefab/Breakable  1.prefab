@@ -89,7 +89,6 @@ GameObject:
   - component: {fileID: 2649122870317705141}
   - component: {fileID: 9086275296804840209}
   - component: {fileID: 6984448349911763564}
-  - component: {fileID: 5697769405013517842}
   m_Layer: 0
   m_Name: Breakable  1
   m_TagString: Breakable
@@ -218,17 +217,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &5697769405013517842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8260235876525331170}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a91c000812766904587a6098d2a7849f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreakableWall
-  wallFragmentsPrefab: {fileID: 8880641151752846562, guid: 2547654629af135448bffd7889426cb4, type: 3}
-  angerPlayerTag: AngerPlayer

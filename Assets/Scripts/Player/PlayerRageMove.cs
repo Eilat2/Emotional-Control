@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerRageMove : MonoBehaviour
 {
-    public float moveSpeed = 6f;
+    [SerializeField] float moveSpeed = 6f;
 
     Rigidbody2D rb;
     Vector2 moveInput;
