@@ -1,168 +1,83 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
+// אחראי על שבירה / הריגה בלחיצת Rage
 public class BreakOnTouch : MonoBehaviour
 {
-    private EmotionController emotion;
+    private EmotionController emotion;   // בודק באיזה רגש אנחנו
+    private Stamina rageStamina;         // סטאמינה של Rage בלבד
 
-    // סטאמינה של זעם בלבד
-    private Stamina rageStamina;
+    [SerializeField] float breakCost = 20f; // כמה סטאמינה יורדת על פעולה
 
-    // כמה סטאמינה יורדת על כל שבירה
-    [SerializeField] float breakCost = 20f;
-
-    [Header("VFX")]
-    [SerializeField] ParticleSystem breakVfxPrefab; // לגרור לכאן את BreakParticles (Prefab)
-    [SerializeField] float vfxDestroyAfter = 3.5f;  // אחרי כמה זמן למחוק את ה-VFX
-
-    [Header("Debris (Real Pieces)")]
-    [SerializeField] GameObject debrisPiecePrefab; // לגרור לכאן את DebrisPiece (Prefab)
-    [SerializeField] int debrisCount = 12;         // כמה חתיכות יוצאות
-    [SerializeField] float debrisForce = 4f;       // כוח פיזור
-    [SerializeField] float debrisTorque = 200f;    // סיבוב חתיכות
-    [SerializeField] float debrisLifeTime = 1.5f;  // אחרי כמה שניות חתיכה נעלמת
-
-    // האובייקט השביר שנמצא כרגע בטווח השבירה
-    private GameObject breakableInRange;
-
-    // האקשן מה-Input Actions (Space) בשם Jump_Break
-    private InputAction jumpBreakAction;
+    private IBreakable breakableInRange; // מה שנמצא כרגע בטווח
+    private InputAction jumpBreakAction; // האקשן של Space (Jump_Break)
 
     void Awake()
     {
-        // רפרנס לבקר הרגשות
-        emotion = GetComponent<EmotionController>();
+        // הסקריפט יושב על BreakZone (Child)
+        // אז את כל הרפרנסים לוקחים מהאבא (Player)
+        Transform playerRoot = transform.root;
 
-        // מוצאים את הסטאמינה מסוג Rage בלבד
-        rageStamina = GetStamina(Stamina.StaminaType.Rage);
+        emotion = playerRoot.GetComponent<EmotionController>();
+        rageStamina = GetStaminaFrom(playerRoot, Stamina.StaminaType.Rage);
 
-        // תופסים את האקשן מתוך PlayerInput
-        PlayerInput playerInput = GetComponent<PlayerInput>();
+        PlayerInput playerInput = playerRoot.GetComponent<PlayerInput>();
         if (playerInput != null)
-        {
-            jumpBreakAction = playerInput.actions["Jump_Break"]; // שם האקשן בקובץ inputactions
-        }
+            jumpBreakAction = playerInput.actions["Jump_Break"];
         else
-        {
-            Debug.LogError("BreakOnTouch: No PlayerInput found on Player! (needed for Jump_Break action)");
-        }
+            Debug.LogError("BreakOnTouch: PlayerInput לא נמצא על השחקן");
     }
 
     void Update()
     {
-        // חייבים להיות ליד משהו שביר
+        // אם אין משהו בטווח – אין מה לעשות
         if (breakableInRange == null) return;
 
         // חייבים להיות במצב Rage
         if (emotion != null && emotion.current != EmotionController.Emotion.Rage)
             return;
 
-        // שוברים רק בלחיצה על Jump_Break (Space)
+        // לחיצה על Space (Jump_Break)
         if (jumpBreakAction != null && jumpBreakAction.WasPressedThisFrame())
         {
-            // אם אין מספיק סטאמינה של Rage – לא שוברים
+            // אם אין מספיק סטאמינה – לא מבצעים
             if (rageStamina != null && !rageStamina.Use(breakCost))
                 return;
 
-            // אם את חוזרת ל-Particles בעתיד:
-            // SpawnVfxAt(breakableInRange.transform.position);
-
-            // מפעילים שברים "אמיתיים" (Debris)
-            SpawnDebrisAt(breakableInRange.transform.position);
-
-            Debug.Log("Broke breakable with Jump_Break!");
-            Destroy(breakableInRange);
+            // אומרים לאובייקט: "תטפל בעצמך"
+            breakableInRange.OnBreak();
             breakableInRange = null;
         }
     }
 
-    // Trigger מה-BreakZone (Child)
+    // כשמשהו נכנס לטווח
     void OnTriggerEnter2D(Collider2D other)
     {
-        // BreakZone הוא Child → הקיר הוא ה-Parent
-        Transform wall = other.transform.parent;
-        if (wall == null) return;
+        // מחפשים קומפוננטה IBreakable על האובייקט או על ההורים שלו
+        IBreakable breakable = other.GetComponentInParent<IBreakable>();
+        if (breakable == null) return;
 
-        // הקיר צריך להיות Breakable
-        if (!wall.CompareTag("Breakable"))
-            return;
-
-        Debug.Log("IN BREAK RANGE: " + wall.gameObject.name);
-        breakableInRange = wall.gameObject;
+        Debug.Log("IN BREAK RANGE");
+        breakableInRange = breakable;
     }
 
+    // כשמשהו יוצא מהטווח
     void OnTriggerExit2D(Collider2D other)
     {
-        Transform wall = other.transform.parent;
-        if (wall == null) return;
+        IBreakable breakable = other.GetComponentInParent<IBreakable>();
+        if (breakable == null) return;
 
-        if (breakableInRange != null && wall.gameObject == breakableInRange)
-        {
-            Debug.Log("OUT OF BREAK RANGE: " + wall.gameObject.name);
+        if (breakableInRange == breakable)
             breakableInRange = null;
-        }
     }
 
-    // VFX לפי מיקום
-    void SpawnVfxAt(Vector3 spawnPos)
+    // חיפוש סטאמינה לפי סוג
+    Stamina GetStaminaFrom(Transform root, Stamina.StaminaType wantedType)
     {
-        if (breakVfxPrefab == null) return;
-
-        spawnPos.z = 0f;
-
-        ParticleSystem vfx = Instantiate(breakVfxPrefab, spawnPos, Quaternion.identity);
-        vfx.Play();
-        Destroy(vfx.gameObject, vfxDestroyAfter);
-    }
-
-    // שברים "אמיתיים" (GameObjects) לפי מיקום
-    void SpawnDebrisAt(Vector3 spawnPos)
-    {
-        if (debrisPiecePrefab == null) return;
-
-        spawnPos.z = 0f;
-
-        for (int i = 0; i < debrisCount; i++)
-        {
-            // פיזור קטן סביב נקודת השבירה
-            Vector3 offset = new Vector3(
-                Random.Range(-0.15f, 0.15f),
-                Random.Range(-0.15f, 0.15f),
-                0f
-            );
-
-            GameObject piece = Instantiate(debrisPiecePrefab, spawnPos + offset, Quaternion.identity);
-
-            // מוחקים אחרי זמן קצר כדי שלא יצטברו אובייקטים
-            Destroy(piece, debrisLifeTime);
-
-            Rigidbody2D rb2d = piece.GetComponent<Rigidbody2D>();
-            if (rb2d != null)
-            {
-                // כוח אקראי עם נטייה למעלה כדי שיראה כמו "פיצוץ"
-                Vector2 dir = new Vector2(
-                    Random.Range(-1f, 1f),
-                    Random.Range(0.3f, 1f)
-                ).normalized;
-
-                rb2d.AddForce(dir * debrisForce, ForceMode2D.Impulse);
-                rb2d.AddTorque(Random.Range(-debrisTorque, debrisTorque));
-            }
-        }
-    }
-
-    /// <summary>
-    /// מחפש על ה-Player סטאמינה לפי סוג (Joy / Rage)
-    /// </summary>
-    Stamina GetStamina(Stamina.StaminaType wantedType)
-    {
-        Stamina[] staminas = GetComponents<Stamina>();
-
+        Stamina[] staminas = root.GetComponents<Stamina>();
         foreach (Stamina s in staminas)
-        {
             if (s.type == wantedType)
                 return s;
-        }
 
         return null;
     }
