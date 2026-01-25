@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 8313243847825221586}
   - component: {fileID: 5402626475424855663}
   - component: {fileID: 3931972488457269586}
+  - component: {fileID: 7535260335561414566}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -42,6 +43,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6275265361961194248}
+  - {fileID: 448633301417979226}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &509243373899275100
@@ -215,13 +217,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   breakCost: 20
-  breakVfxPrefab: {fileID: 8880641151752846562, guid: 2547654629af135448bffd7889426cb4, type: 3}
-  vfxDestroyAfter: 1.5
-  debrisPiecePrefab: {fileID: 8693446288054368926, guid: 69eac51b2b85f3e4faa91946f5df1ae7, type: 3}
-  debrisCount: 12
-  debrisForce: 4
-  debrisTorque: 200
-  debrisLifeTime: 3
 --- !u!114 &1329398633019877157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,6 +343,100 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashOnHit
   flashDuration: 0.12
+--- !u!114 &7535260335561414566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71290161b89836e4887c1478cbb726f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHurtLock
+--- !u!1 &4026276499801630156
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 448633301417979226}
+  - component: {fileID: 7138974822549434861}
+  - component: {fileID: 4474827179815135800}
+  m_Layer: 0
+  m_Name: BreakZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &448633301417979226
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026276499801630156}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5572963052459429787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &7138974822549434861
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026276499801630156}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 1
+--- !u!114 &4474827179815135800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026276499801630156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3572a2b0f20688d4ba766bb6966ca212, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreakOnTouch
+  breakCost: 20
 --- !u!1 &6054922102536520115
 GameObject:
   m_ObjectHideFlags: 0

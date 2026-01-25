@@ -14,16 +14,26 @@ public class PlayerNeutralMove : MonoBehaviour
     // קלט תנועה שמגיע מה־Input System (ציר X = שמאלה/ימינה)
     private Vector2 moveInput;
 
+    // רפרנס ל־HurtLock (נועל תנועה בזמן פגיעה)
+    private PlayerHurtLock hurtLock;
+
     // נקרא פעם אחת כשהאובייקט נטען
     void Awake()
     {
         // קבלת ה־Rigidbody2D שמחובר לשחקן
         rb = GetComponent<Rigidbody2D>();
+
+        // קבלת PlayerHurtLock אם קיים
+        hurtLock = GetComponent<PlayerHurtLock>();
     }
 
     // נקרא כל פריים
     void Update()
     {
+        // אם השחקן כרגע בפגיעה – לא מזיזים אותו
+        if (hurtLock != null && hurtLock.IsLocked)
+            return;
+
         // מזיז את השחקן ימינה/שמאלה לפי הקלט
         // שומר על המהירות האנכית (קפיצה/נפילה) ללא שינוי
         rb.linearVelocity = new Vector2(

@@ -35,6 +35,9 @@ public class PlayerJoyJump : MonoBehaviour
     // סטאמינה של שמחה בלבד (Joy)
     private Stamina joyStamina;
 
+    // נעילת פגיעה (כדי שהנוקבאק לא יידרס)
+    private PlayerHurtLock hurtLock;
+
     private bool jumpedFromGround = false; // האם כבר קפצנו מהרצפה (לחיצה ראשונה)
     private bool glideEnabled = false;     // האם ריחוף פעיל כרגע
 
@@ -56,10 +59,23 @@ public class PlayerJoyJump : MonoBehaviour
         rb.gravityScale = normalGravity;
 
         joyStamina = GetStamina(Stamina.StaminaType.Joy);
+
+        // מקבלים HurtLock אם קיים על השחקן
+        hurtLock = GetComponent<PlayerHurtLock>();
     }
 
     void Update()
     {
+        // אם השחקן כרגע בפגיעה – לא נוגעים בתנועה/קפיצה/ריחוף בפריים הזה
+        // (כדי שהנוקבאק מהאויב יעבוד ולא יידרס)
+        if (hurtLock != null && hurtLock.IsLocked)
+        {
+            // עדיין חשוב לאפס אירועי קלט כדי שלא "יישמרו" לפריים הבא
+            jumpPressedThisFrame = false;
+            jumpReleasedThisFrame = false;
+            return;
+        }
+
         // ---------- תנועה ----------
         float move = moveInput.x;
         rb.linearVelocity = new Vector2(move * moveSpeed, rb.linearVelocity.y);
