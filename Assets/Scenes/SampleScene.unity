@@ -788,6 +788,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3631281811761450487, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: currentStamina
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.025882721
@@ -829,12 +833,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: joyStamina
+      value: 
+      objectReference: {fileID: 1267686892}
+    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: joyJumpForce
       value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: normalGravity
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: glideCostPerSecond
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6551187896837843592, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: currentStamina
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8313243847825221586, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: sensor
@@ -1116,6 +1132,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e795ec891257c944587a14ceac28e952, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableSensor
+--- !u!114 &1267686892 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6551187896837843592, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+  m_PrefabInstance: {fileID: 1051897563}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1267686866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de133220ea07a5044900866822f899a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1648243931
 GameObject:
   m_ObjectHideFlags: 0
