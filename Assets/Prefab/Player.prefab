@@ -22,8 +22,6 @@ GameObject:
   - component: {fileID: 3931972488457269586}
   - component: {fileID: 7535260335561414566}
   - component: {fileID: 6310416760156584816}
-  - component: {fileID: 5712648648732734258}
-  - component: {fileID: 1575394697933259409}
   - component: {fileID: 8347113874450990963}
   m_Layer: 0
   m_Name: Player
@@ -298,11 +296,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1cc1576486cc11d46a780051592a072a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRageMove
+  m_EditorClassIdentifier: Assembly-CSharp::RageEmotionStrategy
   moveSpeed: 3
   breakCost: 20
   sensor: {fileID: 8347113874450990963}
@@ -356,37 +354,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe261f76c2d74084085a5d91e47ffd45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEmotionContext
-  neutralStrategyBehaviour: {fileID: 1575394697933259409}
+  neutralStrategyBehaviour: {fileID: 5402626475424855663}
   joyStrategyBehaviour: {fileID: 5949937731010101288}
-  rageStrategyBehaviour: {fileID: 5712648648732734258}
---- !u!114 &5712648648732734258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cc1576486cc11d46a780051592a072a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRageMove
-  moveSpeed: 6
-  breakCost: 20
-  sensor: {fileID: 8657491866610749284}
---- !u!114 &1575394697933259409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06edab8aabf3729469709d22ec962b47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NeutralEmotionStrategy
-  moveSpeed: 6
+  rageStrategyBehaviour: {fileID: 8313243847825221586}
 --- !u!114 &8347113874450990963
 MonoBehaviour:
   m_ObjectHideFlags: 0

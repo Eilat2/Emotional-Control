@@ -780,17 +780,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1329398633019877157, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: context
-      value: 
-      objectReference: {fileID: 1267686884}
     - target: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3631281811761450487, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: currentStamina
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.x
@@ -832,51 +824,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: joyStamina
-      value: 
-      objectReference: {fileID: 1267686892}
-    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: joyJumpForce
-      value: 18
-      objectReference: {fileID: 0}
-    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: normalGravity
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: glideCostPerSecond
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6551187896837843592, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: currentStamina
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8313243847825221586, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      propertyPath: sensor
-      value: 
-      objectReference: {fileID: 1267686885}
-    m_RemovedComponents:
-    - {fileID: 4474827179815135800, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-    - {fileID: 2905544979865125752, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1267686884}
-    - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1267686883}
-    - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1267686882}
-    - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1267686885}
-    - targetCorrespondingSourceObject: {fileID: 4026276499801630156, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1893579625}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
 --- !u!1 &1061532803
 GameObject:
@@ -1066,83 +1017,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
   m_PrefabInstance: {fileID: 1051897563}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1267686875 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-  m_PrefabInstance: {fileID: 1051897563}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53d8cca46c04b484f929b1eef9de8b92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1267686882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06edab8aabf3729469709d22ec962b47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NeutralEmotionStrategy
-  moveSpeed: 6
---- !u!114 &1267686883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cc1576486cc11d46a780051592a072a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRageMove
-  moveSpeed: 6
-  breakCost: 20
-  sensor: {fileID: 1893579625}
---- !u!114 &1267686884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe261f76c2d74084085a5d91e47ffd45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerEmotionContext
-  neutralStrategyBehaviour: {fileID: 1267686882}
-  joyStrategyBehaviour: {fileID: 1267686875}
-  rageStrategyBehaviour: {fileID: 1267686883}
---- !u!114 &1267686885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e795ec891257c944587a14ceac28e952, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreakableSensor
---- !u!114 &1267686892 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6551187896837843592, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-  m_PrefabInstance: {fileID: 1051897563}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267686866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de133220ea07a5044900866822f899a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1648243931
 GameObject:
   m_ObjectHideFlags: 0
@@ -1321,23 +1195,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1893579621 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4026276499801630156, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
-  m_PrefabInstance: {fileID: 1051897563}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1893579625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893579621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e795ec891257c944587a14ceac28e952, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreakableSensor
 --- !u!1001 &2111896879
 PrefabInstance:
   m_ObjectHideFlags: 0
