@@ -25,18 +25,27 @@ public class PlayerEmotionContext : MonoBehaviour
 
     void Awake()
     {
-        // ממירים את ה-MonoBehaviour ל-interface
         neutralStrategy = neutralStrategyBehaviour as IEmotionStrategy;
         joyStrategy = joyStrategyBehaviour as IEmotionStrategy;
         rageStrategy = rageStrategyBehaviour as IEmotionStrategy;
 
-        // אם אחת ההמרות נכשלה - זה אומר שגררת קומפוננטה שלא מממשת IEmotionStrategy
         if (neutralStrategy == null || joyStrategy == null || rageStrategy == null)
         {
-            Debug.LogError("PlayerEmotionContext: אחד ה-Strategies לא מממש IEmotionStrategy. בדקי מה גררת בשדות.");
+            Debug.LogError("PlayerEmotionContext: אחד ה-Strategies לא מממש IEmotionStrategy או לא שוייך באינספקטור. בדקי מה גררת בשדות.");
         }
     }
 
+    void Start()
+    {
+        // כדי שלא נישאר עם currentStrategy = null בתחילת משחק
+        // (EmotionController אמור לקרוא SetEmotion, אבל זה ביטוח)
+        if (currentStrategy == null)
+        {
+            SetEmotion(EmotionController.Emotion.Neutral);
+        }
+    }
+
+    // Update = קלט/אירועים של פריים (לא פיזיקה)
     void Update()
     {
         if (currentStrategy == null) return;
@@ -47,22 +56,26 @@ public class PlayerEmotionContext : MonoBehaviour
         // מעבירים מצב Space (לחיצה/החזקה/שחרור)
         currentStrategy.HandleJumpBreak(jumpHeld, pressedThisFrame, releasedThisFrame);
 
-        // Tick של האסטרטגיה (פיזיקה/לוגיקה)
-        currentStrategy.Tick();
-
         // חשוב: pressed/released צריכים להיות true רק פריים אחד
         pressedThisFrame = false;
         releasedThisFrame = false;
     }
 
+    // FixedUpdate = פיזיקה (תנועה עם Rigidbody2D)
+    void FixedUpdate()
+    {
+        if (currentStrategy == null) return;
+
+        // Tick של האסטרטגיה (פיזיקה/תנועה)
+        currentStrategy.Tick();
+    }
+
     // ---------- Input System (Send Messages) ----------
-    // חייב להיקרא OnMove כי ה-Action נקרא "Move"
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
     }
 
-    // חייב להיקרא OnJump_Break כי ה-Action נקרא "Jump_Break"
     public void OnJump_Break(InputValue value)
     {
         bool pressed = value.isPressed;
@@ -87,6 +100,12 @@ public class PlayerEmotionContext : MonoBehaviour
             e == EmotionController.Emotion.Joy ? joyStrategy :
             e == EmotionController.Emotion.Rage ? rageStrategy :
                                                   neutralStrategy;
+
+        if (next == null)
+        {
+            Debug.LogError("PlayerEmotionContext: next strategy יצא null. בדקי ששייכת את ה-Behaviour בשדות באינספקטור.");
+            return;
+        }
 
         if (next == currentStrategy) return;
 

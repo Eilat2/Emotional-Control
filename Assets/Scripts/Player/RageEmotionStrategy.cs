@@ -1,21 +1,22 @@
 using UnityEngine;
 
-// ΰρθψθβιδ ωμ ξφα Rage:
-// - ϊπεςδ ιξιπδ/ωξΰμδ
-// - Space (Jump_Break) = ωαιψδ ΰν ιω ΰεαιιχθ ωαιψ αθεεη (BreakableSensor)
-// - ωαιψδ ςεμδ ρθΰξιπδ ωμ Rage αμαγ
+// ΧΧ΅ΧΧ¨ΧΧ’Χ™Χ” Χ©Χ ΧΧ¦Χ‘ Rage:
+// - ΧªΧ Χ•ΧΆΧ” Χ™ΧΧ™Χ Χ”/Χ©ΧΧΧΧ”
+// - Space (Jump_Break) = Χ©Χ‘Χ™Χ¨Χ” ΧΧ Χ™Χ© ΧΧ•Χ‘Χ™Χ™Χ§Χ Χ©Χ‘Χ™Χ¨ Χ‘ΧΧ•Χ•Χ— (BreakableSensor)
+// - Χ©Χ‘Χ™Χ¨Χ” ΧΧ•Χ¨Χ™Χ“Χ” Χ΅ΧΧΧΧ™Χ Χ” Χ©Χ Rage Χ‘ΧΧ‘Χ“
 public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
-    [SerializeField] float moveSpeed = 6f;
+    [Header("Movement")]
+    [SerializeField] float moveSpeed = 3f;   // ΧΧ”Χ™Χ¨Χ•Χª ΧªΧ Χ•ΧΆΧ” Χ©Χ Rage (ΧªΧ©Χ Χ™ Χ‘ΧΧ™Χ Χ΅Χ¤Χ§ΧΧ•Χ¨ ΧΧ Χ¦Χ¨Χ™Χ)
 
     [Header("Break")]
-    [SerializeField] float breakCost = 20f;         // λξδ ρθΰξιπδ ιεψγϊ ςμ ωαιψδ
-    [SerializeField] BreakableSensor sensor;        // μβψεψ ΰϊ BreakZone (child) ωιω ςμιε BreakableSensor
+    [SerializeField] float breakCost = 20f;  // Χ›ΧΧ” Χ΅ΧΧΧΧ™Χ Χ” Χ™Χ•Χ¨Χ“Χª ΧΆΧ Χ©Χ‘Χ™Χ¨Χ”
+    [SerializeField] BreakableSensor sensor; // ΧΧ’Χ¨Χ•Χ¨ ΧΧ›ΧΧ ΧΧª BreakZone (Χ”Χ™ΧΧ“) Χ©Χ™Χ© ΧΆΧΧ™Χ• BreakableSensor
 
-    private Rigidbody2D rb;                         // τιζιχδ ωμ δωηχο
-    private PlayerHurtLock hurtLock;                // πςιμϊ τβιςδ
-    private Stamina rageStamina;                    // ρθΰξιπδ ωμ Rage αμαγ
-    private Vector2 moveInput;                      // χμθ ϊπεςδ ξδ-Context
+    private Rigidbody2D rb;                  // Χ¤Χ™Χ–Χ™Χ§Χ” Χ©Χ Χ”Χ©Χ—Χ§Χ
+    private PlayerHurtLock hurtLock;         // Χ ΧΆΧ™ΧΧª Χ¤Χ’Χ™ΧΆΧ” (Knockback)
+    private Stamina rageStamina;             // Χ΅ΧΧΧΧ™Χ Χ” Χ©Χ Rage Χ‘ΧΧ‘Χ“
+    private Vector2 moveInput;               // Χ§ΧΧ ΧªΧ Χ•ΧΆΧ” ΧΧ”-Context
 
     void Awake()
     {
@@ -25,65 +26,69 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     void Start()
     {
-        // ξεφΰιν ρθΰξιπδ μτι ρεβ Rage (ιω μκ 2 χεξτεππθεϊ Stamina ςμ δωηχο)
+        // ΧΧ•Χ¦ΧΧ™Χ ΧΧª Χ§Χ•ΧΧ¤Χ•Χ Χ ΧΧª Χ”Χ΅ΧΧΧΧ™Χ Χ” ΧΧ΅Χ•Χ’ Rage (Χ™Χ© ΧΧ Χ©ΧªΧ™ Χ§Χ•ΧΧ¤Χ•Χ Χ ΧΧ•Χª Stamina ΧΆΧ Χ”Χ©Χ—Χ§Χ)
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
     }
 
     public void Enter()
     {
-        // ΰιο ξωδε ξιεηγ λψβς
+        // Χ Χ§Χ¨Χ Χ›Χ©Χ Χ›Χ Χ΅Χ™Χ ΧΧ¨Χ’Χ© (Χ›Χ¨Χ’ΧΆ ΧΧ™Χ ΧΧ©Χ”Χ• ΧΧ™Χ•Χ—Χ“)
     }
 
     public void Exit()
     {
-        // ΰιο ξωδε ξιεηγ λψβς
+        // Χ›Χ©Χ™Χ•Χ¦ΧΧ™Χ ΧΧ”Χ¨Χ’Χ© - ΧΧΧ¤Χ΅Χ™Χ ΧΧ”Χ™Χ¨Χ•Χª ΧΧ•Χ¤Χ§Χ™Χª Χ›Χ“Χ™ Χ©ΧΧ "Χ™Χ΅Χ—Χ‘" ΧªΧ Χ•ΧΆΧ” ΧΧ¨Χ’Χ© Χ”Χ‘Χ
+        if (rb != null)
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
-    // χαμϊ ϊπεςδ ξδ-Context
+    // Χ§Χ‘ΧΧª ΧªΧ Χ•ΧΆΧ” ΧΧ”-Context
     public void HandleMove(Vector2 move)
     {
         moveInput = move;
     }
 
     /*
-     * χαμϊ Jump_Break ξδ-Context:
-     * ηωεα: ΰπηπε ψεφιν μαφς ωαιψδ ψχ ςμ "μηιφδ" (pressedThisFrame),
-     * εμΰ λμ ςεγ ξηζιχιν ΰϊ δλτϊεψ (isHeld), λγι ωμΰ ιωαεψ 100 τςξιν.
+     * Χ§Χ‘ΧΧª Jump_Break ΧΧ”-Context:
+     * ΧΧ Χ—Χ Χ• Χ©Χ•Χ‘Χ¨Χ™Χ Χ¨Χ§ ΧΆΧ ΧΧ—Χ™Χ¦Χ” (pressedThisFrame) Χ•ΧΧ ΧΆΧ Χ”Χ—Χ–Χ§Χ”,
+     * Χ›Χ“Χ™ Χ©ΧΧ Χ™Χ©Χ‘Χ•Χ¨ ΧΧΧ Χ¤ΧΆΧΧ™Χ Χ‘Χ¨Χ¦Χ£.
      */
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        // ΰν μΰ πμηυ ςλωιε (Down) - μΰ ςεωιν λμεν
         if (!pressedThisFrame)
             return;
 
-        // ΰν δωηχο απεχαΰχ - μΰ ξαφςιν ωαιψδ
+        // ΧΧ Χ”Χ©Χ—Χ§Χ Χ‘Χ Χ•Χ§Χ‘ΧΧ§ - ΧΧ ΧΧ‘Χ¦ΧΆΧ™Χ Χ©Χ‘Χ™Χ¨Χ”
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // ΰν ΰιο ρπρεψ ΰε ΰιο ξωδε ωαιψ αθεεη - ΰιο ξδ μωαεψ
+        // ΧΧ ΧΧ™Χ Χ΅Χ Χ΅Χ•Χ¨ ΧΧ• ΧΧ™Χ ΧΧ•Χ‘Χ™Χ™Χ§Χ Χ©Χ‘Χ™Χ¨ Χ‘ΧΧ•Χ•Χ— - ΧΧ™Χ ΧΧ” ΧΧ©Χ‘Χ•Χ¨
         if (sensor == null || sensor.current == null)
             return;
 
-        // ΰν ΰιο ξρτιχ ρθΰξιπδ - μΰ ξαφςιν
+        // ΧΧ ΧΧ™Χ ΧΧ΅Χ¤Χ™Χ§ Χ΅ΧΧΧΧ™Χ Χ” - ΧΧ ΧΧ‘Χ¦ΧΆΧ™Χ Χ©Χ‘Χ™Χ¨Χ”
         if (rageStamina != null && !rageStamina.Use(breakCost))
             return;
 
-        // ξαφςιν ωαιψδ: ΰεξψιν μΰεαιιχθ δωαιψ μθτμ αςφξε
+        // ΧΧ‘Χ¦ΧΆΧ™Χ Χ©Χ‘Χ™Χ¨Χ”
         sensor.current.OnBreak();
     }
 
-    // Tick πχψΰ λμ τψιιν λωδΰρθψθβιδ τςιμδ
+    // Tick Χ¨Χ¥ Χ‘-FixedUpdate Χ“Χ¨Χ PlayerEmotionContext (ΧΧ—Χ¨Χ™ Χ”ΧªΧ™Χ§Χ•Χ Χ©ΧΆΧ©Χ™Χ Χ• Χ©Χ)
     public void Tick()
     {
-        // ΰν δωηχο ατβιςδ - μΰ ξζιζιν λγι μΰ μγψερ πεχαΰχ
+        // ΧΧ Χ”Χ©Χ—Χ§Χ Χ‘Χ¤Χ’Χ™ΧΆΧ” - ΧΧ ΧΧ–Χ™Χ–Χ™Χ Χ›Χ“Χ™ ΧΧ ΧΧ“Χ¨Χ•Χ΅ Χ Χ•Χ§Χ‘ΧΧ§
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // ϊπεςδ ΰετχιϊ
-        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
+        // Χ§ΧΧ ΧΧ•Χ¤Χ§Χ™ ΧΧΧ•Χ¨ ΧΧ”Χ™Χ•Χª Χ‘ΧΧ•Χ•Χ— -1..1 (Χ™ΧΧ™Χ Χ”/Χ©ΧΧΧΧ”)
+        float x = Mathf.Clamp(moveInput.x, -1f, 1f);
+
+        // ΧªΧ Χ•ΧΆΧ” ΧΧ•Χ¤Χ§Χ™Χª ΧΧ¤Χ™ ΧΧ”Χ™Χ¨Χ•Χª Rage
+        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
     }
 
-    // ηιτεω χεξτεππθϊ ρθΰξιπδ μτι ρεβ (Joy / Rage)
+    // Χ—Χ™Χ¤Χ•Χ© Χ§Χ•ΧΧ¤Χ•Χ Χ ΧΧª Χ΅ΧΧΧΧ™Χ Χ” ΧΧ¤Χ™ Χ΅Χ•Χ’ (Joy / Rage)
     Stamina GetStamina(Stamina.StaminaType wantedType)
     {
         Stamina[] staminas = GetComponents<Stamina>();
