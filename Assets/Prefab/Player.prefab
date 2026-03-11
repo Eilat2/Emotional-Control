@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 8213838363953559434}
   - component: {fileID: 3126607631450794264}
   - component: {fileID: 5949937731010101288}
-  - component: {fileID: 2905544979865125752}
   - component: {fileID: 1329398633019877157}
   - component: {fileID: 6551187896837843592}
   - component: {fileID: 3631281811761450487}
@@ -22,6 +21,8 @@ GameObject:
   - component: {fileID: 5402626475424855663}
   - component: {fileID: 3931972488457269586}
   - component: {fileID: 7535260335561414566}
+  - component: {fileID: 6310416760156584816}
+  - component: {fileID: 8347113874450990963}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -191,32 +192,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 6
-  normalJumpForce: 12
   joyJumpForce: 18
-  joyActive: 1
-  joyToggleMode: 1
   normalGravity: 6
   glideGravity: 0.2
-  glideCostPerSecond: 15
   floatUpImpulse: 8
+  glideCostPerSecond: 4
   groundCheck: {fileID: 6275265361961194248}
   groundRadius: 0.15
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
---- !u!114 &2905544979865125752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3572a2b0f20688d4ba766bb6966ca212, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  breakCost: 20
+  holdGraceSeconds: 0.1
+  debugLogs: 0
+  joyStamina: {fileID: 6551187896837843592}
 --- !u!114 &1329398633019877157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,10 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   current: 0
-  neutralMovement: {fileID: 5402626475424855663}
-  joyMovement: {fileID: 5949937731010101288}
-  rageMovement: {fileID: 8313243847825221586}
-  rageBreak: {fileID: 2905544979865125752}
+  context: {fileID: 6310416760156584816}
   playerRenderer: {fileID: 0}
   neutralColor: {r: 1, g: 1, b: 1, a: 1}
   joyColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
@@ -311,12 +296,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1cc1576486cc11d46a780051592a072a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRageMove
-  moveSpeed: 6
+  m_EditorClassIdentifier: Assembly-CSharp::RageEmotionStrategy
+  moveSpeed: 3
+  breakCost: 20
+  sensor: {fileID: 8347113874450990963}
 --- !u!114 &5402626475424855663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,6 +342,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71290161b89836e4887c1478cbb726f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHurtLock
+--- !u!114 &6310416760156584816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe261f76c2d74084085a5d91e47ffd45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEmotionContext
+  neutralStrategyBehaviour: {fileID: 5402626475424855663}
+  joyStrategyBehaviour: {fileID: 5949937731010101288}
+  rageStrategyBehaviour: {fileID: 8313243847825221586}
+--- !u!114 &8347113874450990963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e795ec891257c944587a14ceac28e952, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreakableSensor
 --- !u!1 &4026276499801630156
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +379,7 @@ GameObject:
   m_Component:
   - component: {fileID: 448633301417979226}
   - component: {fileID: 7138974822549434861}
-  - component: {fileID: 4474827179815135800}
+  - component: {fileID: 8657491866610749284}
   m_Layer: 0
   m_Name: BreakZone
   m_TagString: Untagged
@@ -424,7 +438,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 1
---- !u!114 &4474827179815135800
+--- !u!114 &8657491866610749284
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -433,10 +447,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4026276499801630156}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3572a2b0f20688d4ba766bb6966ca212, type: 3}
+  m_Script: {fileID: 11500000, guid: e795ec891257c944587a14ceac28e952, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreakOnTouch
-  breakCost: 20
+  m_EditorClassIdentifier: Assembly-CSharp::BreakableSensor
 --- !u!1 &6054922102536520115
 GameObject:
   m_ObjectHideFlags: 0
