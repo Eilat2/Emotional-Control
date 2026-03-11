@@ -13,7 +13,7 @@ public class EmotionController : MonoBehaviour
     // תנועה בסיסית שתעבוד רק במצב Neutral
     [Header("Neutral scripts")]
     [SerializeField] MonoBehaviour neutralMovement;
-
+    
     // ---------- סקריפטים של שמחה ----------
     // הסקריפט הזה יעבוד רק במצב Joy
     [Header("Joy scripts")]
