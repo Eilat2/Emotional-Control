@@ -29,12 +29,14 @@ public class EmotionController : MonoBehaviour
     // ---------- חלק ויזואלי ----------
     [Header("Visual")]
 
-    // הרנדרר של הדמות כדי שנוכל לשנות את הצבע שלה לפי הרגש
+    // אם עדיין יש SpriteRenderer על ה-Player הראשי
     [SerializeField] SpriteRenderer playerRenderer;
 
     // הקומפוננטה שמנהלת את הרגש של הדמות במערכת המשחק
-    // הוספנו אותה כדי למנוע את השגיאה ש-context לא קיים
     [SerializeField] PlayerEmotionContext context;
+
+    // הסקריפט שמחליף בין שלושת הוויזואלים של הדמות
+    [SerializeField] PlayerVisualSwitcher visualSwitcher;
 
     // צבעים שונים לכל רגש
     public Color neutralColor = Color.white;
@@ -50,6 +52,10 @@ public class EmotionController : MonoBehaviour
         // אם לא חיברנו את PlayerEmotionContext,
         // Unity ינסה למצוא אותו על אותו אובייקט
         if (!context) context = GetComponent<PlayerEmotionContext>();
+
+        // אם לא חיברנו את PlayerVisualSwitcher,
+        // Unity ינסה למצוא אותו על אותו אובייקט
+        if (!visualSwitcher) visualSwitcher = GetComponent<PlayerVisualSwitcher>();
 
         // מפעיל את הרגש ההתחלתי של הדמות
         ApplyInitial(current);
@@ -71,7 +77,7 @@ public class EmotionController : MonoBehaviour
         // מעדכן את מערכת הרגשות במשחק
         context?.SetEmotion(e);
 
-        // משנה את הצבע של הדמות לפי הרגש החדש
+        // משנה את הוויזואל של הדמות לפי הרגש החדש
         ApplyVisual(e);
     }
 
@@ -83,13 +89,26 @@ public class EmotionController : MonoBehaviour
         // מעדכן את מערכת הרגשות
         context?.SetEmotion(e);
 
-        // משנה את הצבע של הדמות
+        // משנה את הוויזואל של הדמות
         ApplyVisual(e);
     }
 
-    // פונקציה שמעדכנת את הצבע של הדמות לפי הרגש
+    // פונקציה שמעדכנת את הוויזואל של הדמות לפי הרגש
     void ApplyVisual(Emotion e)
     {
+        // קודם כל מחליפים את הדמות המוצגת
+        if (visualSwitcher != null)
+        {
+            if (e == Emotion.Joy)
+                visualSwitcher.ShowJoy();
+            else if (e == Emotion.Rage)
+                visualSwitcher.ShowRage();
+            else
+                visualSwitcher.ShowNeutral();
+        }
+
+        // אופציונלי: אם עדיין יש SpriteRenderer על ה-Player הראשי,
+        // נשנה גם את הצבע שלו
         if (!playerRenderer) return;
 
         if (e == Emotion.Joy)
