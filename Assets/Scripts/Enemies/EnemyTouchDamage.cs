@@ -67,13 +67,20 @@ public class EnemyTouchDamage : MonoBehaviour
         // סטומפ (בעיקר למעופף) – למשוריין בדרך כלל false
         if (ignoreIfPlayerStompsFromAbove)
         {
-            float playerBottomY = collision.collider.bounds.min.y;
-            float enemyTopY = myCol.bounds.max.y;
+            bool stompedFromAbove = false;
 
-            bool cameFromAbove = playerBottomY >= enemyTopY - stompTolerance;
-            bool fallingOrNotRising = rb.linearVelocity.y <= 0.5f;
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                // אם הנורמל מצביע כלפי מטה על האויב,
+                // זה אומר שהשחקן פגע בו מלמעלה
+                if (contact.normal.y < -0.5f && rb.linearVelocity.y <= 0.5f)
+                {
+                    stompedFromAbove = true;
+                    break;
+                }
+            }
 
-            if (cameFromAbove && fallingOrNotRising)
+            if (stompedFromAbove)
                 return;
         }
 
