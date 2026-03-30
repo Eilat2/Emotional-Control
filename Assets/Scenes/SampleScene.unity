@@ -764,11 +764,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.025882721
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.04850185
+      value: -1.1
       objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.z
@@ -995,6 +995,23 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
   m_PrefabInstance: {fileID: 1051897563}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1560031585 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8939766553357662217, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+  m_PrefabInstance: {fileID: 4347756007190191981}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1560031593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1560031585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891561123276a4442a711aea961f149e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitShake
 --- !u!1 &1648243931
 GameObject:
   m_ObjectHideFlags: 0
@@ -1183,11 +1200,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.94
+      value: 3.91
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1374
+      value: -0.2842
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1435,11 +1452,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3872511016602075821, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 3872511016602075821, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.5
+      value: -0.6
       objectReference: {fileID: 0}
     - target: {fileID: 3872511016602075821, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1473,10 +1490,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7900316194195270962, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
-      propertyPath: ignoreIfPlayerStompsFromAbove
-      value: 0
-      objectReference: {fileID: 0}
+    - target: {fileID: 5981287727614979036, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+      propertyPath: debrisPrefab
+      value: 
+      objectReference: {fileID: 8693446288054368926, guid: d27ca809e659fb04283212aed3b82d0e, type: 3}
     - target: {fileID: 8939766553357662217, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: m_Name
       value: Enemy_Armored
@@ -1484,7 +1501,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8939766553357662217, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1560031593}
   m_SourcePrefab: {fileID: 100100000, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

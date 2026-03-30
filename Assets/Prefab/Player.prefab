@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1904481927904618791}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 6310416760156584816}
   - component: {fileID: 8347113874450990963}
   - component: {fileID: 8808242607467473821}
+  - component: {fileID: 4312077350362799660}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -132,7 +133,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -25, y: -13, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6275265361961194248}
@@ -235,7 +236,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 2.039815, y: 1.2041202}
+  m_Offset: {x: 0.025779009, y: 0.051558137}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -245,7 +246,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.459879, y: 3.4082403}
+  m_Size: {x: 2.5467458, y: 3.0311635}
   m_EdgeRadius: 0
 --- !u!50 &3126607631450794264
 Rigidbody2D:
@@ -403,7 +404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RageEmotionStrategy
   moveSpeed: 3
   breakCost: 20
-  sensor: {fileID: 8347113874450990963}
+  sensor: {fileID: 8657491866610749284}
 --- !u!114 &5402626475424855663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,6 +485,28 @@ MonoBehaviour:
   neutralVisual: {fileID: 8878236238191029557}
   joyVisual: {fileID: 4040764713569367810}
   rageVisual: {fileID: 1904481927904618791}
+--- !u!114 &4312077350362799660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc1b97b30f17d5044bccdd9c8bd1bb36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHitFeedback
+  neutralRenderer: {fileID: 2858727818404033992}
+  joyRenderer: {fileID: 8983909835394641621}
+  rageRenderer: {fileID: 5361198439502625577}
+  blinkStepDuration: 0.06
+  blinkCount: 2
+  squashScale: 0.85
+  emotionController: {fileID: 1329398633019877157}
+  neutralVisual: {fileID: 5368841696831007773}
+  joyVisual: {fileID: 6573042402555808807}
+  rageVisual: {fileID: 1103168689899035246}
 --- !u!1 &4026276499801630156
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,8 +574,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 1
+  m_Offset: {x: 0.03386855, y: -0.006773591}
+  m_Radius: 1.6773684
 --- !u!114 &8657491866610749284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -591,7 +614,7 @@ Transform:
   m_GameObject: {fileID: 4040764713569367810}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1.6, z: 0}
+  m_LocalPosition: {x: 0, y: -1.6, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -681,7 +704,7 @@ Transform:
   m_GameObject: {fileID: 6054922102536520115}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.55, z: 0}
+  m_LocalPosition: {x: 0, y: -1.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -713,7 +736,7 @@ Transform:
   m_GameObject: {fileID: 8878236238191029557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

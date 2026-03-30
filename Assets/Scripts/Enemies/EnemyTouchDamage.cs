@@ -93,6 +93,11 @@ public class EnemyTouchDamage : MonoBehaviour
         if (hurt != null)
             hurt.TriggerHit(hurtLockTime, invincibleTime);
 
+        // פידבק חזותי על השחקן שנפגע
+        PlayerHitFeedback feedback = collision.gameObject.GetComponent<PlayerHitFeedback>();
+        if (feedback != null)
+            feedback.PlayHitFeedback();
+
         // תגובת פגיעה
         if (emotion.current == EmotionController.Emotion.Rage)
         {
@@ -137,7 +142,6 @@ public class EnemyTouchDamage : MonoBehaviour
     {
         float dir = (playerTf.position.x < transform.position.x) ? -1f : 1f;
 
-        // כופים מהירות מורגשת (לא "מקס" קטן)
         rb.linearVelocity = new Vector2(dir * x, y);
     }
 
