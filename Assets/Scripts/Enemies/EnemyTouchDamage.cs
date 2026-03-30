@@ -73,7 +73,7 @@ public class EnemyTouchDamage : MonoBehaviour
             {
                 // אם הנורמל מצביע כלפי מטה על האויב,
                 // זה אומר שהשחקן פגע בו מלמעלה
-                if (contact.normal.y < -0.5f && rb.linearVelocity.y <= 0.5f)
+               if (contact.normal.y < -0.5f && rb.linearVelocity.y <= 0.5f)
                 {
                     stompedFromAbove = true;
                     break;
