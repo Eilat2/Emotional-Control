@@ -34,8 +34,8 @@ public class EnemyTouchDamage : MonoBehaviour
     [SerializeField] float joyPushBackX = 0f;
 
     [Header("Ignore Stomp From Above (optional)")]
-    [SerializeField] bool ignoreIfPlayerStompsFromAbove = false; // למשוריין: עדיף false
-    [SerializeField] float stompTolerance = 0.02f;
+    [SerializeField] bool ignoreIfPlayerStompsFromAbove = false; // במעופף: true, במשוריין: false
+    [SerializeField] float stompTolerance = 0.5f; // כמה הפגיעה צריכה להיות "מלמעלה" כדי להיחשב דריכה
 
     float nextHitTime = 0f;
     Collider2D myCol;
@@ -64,7 +64,7 @@ public class EnemyTouchDamage : MonoBehaviour
         PlayerHurtLock hurt = collision.gameObject.GetComponent<PlayerHurtLock>();
         if (hurt != null && hurt.IsInvincible) return;
 
-        // סטומפ (בעיקר למעופף) – למשוריין בדרך כלל false
+        // אם מדובר באויב מעופף, ורוצים לא להתייחס לפגיעה מלמעלה כנזק לשחקן
         if (ignoreIfPlayerStompsFromAbove)
         {
             bool stompedFromAbove = false;
@@ -72,14 +72,16 @@ public class EnemyTouchDamage : MonoBehaviour
             foreach (ContactPoint2D contact in collision.contacts)
             {
                 // אם הנורמל מצביע כלפי מטה על האויב,
-                // זה אומר שהשחקן פגע בו מלמעלה
-               if (contact.normal.y < -0.5f && rb.linearVelocity.y <= 0.5f)
+                // והשחקן בתנועה כלפי מטה/לא עולה,
+                // זה נחשב דריכה מלמעלה
+                if (contact.normal.y < -stompTolerance && rb.linearVelocity.y <= 0f)
                 {
                     stompedFromAbove = true;
                     break;
                 }
             }
 
+            // אם זו דריכה מלמעלה - לא מפעילים נזק על השחקן
             if (stompedFromAbove)
                 return;
         }
@@ -98,7 +100,7 @@ public class EnemyTouchDamage : MonoBehaviour
         if (feedback != null)
             feedback.PlayHitFeedback();
 
-        // תגובת פגיעה
+        // תגובת פגיעה לפי רגש
         if (emotion.current == EmotionController.Emotion.Rage)
         {
             ApplyKnockback(rb, collision.transform, rageKnockbackX, rageKnockbackY);
@@ -112,7 +114,7 @@ public class EnemyTouchDamage : MonoBehaviour
         }
         else
         {
-            // Neutral – אפשר להחליט אחרת
+            // Neutral
             ApplyKnockback(rb, collision.transform, 8f, 4f);
         }
     }
@@ -137,17 +139,17 @@ public class EnemyTouchDamage : MonoBehaviour
         }
     }
 
-    // קפיצה אחורה מורגשת
     void ApplyKnockback(Rigidbody2D rb, Transform playerTf, float x, float y)
     {
+        // קובע לאיזה צד להעיף את השחקן ביחס למיקום האויב
         float dir = (playerTf.position.x < transform.position.x) ? -1f : 1f;
 
         rb.linearVelocity = new Vector2(dir * x, y);
     }
 
-    // בום למטה
     void ApplyJoySlamDown(Rigidbody2D rb, Transform playerTf)
     {
+        // דוחף מעט הצידה ומעיף חזק למטה
         float dir = (playerTf.position.x < transform.position.x) ? -1f : 1f;
 
         rb.linearVelocity = new Vector2(dir * joyPushBackX, -joySlamDownY);

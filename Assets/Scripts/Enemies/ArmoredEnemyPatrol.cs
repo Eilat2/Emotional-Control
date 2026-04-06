@@ -1,68 +1,55 @@
 using UnityEngine;
 
-// אויב משוריין – הולך ימינה/שמאלה בין שני גבולות X שנקבעים בתחילת המשחק
 public class ArmoredEnemyPatrol : MonoBehaviour
 {
-    [Header("נקודות סיור (אפשר גם להיות ילדים)")]
-    public Transform leftPoint;
-    public Transform rightPoint;
+    [Header("Patrol Points")]
+    [SerializeField] private Transform[] patrolPoints; // מערך של נקודות שהאויב יעבור ביניהן
 
-    [Header("תנועה")]
-    public float speed = 2f;
+    [Header("Movement")]
+    [SerializeField] private float speed = 2f; // מהירות תנועה
+    [SerializeField] private float reachDistance = 0.1f; // מרחק שממנו נחשב שהגענו לנקודה
 
     private Rigidbody2D rb;
-    private int dir = 1; // 1 = ימינה, -1 = שמאלה
-
-    // נשמור את הגבולות כערכים קבועים בעולם (כדי שלא "יברחו" אם הנקודות זזות)
-    private float leftX;
-    private float rightX;
+    private int currentPointIndex = 0; // אינדקס הנקודה הנוכחית
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // אם לא חיברו נקודות – אין מה לעשות
-        if (!leftPoint || !rightPoint)
+        // אם אין נקודות מסלול – לעצור את הסקריפט
+        if (patrolPoints == null || patrolPoints.Length == 0)
         {
-            Debug.LogError("ArmoredEnemyPatrol: לא חיברת leftPoint/rightPoint ב-Inspector");
+            Debug.LogError("No patrol points assigned!");
             enabled = false;
-            return;
-        }
-
-        // קיבוע הגבולות בתחילת המשחק
-        leftX = leftPoint.position.x;
-        rightX = rightPoint.position.x;
-
-        // לוודא שהשמאלי באמת קטן מהימני
-        if (leftX > rightX)
-        {
-            float tmp = leftX;
-            leftX = rightX;
-            rightX = tmp;
         }
     }
 
     void FixedUpdate()
     {
-        // תנועה אופקית
-        rb.linearVelocity = new Vector2(dir * speed, rb.linearVelocity.y);
+        Transform target = patrolPoints[currentPointIndex]; // היעד הנוכחי
 
-        // אם עברנו את הגבול הימני – הופכים שמאלה
-        if (dir == 1 && transform.position.x >= rightX)
-            Flip();
+        // חישוב כיוון תנועה (ימינה או שמאלה)
+        float direction = Mathf.Sign(target.position.x - transform.position.x);
 
-        // אם עברנו את הגבול השמאלי – הופכים ימינה
-        if (dir == -1 && transform.position.x <= leftX)
-            Flip();
+        // תנועה אופקית בלבד
+        rb.linearVelocity = new Vector2(direction * speed, rb.linearVelocity.y);
+
+        // להפוך את הדמות לפי כיוון ההליכה
+        Flip(direction);
+
+        // בדיקה אם הגענו לנקודה
+        if (Vector2.Distance(transform.position, target.position) < reachDistance)
+        {
+            // מעבר לנקודה הבאה במסלול (חוזר להתחלה בסוף)
+            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+        }
     }
 
-    private void Flip()
+    private void Flip(float direction)
     {
-        dir *= -1;
-
-        // להפוך את הספייט שיסתכל לכיוון ההליכה
+        // הופך את הספייט לפי כיוון התנועה
         Vector3 s = transform.localScale;
-        s.x = Mathf.Abs(s.x) * dir;
+        s.x = Mathf.Abs(s.x) * direction;
         transform.localScale = s;
     }
 }

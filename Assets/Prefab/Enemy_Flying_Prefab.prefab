@@ -1,67 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3369002434507636238
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5314072734318979372}
-  m_Layer: 8
-  m_Name: Armored_Left
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5314072734318979372
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3369002434507636238}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3097890382020697571}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4350908082040819978
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3969445422277991054}
-  m_Layer: 8
-  m_Name: Armored_Right
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3969445422277991054
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4350908082040819978}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3097890382020697571}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5213330765932311170
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,9 +35,7 @@ Transform:
   m_LocalPosition: {x: 9, y: 8, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3969445422277991054}
-  - {fileID: 5314072734318979372}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2192692443076179397
@@ -246,6 +182,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da9a56436515edf4f92535a9852303a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KillableEnemy
+  debrisPrefab: {fileID: 0}
+  debrisCount: 5
+  force: 4
+  torque: 4
 --- !u!114 &7115047470405517368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,8 +198,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3795b021f01625a498504cc25a411b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemyMovement
+  patrolPoints:
+  - {fileID: 0}
+  - {fileID: 0}
   speed: 2
-  moveDistance: 2
+  reachDistance: 0.1
 --- !u!114 &8685204949866716553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,4 +241,4 @@ MonoBehaviour:
   joySlamDownY: 12
   joyPushBackX: 2.5
   ignoreIfPlayerStompsFromAbove: 1
-  stompTolerance: 0.02
+  stompTolerance: 0.5

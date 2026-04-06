@@ -1,25 +1,35 @@
 using UnityEngine;
 
-// תנועה פשוטה של אויב מעופף: זז ימינה-שמאלה סביב נקודת ההתחלה
 public class FlyingEnemyMovement : MonoBehaviour
 {
-    [SerializeField] float speed = 2f;        // מהירות
-    [SerializeField] float moveDistance = 2f; // טווח לכל צד
+    [Header("Patrol Points")]
+    [SerializeField] private Transform[] patrolPoints; // נקודות מסלול (אפשר משולש / ריבוע וכו')
 
-    private Vector3 startPos;
-    private int dir = 1;
+    [Header("Movement")]
+    [SerializeField] private float speed = 2f; // מהירות תנועה
+    [SerializeField] private float reachDistance = 0.1f; // מרחק הגעה לנקודה
 
-    void Start()
-    {
-        startPos = transform.position;
-    }
+    private int currentPointIndex = 0; // אינדקס הנקודה הנוכחית
 
     void Update()
     {
-        transform.Translate(Vector2.right * dir * speed * Time.deltaTime);
+        // אם אין נקודות – לא עושים כלום
+        if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-        float dx = transform.position.x - startPos.x;
-        if (Mathf.Abs(dx) >= moveDistance)
-            dir *= -1;
+        Transform target = patrolPoints[currentPointIndex]; // היעד הבא
+
+        // תנועה חלקה לנקודה
+        transform.position = Vector2.MoveTowards(
+            transform.position,
+            target.position,
+            speed * Time.deltaTime
+        );
+
+        // בדיקה אם הגענו לנקודה
+        if (Vector2.Distance(transform.position, target.position) < reachDistance)
+        {
+            // מעבר לנקודה הבאה
+            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+        }
     }
 }
