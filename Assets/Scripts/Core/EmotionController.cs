@@ -118,4 +118,16 @@ public class EmotionController : MonoBehaviour
         else
             playerRenderer.color = neutralColor;
     }
+    public EmotionType GetCurrentEmotion()
+    {
+        switch (current)
+        {
+            case Emotion.Joy:
+                return EmotionType.Joy;
+            case Emotion.Rage:
+                return EmotionType.Rage;
+            default:
+                return EmotionType.Neutral;
+        }
+    }
 }
