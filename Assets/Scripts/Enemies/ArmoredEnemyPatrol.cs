@@ -3,20 +3,25 @@ using UnityEngine;
 public class ArmoredEnemyPatrol : MonoBehaviour
 {
     [Header("Patrol Points")]
-    [SerializeField] private Transform[] patrolPoints; // מערך של נקודות שהאויב יעבור ביניהן
+    [SerializeField] private Transform[] patrolPoints;
+    // מערך של נקודות שהאויב ילך ביניהן
 
     [Header("Movement")]
-    [SerializeField] private float speed = 2f; // מהירות תנועה
-    [SerializeField] private float reachDistance = 0.1f; // מרחק שממנו נחשב שהגענו לנקודה
+    [SerializeField] private float speed = 2f;
+    // מהירות התנועה של האויב
+
+    [SerializeField] private float reachDistance = 0.2f;
+    // מרחק שממנו נחשב שהאויב "הגיע" לנקודה (לא חייב להיות בדיוק עליה)
 
     private Rigidbody2D rb;
-    private int currentPointIndex = 0; // אינדקס הנקודה הנוכחית
+    private int currentPointIndex = 0;
+    // אינדקס הנקודה הנוכחית במערך
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // אם אין נקודות מסלול – לעצור את הסקריפט
+        // אם אין נקודות – לעצור את הסקריפט ולתת שגיאה
         if (patrolPoints == null || patrolPoints.Length == 0)
         {
             Debug.LogError("No patrol points assigned!");
@@ -26,22 +31,32 @@ public class ArmoredEnemyPatrol : MonoBehaviour
 
     void FixedUpdate()
     {
-        Transform target = patrolPoints[currentPointIndex]; // היעד הנוכחי
+        // היעד הנוכחי
+        Transform target = patrolPoints[currentPointIndex];
 
-        // חישוב כיוון תנועה (ימינה או שמאלה)
+        // מחשבים מרחק רק בציר X (כי התנועה אופקית)
+        float distanceX = Mathf.Abs(target.position.x - transform.position.x);
+
+        // אם הגענו מספיק קרוב לנקודה
+        if (distanceX <= reachDistance)
+        {
+            // עוברים לנקודה הבאה (וחוזרים להתחלה בסוף)
+            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+
+            // מעדכנים יעד חדש אחרי ההחלפה
+            target = patrolPoints[currentPointIndex];
+        }
+
+        // מחשבים כיוון תנועה (ימינה או שמאלה)
         float direction = Mathf.Sign(target.position.x - transform.position.x);
 
-        // תנועה אופקית בלבד
+        // מזיזים את האויב רק בציר X
         rb.linearVelocity = new Vector2(direction * speed, rb.linearVelocity.y);
 
-        // להפוך את הדמות לפי כיוון ההליכה
-        Flip(direction);
-
-        // בדיקה אם הגענו לנקודה
-        if (Vector2.Distance(transform.position, target.position) < reachDistance)
+        // הופכים את הדמות רק אם יש כיוון (לא 0)
+        if (direction != 0)
         {
-            // מעבר לנקודה הבאה במסלול (חוזר להתחלה בסוף)
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+            Flip(direction);
         }
     }
 
