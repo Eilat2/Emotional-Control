@@ -1567,10 +1567,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1238976378730337406, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
-      propertyPath: stompTolerance
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 3097890382020697571, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9
@@ -1616,10 +1612,6 @@ PrefabInstance:
       value: Enemy_Flying
       objectReference: {fileID: 0}
     - target: {fileID: 7115047470405517368, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
-      propertyPath: patrolPoints.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7115047470405517368, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 661025028}
@@ -1628,9 +1620,7 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 35496771}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 4350908082040819978, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
-    - {fileID: 3369002434507636238, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
@@ -1642,10 +1632,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1923295664059325346, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
-      propertyPath: patrolPoints.Array.size
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 1923295664059325346, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
@@ -1694,18 +1680,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5981287727614979036, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
-      propertyPath: debrisPrefab
-      value: 
-      objectReference: {fileID: 8693446288054368926, guid: d27ca809e659fb04283212aed3b82d0e, type: 3}
     - target: {fileID: 8939766553357662217, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: m_Name
       value: Enemy_Armored
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 7066251463451069103, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
-    - {fileID: 1279793630769892771, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
