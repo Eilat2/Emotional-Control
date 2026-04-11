@@ -3,45 +3,66 @@ using UnityEngine;
 public class ElectricPlatform : MonoBehaviour
 {
     [Header("Stamina")]
+    // איזה סוג סטאמינה להוריד
     [SerializeField] Stamina.StaminaType staminaTypeToDrain = Stamina.StaminaType.Joy;
+
+    // כמה סטאמינה להוריד בכל פגיעה
     [SerializeField] float drainAmount = 15f;
+
+    // זמן המתנה בין פגיעות
     [SerializeField] float hitCooldown = 0.4f;
 
-    [Header("Knockback")]
-    [SerializeField] float knockbackForceX = 6f;
-    [SerializeField] float knockbackForceY = 2f;
+    [Header("Slam Down")]
+    // עוצמת הדחיפה כלפי מטה
+    [SerializeField] float slamDownForce = 12f;
 
-    [Header("Underside Check")]
-   
+    // רפרנס לסקריפט של רעידת מצלמה
+    private CameraShake cameraShake;
 
+    // שומר מתי מותר לפגוע שוב
     float nextHitTime = 0f;
-    Collider2D myCol;
 
-    void Awake()
+    void Start()
     {
-        myCol = GetComponent<Collider2D>();
+        // מחפש את המצלמה הראשית ולוקח ממנה את סקריפט ה-CameraShake
+        if (Camera.main != null)
+        {
+            cameraShake = Camera.main.GetComponent<CameraShake>();
+        }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    // נקרא כשהשחקן נכנס ל־Trigger
+    void OnTriggerEnter2D(Collider2D collision)
     {
         TryShock(collision);
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    // נקרא כל עוד השחקן בתוך ה־Trigger
+    void OnTriggerStay2D(Collider2D collision)
     {
         TryShock(collision);
     }
 
-    void TryShock(Collision2D collision)
+    // הפונקציה שמטפלת בלוגיקת החשמול
+    void TryShock(Collider2D collision)
     {
+        // אם עדיין לא עבר זמן ה-cooldown – לא פוגעים שוב
         if (Time.time < nextHitTime) return;
-        if (!collision.gameObject.CompareTag("Player")) return;
-        if (myCol == null) return;
 
+        // לוקחים את אובייקט השחקן הראשי דרך ה-Rigidbody אם יש
+        GameObject playerObject = collision.attachedRigidbody != null
+            ? collision.attachedRigidbody.gameObject
+            : collision.gameObject;
+
+        // בודקים שזה באמת השחקן
+        if (!playerObject.CompareTag("Player")) return;
+
+        // מעדכנים זמן לפגיעה הבאה
         nextHitTime = Time.time + hitCooldown;
 
-        // 1) Drain stamina
-        Stamina[] staminas = collision.collider.GetComponents<Stamina>();
+        // ---------- 1) הורדת סטאמינה ----------
+        Stamina[] staminas = playerObject.GetComponents<Stamina>();
+
         for (int i = 0; i < staminas.Length; i++)
         {
             if (staminas[i].type == staminaTypeToDrain)
@@ -51,23 +72,28 @@ public class ElectricPlatform : MonoBehaviour
             }
         }
 
-        // Flash – התחשמלות ויזואלית
-        FlashOnHit flash = collision.gameObject.GetComponent<FlashOnHit>();
-        if (flash != null)
+        // ---------- 2) אפקט פגיעה ----------
+        PlayerHitFeedback hitFeedback = playerObject.GetComponent<PlayerHitFeedback>();
+
+        if (hitFeedback != null)
         {
-            flash.Flash();
+            hitFeedback.PlayHitFeedback();
         }
 
-        // 2) Knockback
-        Rigidbody2D rb = collision.rigidbody;
+        // ---------- 3) סלאם דאון ----------
+        Rigidbody2D rb = playerObject.GetComponent<Rigidbody2D>();
+
         if (rb != null)
         {
-            float dir = (collision.transform.position.x < transform.position.x) ? -1f : 1f;
-
             Vector2 v = rb.linearVelocity;
-            v.x = dir * knockbackForceX;
-            v.y = Mathf.Max(v.y, knockbackForceY);
+            v.y = -slamDownForce;
             rb.linearVelocity = v;
+        }
+
+        // ---------- 4) רעידת מצלמה ----------
+        if (cameraShake != null)
+        {
+            cameraShake.Shake();
         }
     }
 }
