@@ -360,6 +360,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+<<<<<<< HEAD
+=======
 --- !u!1 &459855682
 GameObject:
   m_ObjectHideFlags: 0
@@ -1805,6 +1807,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+>>>>>>> bd3393762141d139e762c1b08d87ad014df4c469
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3124,9 +3127,13 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
+<<<<<<< HEAD
+  m_Children: []
+=======
   m_Children:
   - {fileID: 459855683}
   - {fileID: 1534221779}
+>>>>>>> bd3393762141d139e762c1b08d87ad014df4c469
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2111896879
@@ -3371,6 +3378,10 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
+<<<<<<< HEAD
+  - {fileID: 2125960121}
+=======
+>>>>>>> bd3393762141d139e762c1b08d87ad014df4c469
   - {fileID: 1799168972}
   - {fileID: 4347756007190191981}
   - {fileID: 1854488152181651926}
