@@ -9,6 +9,11 @@ public class PipeConnector : MonoBehaviour
 
     public bool flowingCorrectly = false;
 
+    [Header("Visual")]
+    public SpriteRenderer pipeRenderer;
+    public Color correctFlowColor = Color.white;
+    public Color wrongFlowColor = Color.gray;
+
     private bool playerInside = false;
     private EmotionController playerEmotion;
     private LevelPipeManager manager;
@@ -16,6 +21,11 @@ public class PipeConnector : MonoBehaviour
     void Start()
     {
         manager = FindFirstObjectByType<LevelPipeManager>();
+
+        if (pipeRenderer != null)
+        {
+            pipeRenderer.color = wrongFlowColor;
+        }
     }
 
     void Update()
@@ -40,11 +50,17 @@ public class PipeConnector : MonoBehaviour
         {
             flowingCorrectly = true;
             Debug.Log(pipeOwner + " נכון");
+
+            if (pipeRenderer != null)
+                pipeRenderer.color = correctFlowColor;
         }
         else
         {
             flowingCorrectly = false;
             Debug.Log(pipeOwner + " לא נכון");
+
+            if (pipeRenderer != null)
+                pipeRenderer.color = wrongFlowColor;
         }
 
         if (manager != null)
@@ -62,7 +78,7 @@ public class PipeConnector : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         playerInside = true;
-        playerEmotion = other.GetComponent<EmotionController>();
+        playerEmotion = other.GetComponentInParent<EmotionController>();
     }
 
     private void OnTriggerExit2D(Collider2D other)
