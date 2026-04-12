@@ -80,6 +80,22 @@ public class ElectricPlatform : MonoBehaviour
             hitFeedback.PlayHitFeedback();
         }
 
+        // ---------- 2.5) ניצוצות חשמל ----------
+        ElectricVFX electricVFX = playerObject.GetComponent<ElectricVFX>();
+
+        if (electricVFX != null)
+        {
+            electricVFX.PlaySparks();
+        }
+
+        // ---------- 2.6) ברק חשמל ----------
+        LightningVFX lightning = playerObject.GetComponentInChildren<LightningVFX>();
+
+        if (lightning != null)
+        {
+            lightning.PlayLightning();
+        }
+
         // ---------- 3) סלאם דאון ----------
         Rigidbody2D rb = playerObject.GetComponent<Rigidbody2D>();
 
