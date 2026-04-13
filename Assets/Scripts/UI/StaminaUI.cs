@@ -3,11 +3,10 @@ using UnityEngine.UI;
 
 public class StaminaUI : MonoBehaviour
 {
-    [Header("חיבורים ידניים")]
-    [SerializeField] GameObject player;              // הפלייר שעליו יושבות הסטאמינות
-    [SerializeField] Stamina.StaminaType staminaType; // Joy או Rage – לבחור באינספקטור
+    [Header("Stamina Settings")]
+    [SerializeField] private Stamina.StaminaType staminaType; // סוג הסטאמינה שהפס הזה מציג
 
-    private Stamina stamina;               // הסטאמינה שנמצאה בפועל
+    private Stamina stamina; // הסטאמינה שנמצאה בפועל
     private Slider slider;
 
     void Awake()
@@ -18,49 +17,57 @@ public class StaminaUI : MonoBehaviour
 
     void Start()
     {
-        // בדיקה חשובה – שלא שכחנו לחבר Player
-        if (player == null)
+        // ניסיון ראשוני למצוא את הסטאמינה המתאימה
+        FindStamina();
+    }
+
+    void Update()
+    {
+        // אם משום מה אין רפרנס לסטאמינה, מנסים למצוא שוב
+        if (stamina == null)
         {
-            Debug.LogError("StaminaUI: לא חיברת Player באינספקטור");
-            enabled = false;
+            FindStamina();
             return;
         }
 
-        // מוצאים על ה-Player את ה-Stamina מהסוג שבחרנו (Joy / Rage)
+        // אם המקסימום השתנה - נעדכן גם את הפס
+        if (slider.maxValue != stamina.maxStamina)
+            slider.maxValue = stamina.maxStamina;
+
+        // מעדכנים את ערך הפס לפי הסטאמינה הנוכחית
+        slider.value = stamina.currentStamina;
+    }
+
+    void FindStamina()
+    {
+        // מחפשים את השחקן לפי Tag
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player == null)
+        {
+            Debug.LogWarning("StaminaUI: Player not found.");
+            return;
+        }
+
+        // מחפשים את כל רכיבי הסטאמינה שעל השחקן
         Stamina[] staminas = player.GetComponents<Stamina>();
+
         foreach (Stamina s in staminas)
         {
             if (s.type == staminaType)
             {
                 stamina = s;
-                break;
+
+                // מגדירים את הסליידר לפי נתוני הסטאמינה
+                slider.minValue = 0f;
+                slider.maxValue = stamina.maxStamina;
+                slider.value = stamina.currentStamina;
+
+                Debug.Log("StaminaUI connected successfully.");
+                return;
             }
         }
 
-        // אם לא נמצאה סטאמינה מהסוג שביקשנו – זו שגיאה
-        if (stamina == null)
-        {
-            Debug.LogError($"StaminaUI: לא נמצאה Stamina מסוג {staminaType}");
-            enabled = false;
-            return;
-        }
-
-        // הגדרת הסליידר לפי נתוני הסטאמינה
-        slider.minValue = 0f;
-        slider.maxValue = stamina.maxStamina;
-        slider.value = stamina.currentStamina;
-    }
-
-    void Update()
-    {
-        if (stamina == null) return;
-
-        // אופציונלי: אם maxStamina משתנה, נשמור שהפס מתאים
-        if (slider.maxValue != stamina.maxStamina)
-            slider.maxValue = stamina.maxStamina;
-
-        // כל פריים מעדכנים את הפס לפי הסטאמינה
-        slider.value = stamina.currentStamina;
+        Debug.LogWarning("StaminaUI: Matching stamina type was not found.");
     }
 }
-

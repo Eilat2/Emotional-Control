@@ -2,70 +2,81 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 
+// מנהל את חלון הפאוז, המשך משחק וריסטארט של השלב
 public class PauseMenuInputSystem : MonoBehaviour
 {
-    [SerializeField] GameObject pausePanel;
+    // הפאנל של הפאוז
+    [SerializeField] private GameObject pausePanel;
 
+    // האם המשחק כרגע בפאוז
     private bool isPaused = false;
-    private PlayerInput playerInput;
-    private InputAction pauseAction;
 
-    private void Awake()
+    private void Start()
     {
-        playerInput = FindFirstObjectByType<PlayerInput>();
-        if (playerInput == null)
-        {
-            Debug.LogError("PauseMenuInputSystem: No PlayerInput found in scene.");
-            return;
-        }
+        // בתחילת המשחק סוגרים את חלון הפאוז
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
 
-        pauseAction = playerInput.actions["Pause"];
-        if (pauseAction == null)
-        {
-            Debug.LogError("PauseMenuInputSystem: No action named 'Pause' found.");
-        }
-    }
-
-    private void OnEnable()
-    {
-        if (pauseAction != null)
-            pauseAction.performed += OnPausePerformed;
-    }
-
-    private void OnDisable()
-    {
-        if (pauseAction != null)
-            pauseAction.performed -= OnPausePerformed;
-    }
-
-    private void OnPausePerformed(InputAction.CallbackContext ctx)
-    {
-        TogglePause();
-    }
-
-    public void TogglePause()
-    {
-        if (isPaused) Resume();
-        else Pause();
-    }
-
-    public void Pause()
-    {
-        pausePanel.SetActive(true);
-        Time.timeScale = 0f;
-        isPaused = true;
-    }
-
-    public void Resume()
-    {
-        pausePanel.SetActive(false);
         Time.timeScale = 1f;
         isPaused = false;
     }
 
+    private void Update()
+    {
+        // אם אין מקלדת לא עושים כלום
+        if (Keyboard.current == null)
+            return;
+
+        // לחיצה אחת על ESC פותחת/סוגרת
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            if (isPaused)
+                Resume();
+            else
+                Pause();
+        }
+    }
+
+    // פותח את חלון הפאוז
+    public void Pause()
+    {
+        if (pausePanel == null)
+        {
+            Debug.LogWarning("Pause panel is not assigned.");
+            return;
+        }
+
+        pausePanel.SetActive(true);
+        Time.timeScale = 0f;
+        isPaused = true;
+
+        Debug.Log("Pause menu opened.");
+    }
+
+    // סוגר את חלון הפאוז
+    public void Resume()
+    {
+        if (pausePanel == null)
+        {
+            Debug.LogWarning("Pause panel is not assigned.");
+            return;
+        }
+
+        pausePanel.SetActive(false);
+        Time.timeScale = 1f;
+        isPaused = false;
+
+        Debug.Log("Pause menu closed.");
+    }
+
+    // עושה ריסטארט לשלב הנוכחי
     public void Restart()
     {
         Time.timeScale = 1f;
+        isPaused = false;
+
+        Debug.Log("Restarting current level.");
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
