@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 20266788eec70c5428909efe6e07494b
+guid: b3c7fe31f3c83b344a061da13df85d6a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3958267992450795943
-    second: "\u05D0\u05D1\u05DF \u05E2\u05DD \u05E2\u05DC\u05D9\u05DD \u05E9\u05D1\u05D5\u05E8\u05D4_0"
+      213: 3280540063608336852
+    second: "\u05D0\u05D1\u05DF \u05E9\u05D1\u05D5\u05E8\u05D4.png 1_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u05D0\u05D1\u05DF \u05E2\u05DD \u05E2\u05DC\u05D9\u05DD \u05E9\u05D1\u05D5\u05E8\u05D4_0"
+      name: "\u05D0\u05D1\u05DF \u05E9\u05D1\u05D5\u05E8\u05D4.png 1_0"
       rect:
         serializedVersion: 2
         x: 192
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7a904df64c79ee630800000000000000
-      internalID: 3958267992450795943
+      spriteID: 4d1ffca8ec1d68d20800000000000000
+      internalID: 3280540063608336852
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\u05D0\u05D1\u05DF \u05E2\u05DD \u05E2\u05DC\u05D9\u05DD \u05E9\u05D1\u05D5\u05E8\u05D4_0": 3958267992450795943
+      "\u05D0\u05D1\u05DF \u05E9\u05D1\u05D5\u05E8\u05D4.png 1_0": 3280540063608336852
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

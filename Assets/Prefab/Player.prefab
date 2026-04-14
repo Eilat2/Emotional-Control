@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 8347113874450990963}
   - component: {fileID: 8808242607467473821}
   - component: {fileID: 4312077350362799660}
+  - component: {fileID: 1339707294759412267}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -502,11 +503,22 @@ MonoBehaviour:
   rageRenderer: {fileID: 5361198439502625577}
   blinkStepDuration: 0.06
   blinkCount: 2
-  squashScale: 0.85
   emotionController: {fileID: 1329398633019877157}
   neutralVisual: {fileID: 5368841696831007773}
   joyVisual: {fileID: 6573042402555808807}
   rageVisual: {fileID: 1103168689899035246}
+--- !u!114 &1339707294759412267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec594da7d9b01944b9c16cfb2b0531c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSceneReset
 --- !u!1 &4026276499801630156
 GameObject:
   m_ObjectHideFlags: 0

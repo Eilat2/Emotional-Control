@@ -107,4 +107,10 @@ public class Stamina : MonoBehaviour
     {
         currentStamina = maxStamina;
     }
+    public void ResetForNewScene()
+    {
+        currentStamina = maxStamina;
+        lastUseTime = 0f;
+    }
 }
+

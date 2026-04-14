@@ -10,10 +10,19 @@ public class BreakableWall : MonoBehaviour, IBreakable
     [SerializeField] float debrisTorque = 200f;     // סיבוב החתיכות
     [SerializeField] float debrisLifeTime = 1.5f;   // אחרי כמה זמן חתיכה נעלמת
 
+    [Header("Reveal")]
+    [SerializeField] GameObject hiddenButton;
+
     // פונקציה שמופעלת כשהשחקן שובר את הקיר
     public void OnBreak()
     {
         SpawnDebris();          // יוצרים שברים
+
+        if (hiddenButton != null)
+        {
+            hiddenButton.SetActive(true);
+        }
+
         Destroy(gameObject);    // מוחקים את הקיר
     }
 
