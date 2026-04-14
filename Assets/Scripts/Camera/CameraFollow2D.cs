@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraFollow2D : MonoBehaviour
 {
@@ -20,6 +21,37 @@ public class CameraFollow2D : MonoBehaviour
     private void Start()
     {
         defaultY = transform.position.y;
+
+        if (target == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                target = player.transform;
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        defaultY = transform.position.y;
+        followY = false;
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            target = player.transform;
+        }
     }
 
     public void EnableFollowY()
@@ -40,7 +72,7 @@ public class CameraFollow2D : MonoBehaviour
 
         if (followY)
         {
-            targetY = Mathf.Clamp(target.position.y + offset.y, minY, maxY);
+            targetY = target.position.y + offset.y;
         }
         else
         {
