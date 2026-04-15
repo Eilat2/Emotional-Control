@@ -51,8 +51,9 @@ public class DoorNextLevel : MonoBehaviour
         Vector3 startPos = playerTransform.position;
         Vector3 endPos = portalCenter != null ? portalCenter.position : transform.position;
 
+        // שומרים את הגודל ההתחלתי של השחקן
         Vector3 startScale = playerTransform.localScale;
-        Vector3 endScale = startScale * 0.2f; // קטן תוך כדי
+        Vector3 endScale = startScale * 0.2f;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         float originalGravity = 0f;
@@ -60,11 +61,15 @@ public class DoorNextLevel : MonoBehaviour
         if (rb != null)
             originalGravity = rb.gravityScale;
 
-        SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
-        Color startColor = Color.white;
+        // לוקחים את כל ה-SpriteRenderer של הילדים,
+        // כי אצלך הוויזואליים נמצאים בתוך ילדים של Player
+        SpriteRenderer[] renderers = player.GetComponentsInChildren<SpriteRenderer>(true);
+        Color[] startColors = new Color[renderers.Length];
 
-        if (sr != null)
-            startColor = sr.color;
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            startColors[i] = renderers[i].color;
+        }
 
         // מכבים שליטה רק אחרי ששמרנו את המצב המקורי
         DisablePlayerControl(player);
@@ -79,22 +84,26 @@ public class DoorNextLevel : MonoBehaviour
             // תנועה חלקה למרכז השער
             playerTransform.position = Vector3.Lerp(startPos, endPos, t);
 
-            // הקטנה הדרגתית
+            // הקטנה הדרגתית של כל אובייקט השחקן
             playerTransform.localScale = Vector3.Lerp(startScale, endScale, t);
 
-            // העלמה הדרגתית
-            if (fadePlayer && sr != null)
+            // העלמה הדרגתית של כל הספרייטים של השחקן
+            if (fadePlayer)
             {
-                Color c = startColor;
-                c.a = Mathf.Lerp(1f, 0f, t);
-                sr.color = c;
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    if (renderers[i] == null) continue;
+
+                    Color c = startColors[i];
+                    c.a = Mathf.Lerp(startColors[i].a, 0f, t);
+                    renderers[i].color = c;
+                }
             }
 
             yield return null;
         }
 
-        // מחזירים רק פיזיקה רגילה, כדי שהשחקן לא יישאר "מקולקל"
-        // אבל לא מחזירים גודל/שקיפות כאן, כדי שלא יראו אותו קופץ החוצה
+        // מאפסים מהירויות ופיזיקה בסיסית
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -102,8 +111,8 @@ public class DoorNextLevel : MonoBehaviour
             rb.gravityScale = originalGravity;
         }
 
-        // מאפסים את כל רכיבי הסטאמינה שעל השחקנית
-        Stamina[] staminaComponents = player.GetComponents<Stamina>();
+        // מאפסים סטאמינה
+        Stamina[] staminaComponents = player.GetComponentsInChildren<Stamina>(true);
         foreach (Stamina stamina in staminaComponents)
         {
             stamina.ResetForNewScene();
@@ -128,11 +137,14 @@ public class DoorNextLevel : MonoBehaviour
 
         disabledScripts.Clear();
 
-        // מכבים את כל ה-MonoBehaviourים של השחקן חוץ מהדברים שלא רוצים לכבות
+        // מכבים רק סקריפטים של שליטה/תנועה,
+        // ולא מכבים סקריפטים שצריכים להמשיך לעבוד אחרי מעבר סצנה
         MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
             if (script is EmotionController) continue;
+            if (script is PlayerSceneReset) continue;
+            if (script is PersistentPlayer) continue;
             if (!script.enabled) continue;
 
             script.enabled = false;
