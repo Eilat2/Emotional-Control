@@ -17,6 +17,13 @@ public class LevelPipeManager : MonoBehaviour
     // הדלת לשלב הבא
     public DoorController doorController;
 
+    // סקריפט המצלמה שאחראי על מעבר המצלמה לנקודת פוקוס וחזרה
+    [Header("Camera Sequence")]
+    [SerializeField] private CameraFocusSequence cameraSequence;
+
+    // נקודה באזור המים/אש שאליה המצלמה תזוז
+    [SerializeField] private Transform focusPoint;
+
     // כדי שלא נפתור את הפאזל כמה פעמים
     private bool puzzleSolved = false;
 
@@ -56,6 +63,7 @@ public class LevelPipeManager : MonoBehaviour
             puzzleSolved = true;
             Debug.Log("Puzzle solved!");
 
+            // מפעילים את המים
             if (waterSpray != null)
             {
                 waterSpray.SetActive(true);
@@ -66,6 +74,7 @@ public class LevelPipeManager : MonoBehaviour
                 Debug.LogWarning("Water spray is not assigned.");
             }
 
+            // מכבים את האש
             if (fireObject != null)
             {
                 fireObject.SetActive(false);
@@ -76,6 +85,7 @@ public class LevelPipeManager : MonoBehaviour
                 Debug.LogWarning("Fire object is not assigned.");
             }
 
+            // פותחים את הדלת
             if (doorController != null)
             {
                 doorController.OpenDoor();
@@ -84,6 +94,16 @@ public class LevelPipeManager : MonoBehaviour
             else
             {
                 Debug.LogWarning("Door controller is not assigned.");
+            }
+
+            // מזיזים את המצלמה לאזור המים/אש ואז מחזירים אותה לשחקן
+            if (cameraSequence != null && focusPoint != null)
+            {
+                cameraSequence.PlayFocusSequence(focusPoint);
+            }
+            else
+            {
+                Debug.LogWarning("Camera sequence or focus point is not assigned.");
             }
         }
         else if (!allCorrect)
