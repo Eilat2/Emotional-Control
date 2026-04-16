@@ -5,43 +5,66 @@ using UnityEngine.InputSystem;
 // אבל רק רגש מסוים נחשב ללחיצה נכונה
 public class PuzzleButton : MonoBehaviour
 {
-    // הרגש שצריך ללחוץ עם הכפתור הזה
+    [Header("Puzzle")]
     public EmotionType requiredEmotion;
-
-    // רפרנס למנהל הפאזל
     public LevelPipeManager levelManager;
 
-    // האם השחקן נמצא ליד הכפתור
-    private bool playerInside = false;
+    [Header("Button Visual")]
+    [SerializeField] private Sprite normalSprite;
+    [SerializeField] private Sprite pressedSprite;
+    [SerializeField] private float pressScale = 0.9f;
 
-    // רפרנס לסקריפט הרגשות של השחקן
+    [Header("Glow")]
+    [SerializeField] private SpriteRenderer glowRenderer;
+    [SerializeField] private Color joyGlowColor = new Color(1f, 0.9f, 0.2f, 0.85f);
+    [SerializeField] private Color rageGlowColor = new Color(1f, 0.25f, 0.25f, 0.85f);
+    [SerializeField] private Color neutralGlowColor = new Color(0.75f, 0.75f, 0.75f, 0.75f);
+
+    private bool playerInside = false;
     private EmotionController playerEmotion;
 
-    // האם כבר לחצו על הכפתור
     private bool wasPressed = false;
-
-    // האם הלחיצה הייתה נכונה
     private bool pressedCorrectly = false;
 
-    // מאפשר למנהל לקרוא את המידע הזה
+    private SpriteRenderer sr;
+    private Vector3 originalScale;
+
     public bool WasPressed => wasPressed;
     public bool PressedCorrectly => pressedCorrectly;
 
-    void Update()
+    private void Start()
     {
-        // אם השחקן לא ליד הכפתור, לא עושים כלום
+        sr = GetComponent<SpriteRenderer>();
+        originalScale = transform.localScale;
+
+        if (sr != null && normalSprite != null)
+        {
+            sr.sprite = normalSprite;
+        }
+
+        // מכבים את ההילה בהתחלה
+        if (glowRenderer != null)
+        {
+            glowRenderer.gameObject.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
         if (!playerInside || playerEmotion == null)
             return;
 
-        // לחיצה על F
         if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
         {
             PressButton();
         }
     }
 
-    void PressButton()
+    private void PressButton()
     {
+        if (wasPressed)
+            return;
+
         EmotionType currentEmotion = playerEmotion.GetCurrentEmotion();
 
         wasPressed = true;
@@ -57,7 +80,19 @@ public class PuzzleButton : MonoBehaviour
             Debug.Log("Wrong button press.");
         }
 
-        // מודיע למנהל לבדוק את מצב הפאזל
+        // מחליפים לספרייט לחוץ
+        if (sr != null && pressedSprite != null)
+        {
+            sr.sprite = pressedSprite;
+        }
+
+        // מקטינים קצת לתחושת לחיצה
+        transform.localScale = originalScale * pressScale;
+
+        // מפעילים הילה בצבע של הרגש
+        ActivateGlow(currentEmotion);
+
+        // מודיעים למנהל לבדוק את מצב הפאזל
         if (levelManager != null)
         {
             levelManager.CheckPuzzleState();
@@ -65,6 +100,33 @@ public class PuzzleButton : MonoBehaviour
         else
         {
             Debug.LogWarning("Level manager is not assigned.");
+        }
+    }
+
+    private void ActivateGlow(EmotionType emotion)
+    {
+        if (glowRenderer == null)
+            return;
+
+        glowRenderer.gameObject.SetActive(true);
+        glowRenderer.color = GetGlowColor(emotion);
+    }
+
+    private Color GetGlowColor(EmotionType emotion)
+    {
+        switch (emotion)
+        {
+            case EmotionType.Joy:
+                return joyGlowColor;
+
+            case EmotionType.Rage:
+                return rageGlowColor;
+
+            case EmotionType.Neutral:
+                return neutralGlowColor;
+
+            default:
+                return Color.white;
         }
     }
 
