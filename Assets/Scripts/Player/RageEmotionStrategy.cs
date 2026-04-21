@@ -13,6 +13,9 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] float breakCost = 20f;  // כמה סטאמינה יורדת על שבירה
     [SerializeField] BreakableSensor sensor; // לגרור לכאן את BreakZone (הילד) שיש עליו BreakableSensor
 
+    [Header("Animation")]
+    [SerializeField] Animator rageAnimator;  // לגרור לכאן את ה-Animator של RageVisual
+
     private Rigidbody2D rb;                  // פיזיקה של השחקן
     private PlayerHurtLock hurtLock;         // נעילת פגיעה (Knockback)
     private Stamina rageStamina;             // סטאמינה של Rage בלבד
@@ -28,11 +31,21 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         // מוצאים את קומפוננטת הסטאמינה מסוג Rage (יש לך שתי קומפוננטות Stamina על השחקן)
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
+
+        // אם לא חיברו באינספקטור - מנסים למצוא אוטומטית Animator על הילד RageVisual
+        if (rageAnimator == null)
+        {
+            Transform rageVisual = transform.Find("RageVisual");
+            if (rageVisual != null)
+                rageAnimator = rageVisual.GetComponent<Animator>();
+        }
     }
 
     public void Enter()
     {
-        // נקרא כשנכנסים לרגש (כרגע אין משהו מיוחד)
+        // כשנכנסים למצב Rage - מאפסים את פרמטר המהירות כדי להתחיל ב-Idle
+        if (rageAnimator != null)
+            rageAnimator.SetFloat("speed", 0f);
     }
 
     public void Exit()
@@ -40,6 +53,10 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         // כשיוצאים מהרגש - מאפסים מהירות אופקית כדי שלא "יסחב" תנועה לרגש הבא
         if (rb != null)
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+        // מאפסים גם את האנימציה
+        if (rageAnimator != null)
+            rageAnimator.SetFloat("speed", 0f);
     }
 
     // קבלת תנועה מה-Context
@@ -79,13 +96,22 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         // אם השחקן בפגיעה - לא מזיזים כדי לא לדרוס נוקבאק
         if (hurtLock != null && hurtLock.IsLocked)
+        {
+            if (rageAnimator != null)
+                rageAnimator.SetFloat("speed", 0f);
             return;
+        }
 
         // קלט אופקי אמור להיות בטווח -1..1 (ימינה/שמאלה)
         float x = Mathf.Clamp(moveInput.x, -1f, 1f);
 
         // תנועה אופקית לפי מהירות Rage
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
+
+        // עדכון Animator:
+        // משתמשים בערך מוחלט כדי שגם ימינה וגם שמאלה ייחשבו הליכה
+        if (rageAnimator != null)
+            rageAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
     // חיפוש קומפוננטת סטאמינה לפי סוג (Joy / Rage)
