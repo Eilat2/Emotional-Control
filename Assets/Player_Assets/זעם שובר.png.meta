@@ -117,10 +117,10 @@ TextureImporter:
         serializedVersion: 2
         x: 898
         y: 2578
-        width: 977
-        height: 1507
+        width: 976
+        height: 1506
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -139,10 +139,10 @@ TextureImporter:
         serializedVersion: 2
         x: 2040
         y: 2548
-        width: 1031
+        width: 1030
         height: 1542
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -159,12 +159,12 @@ TextureImporter:
       name: "\u05D6\u05E2\u05DD \u05E9\u05D5\u05D1\u05E8_2"
       rect:
         serializedVersion: 2
-        x: 35
+        x: 34
         y: 976
-        width: 985
-        height: 1545
+        width: 986
+        height: 1544
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -183,10 +183,10 @@ TextureImporter:
         serializedVersion: 2
         x: 1150
         y: 976
-        width: 841
-        height: 1545
+        width: 842
+        height: 1544
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -204,11 +204,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 2104
-        y: 971
-        width: 981
-        height: 1542
+        y: 972
+        width: 980
+        height: 1540
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,7 +225,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 1d5e3060a9bdfc548b92df29b708adb4
     internalID: 0
     vertices: []
     indices: 
@@ -233,7 +233,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       "\u05D6\u05E2\u05DD \u05E9\u05D5\u05D1\u05E8_0": -4166419520230347957
       "\u05D6\u05E2\u05DD \u05E9\u05D5\u05D1\u05E8_1": 3535987147902281791
