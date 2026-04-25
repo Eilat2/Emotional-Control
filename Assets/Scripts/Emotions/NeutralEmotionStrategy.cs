@@ -2,60 +2,82 @@ using UnityEngine;
 
 // אסטרטגיה של מצב ניטרלי:
 // - תנועה ימינה/שמאלה בלבד
-// - Space (Jump_Break) לא עושה כלום במצב ניטרלי
+// - Space לא עושה כלום
+// - מעדכן אנימציית Idle / Walk לפי מהירות
 public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
-    [SerializeField] float moveSpeed = 6f;
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 6f;
+
+    [Header("Animation")]
+    [SerializeField] private Animator neutralAnimator; // לגרור לכאן את Animator של NeutralVisual
 
     private Rigidbody2D rb;              // פיזיקה של השחקן
     private PlayerHurtLock hurtLock;     // כדי לא לדרוס נוקבאק בזמן פגיעה
     private Vector2 moveInput;           // קלט תנועה מה-Context
 
-    void Awake()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
+
+        // אם לא חיברת ידנית, ננסה למצוא את ה-Animator של NeutralVisual
+        ResolveNeutralAnimator();
     }
 
-    // נקרא כשנכנסים למצב ניטרלי
     public void Enter()
     {
-        // כרגע אין משהו מיוחד להפעיל
+        // כשנכנסים לניטרלי מתחילים ממצב עמידה
+        if (neutralAnimator != null)
+            neutralAnimator.SetFloat("speed", 0f);
     }
 
-    // נקרא כשעוזבים מצב ניטרלי
     public void Exit()
     {
-        // כרגע אין משהו מיוחד לכבות
+        // כשעוזבים ניטרלי מאפסים את האנימציה
+        if (neutralAnimator != null)
+            neutralAnimator.SetFloat("speed", 0f);
     }
 
-    // קבלת תנועה מה-Context (OnMove)
     public void HandleMove(Vector2 move)
     {
         moveInput = move;
     }
 
-    /*
-     * קבלת Jump_Break מה-Context:
-     * isHeld            - האם רווח מוחזק כרגע
-     * pressedThisFrame  - האם נלחץ בפריים הזה
-     * releasedThisFrame - האם שוחרר בפריים הזה
-     *
-     * בניטרלי אנחנו פשוט מתעלמים מהכפתור.
-     */
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
         // ניטרלי לא עושה כלום עם Space כרגע
     }
 
-    // Tick נקרא כל פריים כשהאסטרטגיה פעילה
     public void Tick()
     {
         // אם השחקן בנעילת פגיעה - לא מזיזים אותו כדי לא לדרוס נוקבאק
         if (hurtLock != null && hurtLock.IsLocked)
+        {
+            if (neutralAnimator != null)
+                neutralAnimator.SetFloat("speed", 0f);
+
             return;
+        }
+
+        float x = Mathf.Clamp(moveInput.x, -1f, 1f);
 
         // תנועה אופקית לפי הקלט
-        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
+
+        // עדכון אנימציית Idle / Walk
+        if (neutralAnimator != null)
+            neutralAnimator.SetFloat("speed", Mathf.Abs(x));
+    }
+
+    // מחפש את ה-Animator של NeutralVisual אם לא חיברת ידנית באינספקטור
+    private void ResolveNeutralAnimator()
+    {
+        if (neutralAnimator != null) return;
+
+        Transform neutralVisual = transform.Find("NeutralVisual");
+
+        if (neutralVisual != null)
+            neutralAnimator = neutralVisual.GetComponent<Animator>();
     }
 }
