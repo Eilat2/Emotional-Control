@@ -34,17 +34,17 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private bool glideEnabled = false;
 
     private bool jumpHeld = false;
+    private float holdGraceTimer = 0f;
 
-    private void Awake()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
     }
 
-    private void Start()
+    void Start()
     {
         rb.gravityScale = normalGravity;
-
         ResolveJoyStamina();
         ResolveJoyAnimator();
     }
@@ -52,9 +52,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     public void Enter()
     {
         rb.gravityScale = normalGravity;
-
-        glideEnabled = false;
-        jumpHeld = false;
 
         if (joyAnimator != null)
         {
@@ -66,8 +63,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     public void Exit()
     {
         glideEnabled = false;
-        jumpHeld = false;
-
         rb.gravityScale = normalGravity;
 
         if (joyAnimator != null)
@@ -91,7 +86,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         bool grounded = IsGrounded();
 
-        // אם נחתנו על הרצפה — מאפסים קפיצה/ריחוף
+        // נחתנו
         if (grounded && rb.linearVelocity.y <= 0.01f)
         {
             jumpedFromGround = false;
@@ -99,7 +94,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.gravityScale = normalGravity;
         }
 
-        // אם משחררים Space בזמן ריחוף — מפסיקים ריחוף
+        // הפסקת ריחוף
         if (glideEnabled && releasedThisFrame)
         {
             glideEnabled = false;
@@ -107,7 +102,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // לחיצה ראשונה מהקרקע = קפיצה
+        // קפיצה ראשונה
         if (pressedThisFrame && grounded)
         {
             jumpedFromGround = true;
@@ -115,16 +110,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * joyJumpForce, ForceMode2D.Impulse);
-
             return;
         }
 
-        // לחיצה שנייה באוויר = הפעלת ריחוף
+        // ריחוף
         if (pressedThisFrame && !grounded && jumpedFromGround && !glideEnabled)
         {
-            ResolveJoyStamina();
-
-            // אם אין סטאמינה — לא נכנסים לריחוף
             if (joyStamina != null && joyStamina.currentStamina <= 0f)
                 return;
 
@@ -138,76 +129,47 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     public void Tick()
     {
         if (hurtLock != null && hurtLock.IsLocked)
-        {
-            if (joyAnimator != null)
-            {
-                joyAnimator.SetFloat("speed", 0f);
-                joyAnimator.SetBool("isGliding", false);
-            }
-
             return;
-        }
 
-        // תנועה אופקית
+        // תנועה
         rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
-        // האם השחקנית באמת מרחפת כרגע בפועל
-        bool isActuallyGliding = glideEnabled && jumpHeld;
-
-        // עדכון אנימציות
+        // אנימציית הליכה
         if (joyAnimator != null)
-        {
-            // אם מרחפים — לא מפעילים Walk באוויר
-            joyAnimator.SetFloat("speed", isActuallyGliding ? 0f : Mathf.Abs(moveInput.x));
+            joyAnimator.SetFloat("speed", Mathf.Abs(moveInput.x));
 
-            // מפעיל/מכבה את אנימציית הריחוף
-            joyAnimator.SetBool("isGliding", isActuallyGliding);
-        }
+        // 🎯 פה הקסם של הריחוף
+        if (joyAnimator != null)
+            joyAnimator.SetBool("isGliding", glideEnabled);
 
-        // אם הריחוף לא מופעל בכלל — כבידה רגילה
         if (!glideEnabled)
         {
             rb.gravityScale = normalGravity;
             return;
         }
 
-        // אם הריחוף מופעל אבל לא מחזיקים Space — כבידה רגילה
-        if (!jumpHeld)
-        {
-            rb.gravityScale = normalGravity;
-            return;
-        }
-
-        // אם מחזיקים Space בזמן ריחוף — מורידים סטאמינה ומקטינים כבידה
-        ResolveJoyStamina();
-
-        if (joyStamina != null)
+        // ריחוף פעיל
+        if (jumpHeld)
         {
             float cost = glideCostPerSecond * Time.deltaTime;
 
-            if (!joyStamina.Use(cost))
+            if (joyStamina != null && !joyStamina.Use(cost))
             {
                 glideEnabled = false;
                 rb.gravityScale = normalGravity;
-
-                if (joyAnimator != null)
-                    joyAnimator.SetBool("isGliding", false);
-
                 return;
             }
-        }
 
-        rb.gravityScale = glideGravity;
+            rb.gravityScale = glideGravity;
+        }
+        else
+        {
+            rb.gravityScale = normalGravity;
+        }
     }
 
     private bool IsGrounded()
     {
-        if (groundCheck == null)
-        {
-            Debug.LogError("[JOY] groundCheck לא הוגדר באינספקטור!");
-            return false;
-        }
-
         return Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
 
@@ -215,9 +177,9 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         if (joyStamina != null) return;
 
-        Stamina[] all = GetComponentsInChildren<Stamina>(true);
+        Stamina[] all = GetComponentsInChildren<Stamina>();
 
-        foreach (Stamina s in all)
+        foreach (var s in all)
         {
             if (s.type == Stamina.StaminaType.Joy)
             {
