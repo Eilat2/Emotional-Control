@@ -1,13 +1,16 @@
-using UnityEngine;
+ο»Ώusing UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerEmotionContext : MonoBehaviour
 {
-    [Header("Strategies (βψψι μλΰο χεξτεππθεϊ ξδ-Player)")]
+    [Header("Strategies (Χ’Χ¨Χ¨Χ™ ΧΧ›ΧΧ Χ§Χ•ΧΧ¤Χ•Χ Χ ΧΧ•Χª ΧΧ”-Player)")]
     [SerializeField] private MonoBehaviour neutralStrategyBehaviour;
     [SerializeField] private MonoBehaviour joyStrategyBehaviour;
     [SerializeField] private MonoBehaviour rageStrategyBehaviour;
+
+    [Header("Visual")]
+    [SerializeField] private PlayerVisualSwitcher visualSwitcher;
 
     private IEmotionStrategy neutralStrategy;
     private IEmotionStrategy joyStrategy;
@@ -15,85 +18,102 @@ public class PlayerEmotionContext : MonoBehaviour
 
     private IEmotionStrategy currentStrategy;
 
-    // χμθ ϊπεςδ
+    // Χ§ΧΧ Χ”ΧªΧ Χ•ΧΆΧ” Χ©ΧΧ’Χ™ΧΆ ΧΧ”-Input System
     private Vector2 moveInput;
 
-    // ξφα λτϊεψ Jump_Break (Space)
+    // ΧΧ¦Χ‘ Χ›Χ¤ΧªΧ•Χ¨ Jump_Break
     private bool jumpHeld = false;
     private bool pressedThisFrame = false;
     private bool releasedThisFrame = false;
 
-    void Awake()
+    private void Awake()
     {
+        // ΧΧ Χ©Χ›Χ—Χ Χ• ΧΧ’Χ¨Χ•Χ¨ Χ‘ΧΧ™Χ Χ΅Χ¤Χ§ΧΧ•Χ¨, Χ Χ Χ΅Χ” ΧΧΧ¦Χ•Χ ΧΧ•ΧΧ•ΧΧΧ™Χª ΧΆΧ Χ”Χ©Χ—Χ§Χ/Χ™ΧΧ“Χ™Χ Χ©ΧΧ•
+        if (visualSwitcher == null)
+        {
+            visualSwitcher = GetComponentInChildren<PlayerVisualSwitcher>();
+        }
+
+        // Χ”ΧΧ¨Χ” ΧΧ”Χ©Χ“Χ•Χª Χ‘ΧΧ™Χ Χ΅Χ¤Χ§ΧΧ•Χ¨ Χ-interface Χ©Χ Χ”ΧΧ΅ΧΧ¨ΧΧ’Χ™Χ•Χª
         neutralStrategy = neutralStrategyBehaviour as IEmotionStrategy;
         joyStrategy = joyStrategyBehaviour as IEmotionStrategy;
         rageStrategy = rageStrategyBehaviour as IEmotionStrategy;
 
         if (neutralStrategy == null || joyStrategy == null || rageStrategy == null)
         {
-            Debug.LogError("PlayerEmotionContext: ΰηγ δ-Strategies μΰ ξξξω IEmotionStrategy ΰε μΰ ωειικ αΰιπρτχθεψ. αγχι ξδ βψψϊ αωγεϊ.");
+            Debug.LogError("PlayerEmotionContext: ΧΧ—Χ“ Χ”-Strategies ΧΧ ΧΧΧΧ© IEmotionStrategy ΧΧ• ΧΧ Χ©Χ•Χ™Χ™Χ Χ‘ΧΧ™Χ Χ΅Χ¤Χ§ΧΧ•Χ¨.");
+        }
+
+        if (visualSwitcher == null)
+        {
+            Debug.LogWarning("PlayerEmotionContext: ΧΧ Χ ΧΧ¦Χ PlayerVisualSwitcher. Χ”Χ“ΧΧ•Χª ΧΧ ΧªΧªΧ”Χ¤Χ Χ™ΧΧ™Χ Χ”/Χ©ΧΧΧΧ”.");
         }
     }
 
-    void Start()
+    private void Start()
     {
-        // λγι ωμΰ πιωΰψ ςν currentStrategy = null αϊηιμϊ ξωηχ
-        // (EmotionController ΰξεψ μχψεΰ SetEmotion, ΰαμ ζδ αιθεη)
+        // Χ‘Χ™ΧΧ•Χ—: ΧΧªΧ—Χ™ΧΧ™Χ Χ‘Χ Χ™ΧΧ¨ΧΧ™ ΧΧ ΧΧ Χ”Χ•Χ’Χ“Χ¨ ΧΧ©Χ”Χ• ΧΧ—Χ¨
         if (currentStrategy == null)
         {
             SetEmotion(EmotionController.Emotion.Neutral);
         }
     }
 
-    // Update = χμθ/ΰιψεςιν ωμ τψιιν (μΰ τιζιχδ)
-    void Update()
+    // Update = Χ§ΧΧ Χ•ΧΧ•Χ’Χ™Χ§Χ” Χ›ΧΧΧ™Χª, Χ¨Χ¥ Χ›Χ Χ¤Χ¨Χ™Χ™Χ
+    private void Update()
     {
         if (currentStrategy == null) return;
 
-        // ξςαιψιν ϊπεςδ (βν ΰν 0)
+        // Χ©ΧΧ™Χ—Χª Χ”ΧªΧ Χ•ΧΆΧ” ΧΧΧ΅ΧΧ¨ΧΧ’Χ™Χ” Χ”Χ¤ΧΆΧ™ΧΧ”
         currentStrategy.HandleMove(moveInput);
 
-        // ξςαιψιν ξφα Space (μηιφδ/δηζχδ/ωηψεψ)
+        // ΧΆΧ“Χ›Χ•Χ Χ›Χ™Χ•Χ•Χ Χ”Χ“ΧΧ•Χª ΧΧ¤Χ™ Χ”ΧªΧ Χ•ΧΆΧ” Χ‘Χ¦Χ™Χ¨ X
+        if (visualSwitcher != null)
+        {
+            visualSwitcher.SetDirection(moveInput.x);
+        }
+
+        // Χ©ΧΧ™Χ—Χª Χ§ΧΧ Χ§Χ¤Χ™Χ¦Χ”/Χ©Χ‘Χ™Χ¨Χ” ΧΧΧ΅ΧΧ¨ΧΧ’Χ™Χ” Χ”Χ¤ΧΆΧ™ΧΧ”
         currentStrategy.HandleJumpBreak(jumpHeld, pressedThisFrame, releasedThisFrame);
 
-        // ηωεα: pressed/released φψιλιν μδιεϊ true ψχ τψιιν ΰηγ
+        // ΧΧ™Χ¤Χ•Χ΅ ΧΧ—Χ™Χ¦Χ”/Χ©Χ—Χ¨Χ•Χ¨ Χ›Χ“Χ™ Χ©Χ™Χ”Χ™Χ• Χ¤ΧΆΧ™ΧΧ™Χ Χ¨Χ§ Χ¤Χ¨Χ™Χ™Χ ΧΧ—Χ“
         pressedThisFrame = false;
         releasedThisFrame = false;
     }
 
-    // FixedUpdate = τιζιχδ (ϊπεςδ ςν Rigidbody2D)
-    void FixedUpdate()
+    // FixedUpdate = Χ¤Χ™Χ–Χ™Χ§Χ”, Χ¨Χ¥ Χ‘Χ§Χ¦Χ‘ Χ§Χ‘Χ•ΧΆ
+    private void FixedUpdate()
     {
         if (currentStrategy == null) return;
 
-        // Tick ωμ δΰρθψθβιδ (τιζιχδ/ϊπεςδ)
+        // Χ”Χ¤ΧΆΧΧª Χ”ΧΧ•Χ’Χ™Χ§Χ” Χ”Χ¤Χ™Χ–Χ™Χ§ΧΧ™Χª Χ©Χ Χ”ΧΧ΅ΧΧ¨ΧΧ’Χ™Χ”
         currentStrategy.Tick();
     }
 
-    // ---------- Input System (Send Messages) ----------
+    // Χ§ΧΧ ΧªΧ Χ•ΧΆΧ” ΧΧ”-Input System
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
     }
 
+    // Χ§ΧΧ Χ§Χ¤Χ™Χ¦Χ”/Χ©Χ‘Χ™Χ¨Χ” ΧΧ”-Input System
     public void OnJump_Break(InputValue value)
     {
         bool pressed = value.isPressed;
 
-        // pressedThisFrame = Down
+        // Χ”ΧªΧ—ΧΧª ΧΧ—Χ™Χ¦Χ”
         if (pressed && !jumpHeld)
             pressedThisFrame = true;
 
-        // releasedThisFrame = Up
+        // Χ©Χ—Χ¨Χ•Χ¨ ΧΧ—Χ™Χ¦Χ”
         if (!pressed && jumpHeld)
             releasedThisFrame = true;
 
-        // ξφα ξεηζχ
+        // Χ©ΧΧ™Χ¨Χª ΧΧ¦Χ‘ Χ”Χ›Χ¤ΧªΧ•Χ¨
         jumpHeld = pressed;
     }
-    // -----------------------------------------------
 
-    // πχψΰ ς"ι EmotionController λωδψβω ξωϊπδ
+    // Χ©Χ™Χ Χ•Χ™ Χ¨Χ’Χ©, Χ Χ§Χ¨Χ ΧΆΧ Χ™Χ“Χ™ EmotionController
     public void SetEmotion(EmotionController.Emotion e)
     {
         IEmotionStrategy next =
@@ -103,14 +123,20 @@ public class PlayerEmotionContext : MonoBehaviour
 
         if (next == null)
         {
-            Debug.LogError("PlayerEmotionContext: next strategy ιφΰ null. αγχι ωωιιλϊ ΰϊ δ-Behaviour αωγεϊ αΰιπρτχθεψ.");
+            Debug.LogError("PlayerEmotionContext: next strategy Χ™Χ¦Χ null.");
             return;
         }
 
+        // ΧΧ Χ›Χ‘Χ¨ Χ ΧΧ¦ΧΧ™Χ Χ‘ΧΧ•ΧªΧ• Χ¨Χ’Χ©, ΧΧ ΧΆΧ•Χ©Χ™Χ Χ›ΧΧ•Χ
         if (next == currentStrategy) return;
 
+        // Χ™Χ¦Χ™ΧΧ” ΧΧ”Χ¨Χ’Χ© Χ”Χ§Χ•Χ“Χ
         currentStrategy?.Exit();
+
+        // ΧΧΆΧ‘Χ¨ ΧΧ¨Χ’Χ© Χ”Χ—Χ“Χ©
         currentStrategy = next;
+
+        // Χ›Χ Χ™Χ΅Χ” ΧΧ¨Χ’Χ© Χ”Χ—Χ“Χ©
         currentStrategy?.Enter();
     }
 }
