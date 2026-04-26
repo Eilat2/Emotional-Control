@@ -3586,7 +3586,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.21568628, g: 0.21568628, b: 0.21960784, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -11788,6 +11788,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4107138449350486641, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4217880981914924426, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
+      propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4671925263585091470, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}

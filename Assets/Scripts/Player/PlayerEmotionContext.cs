@@ -39,6 +39,7 @@ public class PlayerEmotionContext : MonoBehaviour
         joyStrategy = joyStrategyBehaviour as IEmotionStrategy;
         rageStrategy = rageStrategyBehaviour as IEmotionStrategy;
 
+        // בדיקה שכל האסטרטגיות באמת קיימות ומממשות IEmotionStrategy
         if (neutralStrategy == null || joyStrategy == null || rageStrategy == null)
         {
             Debug.LogError("PlayerEmotionContext: אחד ה-Strategies לא מממש IEmotionStrategy או לא שוייך באינספקטור.");
@@ -52,22 +53,26 @@ public class PlayerEmotionContext : MonoBehaviour
 
     private void Start()
     {
-        // ביטוח: מתחילים בניטרלי אם לא הוגדר משהו אחר
+        // מתחילים תמיד ברגש ניטרלי
         if (currentStrategy == null)
         {
             SetEmotion(EmotionController.Emotion.Neutral);
         }
     }
 
-    // Update = קלט ולוגיקה כללית, רץ כל פריים
     private void Update()
     {
-        if (currentStrategy == null) return;
+        // אם המשחק בפאוז — לא נותנים לשחקן לזוז / לקפוץ / לשבור
+        if (Time.timeScale == 0f)
+            return;
+
+        if (currentStrategy == null)
+            return;
 
         // שליחת התנועה לאסטרטגיה הפעילה
         currentStrategy.HandleMove(moveInput);
 
-        // עדכון כיוון הדמות לפי התנועה בציר X
+        // עדכון כיוון הדמות לפי תנועה ימינה/שמאלה
         if (visualSwitcher != null)
         {
             visualSwitcher.SetDirection(moveInput.x);
@@ -81,24 +86,38 @@ public class PlayerEmotionContext : MonoBehaviour
         releasedThisFrame = false;
     }
 
-    // FixedUpdate = פיזיקה, רץ בקצב קבוע
     private void FixedUpdate()
     {
-        if (currentStrategy == null) return;
+        // אם המשחק בפאוז — לא מריצים לוגיקת פיזיקה של הרגש
+        if (Time.timeScale == 0f)
+            return;
+
+        if (currentStrategy == null)
+            return;
 
         // הפעלת הלוגיקה הפיזיקלית של האסטרטגיה
         currentStrategy.Tick();
     }
 
-    // קלט תנועה מה-Input System
     public void OnMove(InputValue value)
     {
+        // אם המשחק בפאוז — מאפסים תנועה כדי שלא תישמר לחיצה ישנה
+        if (Time.timeScale == 0f)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
+        // קריאת תנועה מה-Input System
         moveInput = value.Get<Vector2>();
     }
 
-    // קלט קפיצה/שבירה מה-Input System
     public void OnJump_Break(InputValue value)
     {
+        // אם המשחק בפאוז — מתעלמים מקפיצה/שבירה
+        if (Time.timeScale == 0f)
+            return;
+
         bool pressed = value.isPressed;
 
         // התחלת לחיצה
@@ -113,7 +132,6 @@ public class PlayerEmotionContext : MonoBehaviour
         jumpHeld = pressed;
     }
 
-    // שינוי רגש, נקרא על ידי EmotionController
     public void SetEmotion(EmotionController.Emotion e)
     {
         IEmotionStrategy next =
@@ -128,7 +146,8 @@ public class PlayerEmotionContext : MonoBehaviour
         }
 
         // אם כבר נמצאים באותו רגש, לא עושים כלום
-        if (next == currentStrategy) return;
+        if (next == currentStrategy)
+            return;
 
         // יציאה מהרגש הקודם
         currentStrategy?.Exit();
