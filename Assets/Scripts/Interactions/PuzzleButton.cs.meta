@@ -1,2 +1,16 @@
 fileFormatVersion: 2
 guid: 9caa78e0c191e674282729d813fb6ee3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - levelManager: {instanceID: 0}
+  - normalSprite: {instanceID: 0}
+  - pressedSprite: {instanceID: 0}
+  - glowRenderer: {instanceID: 0}
+  - interactionPopup: {fileID: 553719954662290032, guid: d5a36c3438a4312489f517ca4f2e0479, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
