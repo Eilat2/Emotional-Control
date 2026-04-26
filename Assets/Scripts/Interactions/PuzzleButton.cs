@@ -6,13 +6,13 @@ using UnityEngine.InputSystem;
 public class PuzzleButton : MonoBehaviour
 {
     [Header("Puzzle")]
-    public EmotionType requiredEmotion;           // איזה רגש נדרש לכפתור הזה
-    public LevelPipeManager levelManager;         // מנהל הפאזל שבודק אם הכול נפתר
+    public EmotionType requiredEmotion;      // איזה רגש נדרש לכפתור הזה
+    public PuzzleManager levelManager;       // מנהל הפאזל שבודק אם הכול נפתר
 
     [Header("Button Visual")]
-    [SerializeField] private Sprite normalSprite; // ספרייט רגיל
-    [SerializeField] private Sprite pressedSprite;// ספרייט לחוץ
-    [SerializeField] private float pressScale = 0.9f; // הקטנה בלחיצה
+    [SerializeField] private Sprite normalSprite;      // ספרייט רגיל
+    [SerializeField] private Sprite pressedSprite;     // ספרייט לחוץ
+    [SerializeField] private float pressScale = 0.9f;  // הקטנה בלחיצה
 
     [Header("Glow")]
     [SerializeField] private SpriteRenderer glowRenderer; // הילה סביב הכפתור
@@ -23,11 +23,11 @@ public class PuzzleButton : MonoBehaviour
     [Header("Interaction Popup")]
     [SerializeField] private GameObject interactionPopup; // הפופאפ "Press F"
 
-    private bool playerInside = false;              // האם השחקן בתוך הטריגר
-    private EmotionController playerEmotion;        // הרגש הנוכחי של השחקן
+    private bool playerInside = false;        // האם השחקן בתוך הטריגר
+    private EmotionController playerEmotion;  // הרגש הנוכחי של השחקן
 
-    private bool wasPressed = false;                // האם כבר נלחץ
-    private bool pressedCorrectly = false;          // האם נלחץ נכון
+    private bool wasPressed = false;          // האם הכפתור כבר נלחץ
+    private bool pressedCorrectly = false;    // האם הכפתור נלחץ עם הרגש הנכון
 
     private SpriteRenderer sr;
     private Vector3 originalScale;
@@ -61,7 +61,7 @@ public class PuzzleButton : MonoBehaviour
 
     private void Update()
     {
-        // אם השחקן לא ליד הכפתור - לא עושים כלום
+        // אם השחקן לא ליד הכפתור — לא עושים כלום
         if (!playerInside || playerEmotion == null)
             return;
 
@@ -74,15 +74,16 @@ public class PuzzleButton : MonoBehaviour
 
     private void PressButton()
     {
-        // לא מאפשרים ללחוץ פעמיים
+        // לא מאפשרים ללחוץ על אותו כפתור פעמיים
         if (wasPressed)
             return;
 
+        // שומרים את הרגש הנוכחי של השחקן בזמן הלחיצה
         EmotionType currentEmotion = playerEmotion.GetCurrentEmotion();
 
         wasPressed = true;
 
-        // בדיקה אם הרגש נכון
+        // בודקים אם הרגש של השחקן תואם לרגש שהכפתור דורש
         if (currentEmotion == requiredEmotion)
         {
             pressedCorrectly = true;
@@ -94,32 +95,32 @@ public class PuzzleButton : MonoBehaviour
             Debug.Log("Wrong button press.");
         }
 
-        // שינוי ספרייט לכפתור לחוץ
+        // מחליפים לספרייט של כפתור לחוץ
         if (sr != null && pressedSprite != null)
         {
             sr.sprite = pressedSprite;
         }
 
-        // הקטנה קטנה כדי לתת תחושת לחיצה
+        // מקטינים קצת את הכפתור כדי לתת תחושת לחיצה
         transform.localScale = originalScale * pressScale;
 
-        // הפעלת הילה לפי הרגש
+        // מפעילים הילה בצבע של הרגש שלחץ על הכפתור
         ActivateGlow(currentEmotion);
 
-        // כיבוי הפופאפ אחרי לחיצה
+        // מכבים את הפופאפ אחרי הלחיצה
         if (interactionPopup != null)
         {
             interactionPopup.SetActive(false);
         }
 
-        // עדכון מנהל הפאזל
+        // מעדכנים את מנהל הפאזל כדי שיבדוק אם כל הכפתורים נלחצו נכון
         if (levelManager != null)
         {
             levelManager.CheckPuzzleState();
         }
         else
         {
-            Debug.LogWarning("Level manager is not assigned.");
+            Debug.LogWarning("Puzzle manager is not assigned.");
         }
     }
 
@@ -177,7 +178,7 @@ public class PuzzleButton : MonoBehaviour
 
         Debug.Log("Player left button area.");
 
-        // מסתירים את הפופאפ כשמתרחקים
+        // מסתירים את הפופאפ כשהשחקן מתרחק
         if (interactionPopup != null)
         {
             interactionPopup.SetActive(false);

@@ -410,7 +410,8 @@ MonoBehaviour:
   rageButton: {fileID: 2129984155}
   waterSpray: {fileID: 1190621274}
   fireObject: {fileID: 1225648433}
-  doorController: {fileID: 0}
+  doorObject: {fileID: 1462902141}
+  doorController: {fileID: 1462902143}
   cameraSequence: {fileID: 904870109}
   focusPoint: {fileID: 1629701909}
 --- !u!4 &139903102
@@ -9271,7 +9272,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 20.56
+      value: 19.2
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9394,6 +9395,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 3915239080157023507, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.54096
@@ -9404,11 +9409,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 24.78
+      value: 23.56
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -11.14
+      value: -11.21
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9455,11 +9460,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3915239080157023507, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
   m_PrefabInstance: {fileID: 1462902140}
   m_PrefabAsset: {fileID: 0}
---- !u!61 &1462902142 stripped
-BoxCollider2D:
-  m_CorrespondingSourceObject: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
-  m_PrefabInstance: {fileID: 1462902140}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1462902143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9472,7 +9472,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84b3a106a3b1a7d409343a97b5aa4513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorController
-  blockingCollider: {fileID: 1462902142}
+  blockingCollider: {fileID: 0}
+  disableOnOpen: 0
 --- !u!1 &1472276842
 GameObject:
   m_ObjectHideFlags: 0

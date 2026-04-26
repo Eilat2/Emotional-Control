@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // מנהל הפאזל של הכפתורים
-public class LevelPipeManager : MonoBehaviour
+public class PuzzleManager : MonoBehaviour
 {
     // שלושת הכפתורים בפאזל
     public PuzzleButton neutralButton;
@@ -14,18 +14,38 @@ public class LevelPipeManager : MonoBehaviour
     // האש שתכבה אחרי פתרון נכון
     public GameObject fireObject;
 
-    // הדלת לשלב הבא
+    [Header("Door")]
+    // האובייקט של הדלת עצמה שיופיע אחרי כיבוי האש
+    public GameObject doorObject;
+
+    // סקריפט הדלת שאחראי על פתיחה / ביטול קוליידר
     public DoorController doorController;
 
-    // סקריפט המצלמה שאחראי על מעבר המצלמה לנקודת פוקוס וחזרה
     [Header("Camera Sequence")]
     [SerializeField] private CameraFocusSequence cameraSequence;
-
-    // נקודה באזור המים/אש שאליה המצלמה תזוז
     [SerializeField] private Transform focusPoint;
 
     // כדי שלא נפתור את הפאזל כמה פעמים
     private bool puzzleSolved = false;
+
+    private void Start()
+    {
+        // בתחילת השלב מסתירים את הדלת עצמה
+        if (doorObject != null)
+        {
+            doorObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("Door object is not assigned.");
+        }
+
+        // גם המים מתחילים כבויים
+        if (waterSpray != null)
+        {
+            waterSpray.SetActive(false);
+        }
+    }
 
     // בודק את מצב הפאזל
     public void CheckPuzzleState()
@@ -85,7 +105,18 @@ public class LevelPipeManager : MonoBehaviour
                 Debug.LogWarning("Fire object is not assigned.");
             }
 
-            // פותחים את הדלת
+            // חושפים את הדלת אחרי שהאש נכבית
+            if (doorObject != null)
+            {
+                doorObject.SetActive(true);
+                Debug.Log("Door object revealed. Active: " + doorObject.activeSelf);
+            }
+            else
+            {
+                Debug.LogWarning("Door object is not assigned.");
+            }
+
+            // פותחים את הדלת / מבטלים קוליידר
             if (doorController != null)
             {
                 doorController.OpenDoor();
@@ -96,7 +127,7 @@ public class LevelPipeManager : MonoBehaviour
                 Debug.LogWarning("Door controller is not assigned.");
             }
 
-            // מזיזים את המצלמה לאזור המים/אש ואז מחזירים אותה לשחקן
+            // מזיזים את המצלמה לאזור ואז מחזירים
             if (cameraSequence != null && focusPoint != null)
             {
                 cameraSequence.PlayFocusSequence(focusPoint);
