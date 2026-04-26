@@ -38,9 +38,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
 
+        // אם לא חיברנו Animator ידנית, ננסה למצוא אותו בתוך RageVisual
         if (rageAnimator == null)
         {
             Transform rageVisual = transform.Find("RageVisual");
+
             if (rageVisual != null)
                 rageAnimator = rageVisual.GetComponent<Animator>();
         }
@@ -72,27 +74,33 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        // מפעילים רק ברגע הלחיצה, לא בהחזקה
+        // מפעילים שבירה רק ברגע הלחיצה, לא בזמן החזקה
         if (!pressedThisFrame)
             return;
 
-        // אם השחקן בנוקבאק - לא עושים כלום
+        // אם השחקן בנוקבאק / נעילת פגיעה - לא מאפשרים שבירה
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // תמיד מפעילים אנימציית שבירה כשלוחצים Space בזעם
+        // תמיד מפעילים אנימציית שבירה כשלוחצים Space במצב Rage
         PlayBreakAnimation();
 
-        // אם אין אובייקט שביר בטווח - רק האנימציה תתנגן
+        // אם אין חיישן או שאין כרגע אובייקט שביר בטווח -
+        // רק האנימציה תתנגן ולא יישבר כלום
         if (sensor == null || sensor.current == null)
             return;
+
+        // שומרים את האובייקט השביר ברגע הלחיצה.
+        // זה חשוב כדי שגם אם החיישן משתנה בזמן הדיליי,
+        // עדיין נשבור את מה שהשחקן התכוון לשבור ברגע הלחיצה.
+        IBreakable targetToBreak = sensor.current;
 
         // אם אין מספיק סטאמינה - רק האנימציה תתנגן
         if (rageStamina != null && !rageStamina.Use(breakCost))
             return;
 
-        // אם יש מה לשבור ויש סטאמינה - נשבור אחרי דיליי קטן
-        StartCoroutine(BreakAfterDelay(sensor.current));
+        // אם יש מטרה ויש סטאמינה - שוברים אחרי דיליי קטן
+        StartCoroutine(BreakAfterDelay(targetToBreak));
     }
 
     public void Tick()
@@ -149,8 +157,10 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         yield return new WaitForSeconds(breakDelay);
 
+        // אם עדיין קיימת מטרה אחרי הדיליי - שוברים אותה
         if (target != null)
         {
+            Debug.Log("Breaking target: " + target);
             target.OnBreak();
         }
     }
