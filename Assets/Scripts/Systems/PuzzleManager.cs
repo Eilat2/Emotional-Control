@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 // מנהל הפאזל של הכפתורים
@@ -11,7 +12,11 @@ public class PuzzleManager : MonoBehaviour
     // המים שיופעלו אחרי פתרון נכון
     public GameObject waterSpray;
 
-    // האש שתכבה אחרי פתרון נכון
+    [Header("Water Settings")]
+    // אחרי כמה שניות המים ייכבו לבד
+    [SerializeField] private float waterDuration = 3f;
+
+    // האש שתכבה רק כשהמים נוגעים בה
     public GameObject fireObject;
 
     [Header("Door")]
@@ -27,6 +32,9 @@ public class PuzzleManager : MonoBehaviour
 
     // כדי שלא נפתור את הפאזל כמה פעמים
     private bool puzzleSolved = false;
+
+    // כדי שלא נכבה את האש ונפתח את הדלת כמה פעמים
+    private bool fireExtinguished = false;
 
     private void Start()
     {
@@ -84,47 +92,34 @@ public class PuzzleManager : MonoBehaviour
             Debug.Log("Puzzle solved!");
 
             // מפעילים את המים
+            // שימי לב: כאן כבר לא מכבים את האש ולא פותחים את הדלת.
+            // האש תיכבה רק כשהמים יגעו בה.
             if (waterSpray != null)
             {
                 waterSpray.SetActive(true);
+
+                // מפעיל מחדש את ה-Particle System כדי שהמים יתחילו מיד
+                ParticleSystem ps = waterSpray.GetComponentInChildren<ParticleSystem>();
+
+                if (ps != null)
+                {
+                    ps.Clear();
+                    ps.Play();
+                    Debug.Log("Particle system started.");
+                }
+                else
+                {
+                    Debug.LogWarning("No Particle System found on WaterSpray or its children.");
+                }
+
+                // מכבים את המים אחרי כמה שניות
+                StartCoroutine(StopWaterAfterTime());
+
                 Debug.Log("Water spray activated.");
             }
             else
             {
                 Debug.LogWarning("Water spray is not assigned.");
-            }
-
-            // מכבים את האש
-            if (fireObject != null)
-            {
-                fireObject.SetActive(false);
-                Debug.Log("Fire object deactivated.");
-            }
-            else
-            {
-                Debug.LogWarning("Fire object is not assigned.");
-            }
-
-            // חושפים את הדלת אחרי שהאש נכבית
-            if (doorObject != null)
-            {
-                doorObject.SetActive(true);
-                Debug.Log("Door object revealed. Active: " + doorObject.activeSelf);
-            }
-            else
-            {
-                Debug.LogWarning("Door object is not assigned.");
-            }
-
-            // פותחים את הדלת / מבטלים קוליידר
-            if (doorController != null)
-            {
-                doorController.OpenDoor();
-                Debug.Log("Door opened.");
-            }
-            else
-            {
-                Debug.LogWarning("Door controller is not assigned.");
             }
 
             // מזיזים את המצלמה לאזור ואז מחזירים
@@ -140,6 +135,59 @@ public class PuzzleManager : MonoBehaviour
         else if (!allCorrect)
         {
             Debug.Log("Puzzle failed. Not all buttons were pressed with the correct emotion.");
+        }
+    }
+
+    // מכבה את המים אחרי זמן שהגדרנו ב-Inspector
+    private IEnumerator StopWaterAfterTime()
+    {
+        yield return new WaitForSeconds(waterDuration);
+
+        if (waterSpray != null)
+        {
+            waterSpray.SetActive(false);
+            Debug.Log("Water spray stopped.");
+        }
+    }
+
+    // הפונקציה הזאת תיקרא מהסקריפט של המים כשהם נוגעים באש
+    public void ExtinguishFireAndRevealDoor()
+    {
+        if (fireExtinguished) return;
+
+        fireExtinguished = true;
+
+        // מכבים את האש
+        if (fireObject != null)
+        {
+            fireObject.SetActive(false);
+            Debug.Log("Fire object deactivated by water.");
+        }
+        else
+        {
+            Debug.LogWarning("Fire object is not assigned.");
+        }
+
+        // חושפים את הדלת אחרי שהאש נכבית
+        if (doorObject != null)
+        {
+            doorObject.SetActive(true);
+            Debug.Log("Door object revealed. Active: " + doorObject.activeSelf);
+        }
+        else
+        {
+            Debug.LogWarning("Door object is not assigned.");
+        }
+
+        // פותחים את הדלת / מבטלים קוליידר
+        if (doorController != null)
+        {
+            doorController.OpenDoor();
+            Debug.Log("Door opened.");
+        }
+        else
+        {
+            Debug.LogWarning("Door controller is not assigned.");
         }
     }
 }
