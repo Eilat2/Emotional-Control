@@ -158,4 +158,21 @@ public class PlayerEmotionContext : MonoBehaviour
         // כניסה לרגש החדש
         currentStrategy?.Enter();
     }
+
+    // מחזיר את הדמות לרגש ניטרלי ומאפס קלטים שנשארו מהשלב הקודם
+    public void ResetToNeutral()
+    {
+        moveInput = Vector2.zero;
+        jumpHeld = false;
+        pressedThisFrame = false;
+        releasedThisFrame = false;
+
+        SetEmotion(EmotionController.Emotion.Neutral);
+
+        if (visualSwitcher != null)
+        {
+            visualSwitcher.ShowNeutral();
+            visualSwitcher.SetDirection(0f);
+        }
+    }
 }

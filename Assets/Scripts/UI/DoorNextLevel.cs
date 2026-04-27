@@ -118,6 +118,13 @@ public class DoorNextLevel : MonoBehaviour
             stamina.ResetForNewScene();
         }
 
+        // מחזירים את הדמות לניטרלי לפני מעבר לשלב הבא
+        PlayerEmotionContext emotionContext = player.GetComponent<PlayerEmotionContext>();
+        if (emotionContext != null)
+        {
+            emotionContext.ResetToNeutral();
+        }
+
         // מעבר סצנה
         if (sceneFader != null)
         {
@@ -143,6 +150,7 @@ public class DoorNextLevel : MonoBehaviour
         foreach (MonoBehaviour script in scripts)
         {
             if (script is EmotionController) continue;
+            if (script is PlayerEmotionContext) continue;
             if (script is PlayerSceneReset) continue;
             if (script is PersistentPlayer) continue;
             if (!script.enabled) continue;
