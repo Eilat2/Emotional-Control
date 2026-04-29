@@ -3207,7 +3207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdc0dc131325914fb46f58ca3f976d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CloudMovement
-  speed: 0.3
+  speed: 1.2
   distance: 1
 --- !u!1 &456800738
 GameObject:
@@ -3313,7 +3313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fdc0dc131325914fb46f58ca3f976d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CloudMovement
-  speed: 0.5
+  speed: 1
   distance: 2
 --- !u!1 &519420028
 GameObject:
