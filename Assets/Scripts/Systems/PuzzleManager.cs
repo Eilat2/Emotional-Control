@@ -13,32 +13,28 @@ public class PuzzleManager : MonoBehaviour
     public GameObject waterSpray;
 
     [Header("Water Settings")]
-    // אחרי כמה שניות המים ייכבו לבד
     [SerializeField] private float waterDuration = 3f;
 
     // האש שתכבה רק כשהמים נוגעים בה
     public GameObject fireObject;
 
     [Header("Door")]
-    // האובייקט של הדלת עצמה שיופיע אחרי כיבוי האש
     public GameObject doorObject;
-
-    // סקריפט הדלת שאחראי על פתיחה / ביטול קוליידר
     public DoorController doorController;
+
+    [Header("Stone")]
+    public GameObject unbreakableStone;
+    public GameObject breakableStone;
 
     [Header("Camera Sequence")]
     [SerializeField] private CameraFocusSequence cameraSequence;
     [SerializeField] private Transform focusPoint;
 
-    // כדי שלא נפתור את הפאזל כמה פעמים
     private bool puzzleSolved = false;
-
-    // כדי שלא נכבה את האש ונפתח את הדלת כמה פעמים
     private bool fireExtinguished = false;
 
     private void Start()
     {
-        // בתחילת השלב מסתירים את הדלת עצמה
         if (doorObject != null)
         {
             doorObject.SetActive(false);
@@ -48,14 +44,23 @@ public class PuzzleManager : MonoBehaviour
             Debug.LogWarning("Door object is not assigned.");
         }
 
-        // גם המים מתחילים כבויים
         if (waterSpray != null)
         {
             waterSpray.SetActive(false);
         }
+
+        // בתחילת השלב האבן הלא שבירה פעילה, והשבירה כבויה
+        if (unbreakableStone != null)
+        {
+            unbreakableStone.SetActive(true);
+        }
+
+        if (breakableStone != null)
+        {
+            breakableStone.SetActive(false);
+        }
     }
 
-    // בודק את מצב הפאזל
     public void CheckPuzzleState()
     {
         Debug.Log("Checking puzzle state...");
@@ -91,14 +96,10 @@ public class PuzzleManager : MonoBehaviour
             puzzleSolved = true;
             Debug.Log("Puzzle solved!");
 
-            // מפעילים את המים
-            // שימי לב: כאן כבר לא מכבים את האש ולא פותחים את הדלת.
-            // האש תיכבה רק כשהמים יגעו בה.
             if (waterSpray != null)
             {
                 waterSpray.SetActive(true);
 
-                // מפעיל מחדש את ה-Particle System כדי שהמים יתחילו מיד
                 ParticleSystem ps = waterSpray.GetComponentInChildren<ParticleSystem>();
 
                 if (ps != null)
@@ -112,7 +113,6 @@ public class PuzzleManager : MonoBehaviour
                     Debug.LogWarning("No Particle System found on WaterSpray or its children.");
                 }
 
-                // מכבים את המים אחרי כמה שניות
                 StartCoroutine(StopWaterAfterTime());
 
                 Debug.Log("Water spray activated.");
@@ -122,7 +122,6 @@ public class PuzzleManager : MonoBehaviour
                 Debug.LogWarning("Water spray is not assigned.");
             }
 
-            // מזיזים את המצלמה לאזור ואז מחזירים
             if (cameraSequence != null && focusPoint != null)
             {
                 cameraSequence.PlayFocusSequence(focusPoint);
@@ -138,7 +137,6 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
-    // מכבה את המים אחרי זמן שהגדרנו ב-Inspector
     private IEnumerator StopWaterAfterTime()
     {
         yield return new WaitForSeconds(waterDuration);
@@ -150,14 +148,12 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
-    // הפונקציה הזאת תיקרא מהסקריפט של המים כשהם נוגעים באש
     public void ExtinguishFireAndRevealDoor()
     {
         if (fireExtinguished) return;
 
         fireExtinguished = true;
 
-        // מכבים את האש
         if (fireObject != null)
         {
             fireObject.SetActive(false);
@@ -168,7 +164,27 @@ public class PuzzleManager : MonoBehaviour
             Debug.LogWarning("Fire object is not assigned.");
         }
 
-        // חושפים את הדלת אחרי שהאש נכבית
+        // מחליפים מאבן לא שבירה לאבן שבירה
+        if (unbreakableStone != null)
+        {
+            unbreakableStone.SetActive(false);
+            Debug.Log("Unbreakable stone deactivated.");
+        }
+        else
+        {
+            Debug.LogWarning("Unbreakable stone is not assigned.");
+        }
+
+        if (breakableStone != null)
+        {
+            breakableStone.SetActive(true);
+            Debug.Log("Breakable stone activated.");
+        }
+        else
+        {
+            Debug.LogWarning("Breakable stone is not assigned.");
+        }
+
         if (doorObject != null)
         {
             doorObject.SetActive(true);
@@ -179,7 +195,6 @@ public class PuzzleManager : MonoBehaviour
             Debug.LogWarning("Door object is not assigned.");
         }
 
-        // פותחים את הדלת / מבטלים קוליידר
         if (doorController != null)
         {
             doorController.OpenDoor();
