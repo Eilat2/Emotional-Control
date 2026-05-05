@@ -2,40 +2,47 @@ using UnityEngine;
 
 public class Stamina : MonoBehaviour
 {
-    // סוג הסטאמינה – כדי שנדע אם היא שייכת לשמחה או לזעם
+    // סוג הסטאמינה – כדי לדעת אם שייכת ל-Joy או Rage
     public enum StaminaType
     {
         Joy,
         Rage
     }
 
-    // קובעים באינספקטור האם זו סטאמינה של Joy או Rage
+    // סוג הסטאמינה של האובייקט הזה (נקבע באינספקטור)
     public StaminaType type = StaminaType.Joy;
 
-    // כמות הסטאמינה המקסימלית
+    // מקסימום סטאמינה
     public float maxStamina = 100f;
 
-    // כמות הסטאמינה הנוכחית (משתנה בזמן המשחק)
+    // סטאמינה נוכחית בזמן המשחק
     public float currentStamina;
 
     [Header("טעינה (Regen)")]
-    public float regenPerSecond = 1f;           // כמה סטאמינה נטענת בשנייה
-    public float regenDelay = 0.4f;             // כמה זמן אחרי שימוש מתחילים להיטען
+    public float regenPerSecond = 1f;   // כמה נטען כל שנייה
+    public float regenDelay = 0.4f;     // דיליי אחרי שימוש לפני טעינה
 
     [Header("זיהוי חוסר תזוזה")]
-    public float idleSpeedThreshold = 0.05f;    // מתחת לזה נחשב "לא זז"
+    public float idleSpeedThreshold = 0.05f;
 
-    private Rigidbody2D rb;                     // כדי לדעת אם השחקן זז
-    private float lastUseTime;                  // מתי בפעם האחרונה השתמשנו בסטאמינה
+    private Rigidbody2D rb;                      // כדי לבדוק אם השחקן זז
+    private float lastUseTime;                   // מתי השתמשנו לאחרונה
+    private PlayerEmotionContext emotionContext; // 🔥 חיבור ל-Context
+
+    // כדי שלא נפעיל GameOver כמה פעמים
+    private bool depletedTriggered = false;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // מביאים את ה-Context מהשחקן
+        emotionContext = GetComponent<PlayerEmotionContext>();
     }
 
     void Start()
     {
-        // בתחילת המשחק הסטאמינה מלאה
+        // מתחילים עם סטאמינה מלאה
         currentStamina = maxStamina;
     }
 
@@ -47,11 +54,11 @@ public class Stamina : MonoBehaviour
 
     void RegenerateWhenIdle()
     {
-        // אם כבר מלא – אין מה להטעין
+        // אם כבר מלא – אין צורך להטעין
         if (currentStamina >= maxStamina)
             return;
 
-        // אם עדיין לא עבר זמן הדיליי מאז שימוש – לא נטען עדיין
+        // אם עוד לא עבר זמן מאז השימוש האחרון – לא נטען
         if (Time.time < lastUseTime + regenDelay)
             return;
 
@@ -59,58 +66,89 @@ public class Stamina : MonoBehaviour
         if (!IsIdle())
             return;
 
-        // נטענים לאט לאט
+        // טעינה הדרגתית
         currentStamina += regenPerSecond * Time.deltaTime;
 
-        // דואגים שלא יעלה מעל המקסימום
+        // שלא יעבור את המקסימום
         currentStamina = Mathf.Min(currentStamina, maxStamina);
     }
 
     bool IsIdle()
     {
-        // אם אין Rigidbody2D (לא אמור לקרות) אז נתייחס כ-idle
+        // אם אין Rigidbody – נניח שהוא idle
         if (rb == null) return true;
 
-        // נבדוק מהירות בפועל
+        // בודקים מהירות
         return rb.linearVelocity.magnitude <= idleSpeedThreshold;
     }
 
     /// <summary>
     /// שימוש בסטאמינה
-    /// amount = כמה להוריד
-    /// מחזיר true אם עדיין נשארה סטאמינה, false אם נגמרה
+    /// מחזיר true אם נשארה סטאמינה
+    /// מחזיר false אם נגמרה
     /// </summary>
     public bool Use(float amount)
     {
-        // אם כבר אין סטאמינה – אי אפשר להשתמש
+        // אם כבר אין סטאמינה – מפעילים כישלון
         if (currentStamina <= 0f)
+        {
+            TriggerDepleted();
             return false;
+        }
 
-        // מורידים את הכמות שביקשו
+        // מורידים סטאמינה
         currentStamina -= amount;
 
-        // דואגים שלא תרד מתחת ל-0
+        // לא יורדים מתחת ל-0
         currentStamina = Mathf.Max(currentStamina, 0f);
 
-        // חשוב: מסמנים זמן שימוש אחרון כדי לעצור טעינה רגע אחרי שימוש
+        // שומרים זמן שימוש אחרון
         lastUseTime = Time.time;
 
-        // מחזיר האם עדיין יש סטאמינה
-        return currentStamina > 0f;
+        // אם נגמר עכשיו – מפעילים כישלון
+        if (currentStamina <= 0f)
+        {
+            TriggerDepleted();
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
-    /// מילוי מלא של הסטאמינה
-    /// (לדוגמה: אחרי פסילה / Respawn)
+    /// מפעיל את ה-Failure של השחקן (דרך ה-Context)
+    /// </summary>
+    private void TriggerDepleted()
+    {
+        // שלא יקרה פעמיים
+        if (depletedTriggered)
+            return;
+
+        depletedTriggered = true;
+
+        // קוראים ל-Context שיפעיל את ה-Strategy המתאים
+        if (emotionContext != null)
+        {
+            emotionContext.OnStaminaDepleted();
+        }
+    }
+
+    /// <summary>
+    /// מילוי מלא (למשל אחרי Respawn)
     /// </summary>
     public void Refill()
     {
         currentStamina = maxStamina;
+        depletedTriggered = false;
     }
+
+    /// <summary>
+    /// איפוס כשעוברים סצנה
+    /// </summary>
     public void ResetForNewScene()
     {
         currentStamina = maxStamina;
         lastUseTime = 0f;
+        depletedTriggered = false;
     }
 }
-

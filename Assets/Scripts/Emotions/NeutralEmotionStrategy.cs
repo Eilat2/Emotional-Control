@@ -3,6 +3,7 @@ using UnityEngine;
 // אסטרטגיה של מצב ניטרלי:
 // - תנועה ימינה/שמאלה בלבד
 // - Space לא עושה כלום
+// - אם נפסלים במצב ניטרלי -> Game Over מיידי
 // - מעדכן אנימציית Idle / Walk לפי מהירות
 public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
@@ -10,37 +11,41 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float moveSpeed = 6f;
 
     [Header("Animation")]
-    [SerializeField] private Animator neutralAnimator; // לגרור לכאן את Animator של NeutralVisual
+    [SerializeField] private Animator neutralAnimator;
 
-    private Rigidbody2D rb;              // פיזיקה של השחקן
-    private PlayerHurtLock hurtLock;     // כדי לא לדרוס נוקבאק בזמן פגיעה
-    private Vector2 moveInput;           // קלט תנועה מה-Context
+    private Rigidbody2D rb;
+    private PlayerHurtLock hurtLock;
+    private Vector2 moveInput;
+
+    // כדי שלא יופעל Game Over כמה פעמים
+    private bool isFailing = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
 
-        // אם לא חיברת ידנית, ננסה למצוא את ה-Animator של NeutralVisual
         ResolveNeutralAnimator();
     }
 
     public void Enter()
     {
-        // כשנכנסים לניטרלי מתחילים ממצב עמידה
+        isFailing = false;
+
         if (neutralAnimator != null)
             neutralAnimator.SetFloat("speed", 0f);
     }
 
     public void Exit()
     {
-        // כשעוזבים ניטרלי מאפסים את האנימציה
         if (neutralAnimator != null)
             neutralAnimator.SetFloat("speed", 0f);
     }
 
     public void HandleMove(Vector2 move)
     {
+        if (isFailing) return;
+
         moveInput = move;
     }
 
@@ -51,7 +56,8 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Tick()
     {
-        // אם השחקן בנעילת פגיעה - לא מזיזים אותו כדי לא לדרוס נוקבאק
+        if (isFailing) return;
+
         if (hurtLock != null && hurtLock.IsLocked)
         {
             if (neutralAnimator != null)
@@ -62,15 +68,37 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         float x = Mathf.Clamp(moveInput.x, -1f, 1f);
 
-        // תנועה אופקית לפי הקלט
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
-        // עדכון אנימציית Idle / Walk
         if (neutralAnimator != null)
             neutralAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
-    // מחפש את ה-Animator של NeutralVisual אם לא חיברת ידנית באינספקטור
+    // במצב ניטרלי אין סטאמינה, אז כל פסילה היא Game Over מיידי
+    public void HandleStaminaDepleted()
+    {
+        if (isFailing) return;
+
+        isFailing = true;
+
+        rb.linearVelocity = Vector2.zero;
+
+        if (neutralAnimator != null)
+            neutralAnimator.SetFloat("speed", 0f);
+
+        // קריאה למסך Game Over שלך
+        PauseMenuInputSystem pauseMenu = FindObjectOfType<PauseMenuInputSystem>();
+
+        if (pauseMenu != null)
+        {
+            pauseMenu.GameOver();
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
+        }
+    }
+
     private void ResolveNeutralAnimator()
     {
         if (neutralAnimator != null) return;

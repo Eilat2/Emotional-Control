@@ -24,4 +24,11 @@ public interface IEmotionStrategy
 
     // נקרא כל פריים מה-Context (Update)
     void Tick();
+
+    // נקרא כשהסטאמינה של הרגש הנוכחי נגמרת
+    // כל Strategy מחליט בעצמו איך השחקן נפסל:
+    // Joy  -> מתעופפת מחוץ למסך
+    // Rage -> מאבד שליטה ורועד
+    // Neutral -> Game Over מיידי
+    void HandleStaminaDepleted();
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
@@ -9,12 +10,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float joyJumpForce = 6f;
 
     [Header("Glide (2nd press)")]
-    [SerializeField] private float normalGravity = 4f;
-    [SerializeField] private float glideGravity = 1.2f;
-    [SerializeField] private float floatUpImpulse = 8f;
+    [SerializeField] private float normalGravity = 4f;      // כבידה רגילה
+    [SerializeField] private float glideGravity = 1.2f;     // כבידה בזמן ריחוף
+    [SerializeField] private float floatUpImpulse = 8f;     // דחיפה למעלה בתחילת ריחוף
 
     [Header("Stamina (Joy)")]
-    [SerializeField] private float glideCostPerSecond = 15f;
+    [SerializeField] private float glideCostPerSecond = 15f; // כמה סטאמינה יורדת לשנייה בזמן ריחוף
     [SerializeField] private Stamina joyStamina;
 
     [Header("Ground Check")]
@@ -25,21 +26,29 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [Header("Animation")]
     [SerializeField] private Animator joyAnimator;
 
+    [Header("Joy Failure")]
+    [SerializeField] private float failureDuration = 3.5f;      // זמן הפסילה
+    [SerializeField] private float failureUpSpeed = 9f;         // מהירות עלייה
+    [SerializeField] private float failureSideAmount = 2.5f;    // מרחק תנועה ימינה ושמאלה
+    [SerializeField] private float failureSideSpeed = 3.5f;     // מהירות התנועה לצדדים
+
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
+    private Collider2D playerCollider;
 
     private Vector2 moveInput;
 
     private bool jumpedFromGround = false;
     private bool glideEnabled = false;
-
     private bool jumpHeld = false;
-    private float holdGraceTimer = 0f;
+
+    private bool isFailing = false; // האם Joy כרגע באמצע פסילה
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
+        playerCollider = GetComponent<Collider2D>();
     }
 
     void Start()
@@ -51,20 +60,46 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Enter()
     {
-        rb.gravityScale = normalGravity;
-
-        if (joyAnimator != null)
-        {
-            joyAnimator.SetFloat("speed", 0f);
-            joyAnimator.SetBool("isGliding", false);
-        }
+        // כשנכנסים ל-Joy מתחילים ממצב נקי
+        StopAllCoroutines();
+        ResetJoyState();
     }
 
     public void Exit()
     {
-        glideEnabled = false;
-        rb.gravityScale = normalGravity;
+        // חשוב:
+        // אם Joy באמצע פסילה, אסור לעצור את ה-Coroutine.
+        // אחרת היא תעוף החוצה אבל לא תגיע לשלב של פתיחת Game Over.
+        if (isFailing)
+            return;
 
+        StopAllCoroutines();
+        ResetJoyState();
+    }
+
+    private void ResetJoyState()
+    {
+        // מאפסים דגלים פנימיים
+        isFailing = false;
+        glideEnabled = false;
+        jumpHeld = false;
+        jumpedFromGround = false;
+        moveInput = Vector2.zero;
+
+        // מחזירים קוליידר ליתר ביטחון
+        if (playerCollider != null)
+            playerCollider.enabled = true;
+
+        // מחזירים פיזיקה תקינה
+        if (rb != null)
+        {
+            rb.simulated = true;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.gravityScale = normalGravity;
+        }
+
+        // מאפסים אנימציה
         if (joyAnimator != null)
         {
             joyAnimator.SetFloat("speed", 0f);
@@ -74,11 +109,17 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleMove(Vector2 move)
     {
+        // בזמן פסילה אין שליטה בתנועה
+        if (isFailing) return;
+
         moveInput = move;
     }
 
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
+        // בזמן פסילה לא מאפשרים קפיצה/ריחוף
+        if (isFailing) return;
+
         jumpHeld = isHeld;
 
         if (hurtLock != null && hurtLock.IsLocked)
@@ -86,7 +127,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         bool grounded = IsGrounded();
 
-        // נחתנו
+        // אם נחתנו – מאפסים מצב ריחוף
         if (grounded && rb.linearVelocity.y <= 0.01f)
         {
             jumpedFromGround = false;
@@ -94,7 +135,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.gravityScale = normalGravity;
         }
 
-        // הפסקת ריחוף
+        // אם שחררנו את הכפתור בזמן ריחוף – מפסיקים לרחף
         if (glideEnabled && releasedThisFrame)
         {
             glideEnabled = false;
@@ -102,7 +143,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // קפיצה ראשונה
+        // קפיצה רגילה מהקרקע
         if (pressedThisFrame && grounded)
         {
             jumpedFromGround = true;
@@ -113,11 +154,15 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // ריחוף
+        // התחלת ריחוף באוויר בלחיצה שנייה
         if (pressedThisFrame && !grounded && jumpedFromGround && !glideEnabled)
         {
+            // אם אין סטאמינה בכלל – נפסלים מיד
             if (joyStamina != null && joyStamina.currentStamina <= 0f)
+            {
+                HandleStaminaDepleted();
                 return;
+            }
 
             glideEnabled = true;
 
@@ -128,36 +173,44 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Tick()
     {
+        // בזמן פסילה לא מריצים תנועה רגילה
+        if (isFailing) return;
+
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // תנועה
+        // תנועה אופקית רגילה
         rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
-        // אנימציית הליכה
+        // עדכון אנימציות
         if (joyAnimator != null)
+        {
             joyAnimator.SetFloat("speed", Mathf.Abs(moveInput.x));
-
-        // 🎯 פה הקסם של הריחוף
-        if (joyAnimator != null)
             joyAnimator.SetBool("isGliding", glideEnabled);
+        }
 
+        // אם לא מרחפים – כבידה רגילה
         if (!glideEnabled)
         {
             rb.gravityScale = normalGravity;
             return;
         }
 
-        // ריחוף פעיל
+        // אם מרחפים ומחזיקים כפתור – צורכים סטאמינה
         if (jumpHeld)
         {
             float cost = glideCostPerSecond * Time.deltaTime;
 
-            if (joyStamina != null && !joyStamina.Use(cost))
+            if (joyStamina != null)
             {
-                glideEnabled = false;
-                rb.gravityScale = normalGravity;
-                return;
+                bool hasStamina = joyStamina.Use(cost);
+
+                // ברגע שהסטאמינה מגיעה ל-0 – מפעילים פסילה מיד
+                if (!hasStamina)
+                {
+                    HandleStaminaDepleted();
+                    return;
+                }
             }
 
             rb.gravityScale = glideGravity;
@@ -165,6 +218,73 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         else
         {
             rb.gravityScale = normalGravity;
+        }
+    }
+
+    public void HandleStaminaDepleted()
+    {
+        // הגנה כדי שהפסילה לא תופעל יותר מפעם אחת
+        if (isFailing) return;
+
+        isFailing = true;
+
+        StartCoroutine(JoyFailure());
+    }
+
+    private IEnumerator JoyFailure()
+    {
+        // מבטלים שליטה וריחוף רגיל
+        glideEnabled = false;
+        jumpHeld = false;
+        moveInput = Vector2.zero;
+
+        // מאפסים פיזיקה לפני תעופה
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+
+        // מבטלים כבידה כדי שתוכל לעוף למעלה בלי ליפול
+        rb.gravityScale = 0f;
+
+        // לא מכבים Collider כדי שלא יהיו נפילות דרך רצפה אחרי Restart
+        if (playerCollider != null)
+            playerCollider.enabled = true;
+
+        // משאירים אנימציית ריחוף בזמן הפסילה
+        if (joyAnimator != null)
+        {
+            joyAnimator.SetFloat("speed", 0f);
+            joyAnimator.SetBool("isGliding", true);
+        }
+
+        float timer = 0f;
+        Vector3 startPosition = transform.position;
+
+        while (timer < failureDuration)
+        {
+            timer += Time.deltaTime;
+
+            // עלייה גבוהה למעלה כדי לצאת מהמסך
+            float upMovement = timer * failureUpSpeed;
+
+            // תנועה איטית מצד לצד בשביל דרמה
+            float sideMovement = Mathf.Sin(timer * failureSideSpeed) * failureSideAmount;
+
+            transform.position = startPosition + new Vector3(sideMovement, upMovement, 0f);
+
+            yield return null;
+        }
+
+        // בסוף הפסילה פותחים את מסך ה-Game Over
+        PauseMenuInputSystem pauseMenu =
+            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
+
+        if (pauseMenu != null)
+        {
+            pauseMenu.GameOver();
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
         }
     }
 

@@ -2,24 +2,38 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-// מנהל את חלון הפאוז (Pause), המשך משחק (Resume) וריסטארט (Restart)
+// מנהל פאוז + ריסטארט + GAME OVER
 public class PauseMenuInputSystem : MonoBehaviour
 {
     [Header("Pause UI")]
-
-    // הפאנל הראשי של הפאוז
     [SerializeField] private GameObject pausePanel;
-
-    // הכפתור הראשון שייבחר אוטומטית
     [SerializeField] private GameObject firstSelectedButton;
+
+    [Header("Game Over UI")]
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject gameOverFirstSelectedButton;
+
+    [Header("Game Over Button")]
+    [SerializeField] private Button gameOverRestartButton;
+
+    [Header("Player Reset")]
+    [SerializeField] private float normalGravityScale = 4f;
 
     private void Start()
     {
+        // סוגרים פאנלים בהתחלה
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
         Time.timeScale = 1f;
+
+        // מחברים את כפתור הריסטארט דרך קוד
+        SetupRestartButton();
     }
 
     private void Update()
@@ -27,6 +41,7 @@ public class PauseMenuInputSystem : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
+        // ESC פותח/סוגר Pause
         if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             bool panelIsOpen = pausePanel != null && pausePanel.activeSelf;
@@ -38,69 +53,134 @@ public class PauseMenuInputSystem : MonoBehaviour
         }
     }
 
-    // פתיחת חלון פאוז
+    // =======================
+    // 🔥 חיבור כפתור ריסטארט
+    // =======================
+    private void SetupRestartButton()
+    {
+        if (gameOverRestartButton == null && gameOverFirstSelectedButton != null)
+            gameOverRestartButton = gameOverFirstSelectedButton.GetComponent<Button>();
+
+        if (gameOverRestartButton != null)
+        {
+            gameOverRestartButton.onClick.RemoveAllListeners();
+            gameOverRestartButton.onClick.AddListener(Restart);
+        }
+    }
+
+    // =======================
+    // ⏸️ PAUSE
+    // =======================
     public void Pause()
     {
-        if (pausePanel == null)
-        {
-            Debug.LogWarning("Pause panel is not assigned.");
-            return;
-        }
+        if (pausePanel == null) return;
 
         pausePanel.SetActive(true);
-
-        // עוצרים את המשחק
         Time.timeScale = 0f;
 
-        // עוצרים פיזית את השחקן כדי שלא ימשיך לזוז בזמן פאוז
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-            }
-        }
+        StopPlayerMovement();
 
-        // בוחרים כפתור ראשון כדי שה-UI יהיה מוכן לקלט
         if (EventSystem.current != null && firstSelectedButton != null)
         {
             EventSystem.current.SetSelectedGameObject(null);
             EventSystem.current.SetSelectedGameObject(firstSelectedButton);
         }
-
-        Debug.Log("Pause menu opened.");
     }
 
-    // חזרה למשחק
+    // ▶️ RESUME
     public void Resume()
     {
-        if (pausePanel == null)
-            return;
+        if (pausePanel == null) return;
 
         pausePanel.SetActive(false);
-
         Time.timeScale = 1f;
-
-        Debug.Log("Pause menu closed.");
     }
 
-    // ריסטארט של השלב הנוכחי
+    // =======================
+    // 🔄 RESTART (תוקן!)
+    // =======================
     public void Restart()
     {
-        Debug.Log("RESTART BUTTON CLICKED!!! Scene: " + SceneManager.GetActiveScene().name);
+        Debug.Log("GAME OVER RESTART CLICKED");
 
-        // מחזירים את הזמן לפני טעינת הסצנה
+        // מחזירים זמן רגיל (קריטי!)
         Time.timeScale = 1f;
 
-        // סוגרים את חלון הפאוז
+        // מנקים UI כדי שלא ייתקע
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
+
+        // סוגרים פאנלים
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
-        // טוענים מחדש את הסצנה הנוכחית בלבד
-        // לא מוחקים את ה-Player, כי הוא Persistent ועובר בין שלבים
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
+        // ❌ חשוב: לא מאפסים שחקן כאן!
+        // PlayerSceneReset יעשה את זה אחרי טעינת הסצנה
+
+        // טוענים מחדש את הסצנה
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // =======================
+    // 💀 GAME OVER
+    // =======================
+    public void GameOver()
+    {
+        if (gameOverPanel == null)
+            gameOverPanel = FindInactiveObjectByName("GameOverPanel");
+
+        if (gameOverPanel == null)
+        {
+            Debug.LogWarning("Game Over panel is not assigned.");
+            return;
+        }
+
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+
+        StopPlayerMovement();
+
+        if (EventSystem.current != null && gameOverFirstSelectedButton != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(gameOverFirstSelectedButton);
+        }
+
+        Debug.Log("Game Over menu opened.");
+    }
+
+    // =======================
+    // 🧠 עצירת שחקן
+    // =======================
+    private void StopPlayerMovement()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+    }
+
+    // =======================
+    // 🔍 חיפוש אובייקט גם אם כבוי
+    // =======================
+    private GameObject FindInactiveObjectByName(string objectName)
+    {
+        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name == objectName && obj.scene.IsValid())
+                return obj;
+        }
+
+        return null;
     }
 }

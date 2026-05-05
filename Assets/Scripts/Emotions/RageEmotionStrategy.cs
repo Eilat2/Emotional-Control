@@ -1,9 +1,9 @@
 using UnityEngine;
+using System.Collections;
 
 // אסטרטגיה של מצב Rage:
-// - תנועה ימינה/שמאלה
-// - Space = תמיד מפעיל אנימציית שבירה
-// - אם יש אובייקט שביר בטווח ויש סטאמינה -> שובר אחרי דיליי קטן
+// - תנועה רגילה + שבירה
+// - כשהסטאמינה נגמרת -> מאבד שליטה מצד לצד על הרצפה ואז Game Over
 public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
     [Header("Movement")]
@@ -20,13 +20,19 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float breakDelay = 0.2f;
     [SerializeField] private float breakAnimationLockTime = 0.35f;
 
+    [Header("Rage Failure (על הרצפה)")]
+    [SerializeField] private float failureDuration = 2.5f;          // כמה זמן הזעם משתגע לפני Game Over
+    [SerializeField] private float failureMoveSpeed = 8f;           // מהירות תנועה בזמן פסילה
+    [SerializeField] private float failureShakeAmount = 0.10f;      // עוצמת רעידה בציר X
+    [SerializeField] private float directionSwitchInterval = 0.12f; // כל כמה זמן מחליף כיוון
+
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
     private Stamina rageStamina;
     private Vector2 moveInput;
 
-    // האם השחקן כרגע באמצע אנימציית שבירה
     private bool isBreaking = false;
+    private bool isFailing = false;
 
     private void Awake()
     {
@@ -37,20 +43,13 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private void Start()
     {
         rageStamina = GetStamina(Stamina.StaminaType.Rage);
-
-        // אם לא חיברנו Animator ידנית, ננסה למצוא אותו בתוך RageVisual
-        if (rageAnimator == null)
-        {
-            Transform rageVisual = transform.Find("RageVisual");
-
-            if (rageVisual != null)
-                rageAnimator = rageVisual.GetComponent<Animator>();
-        }
+        ResolveRageAnimator();
     }
 
     public void Enter()
     {
         isBreaking = false;
+        isFailing = false;
 
         if (rageAnimator != null)
             rageAnimator.SetFloat("speed", 0f);
@@ -59,6 +58,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     public void Exit()
     {
         isBreaking = false;
+        isFailing = false;
 
         if (rb != null)
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -69,42 +69,40 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleMove(Vector2 move)
     {
+        if (isFailing) return;
+
         moveInput = move;
     }
 
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        // מפעילים שבירה רק ברגע הלחיצה, לא בזמן החזקה
-        if (!pressedThisFrame)
-            return;
+        if (isFailing) return;
+        if (!pressedThisFrame) return;
 
-        // אם השחקן בנוקבאק / נעילת פגיעה - לא מאפשרים שבירה
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // תמיד מפעילים אנימציית שבירה כשלוחצים Space במצב Rage
         PlayBreakAnimation();
 
-        // אם אין חיישן או שאין כרגע אובייקט שביר בטווח -
-        // רק האנימציה תתנגן ולא יישבר כלום
         if (sensor == null || sensor.current == null)
             return;
 
-        // שומרים את האובייקט השביר ברגע הלחיצה.
-        // זה חשוב כדי שגם אם החיישן משתנה בזמן הדיליי,
-        // עדיין נשבור את מה שהשחקן התכוון לשבור ברגע הלחיצה.
         IBreakable targetToBreak = sensor.current;
 
-        // אם אין מספיק סטאמינה - רק האנימציה תתנגן
+        // אם אין סטאמינה -> מפעילים פסילה מיד
         if (rageStamina != null && !rageStamina.Use(breakCost))
+        {
+            HandleStaminaDepleted();
             return;
+        }
 
-        // אם יש מטרה ויש סטאמינה - שוברים אחרי דיליי קטן
         StartCoroutine(BreakAfterDelay(targetToBreak));
     }
 
     public void Tick()
     {
+        if (isFailing) return;
+
         if (hurtLock != null && hurtLock.IsLocked)
         {
             if (rageAnimator != null)
@@ -115,7 +113,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         float x = Mathf.Clamp(moveInput.x, -1f, 1f);
 
-        // בזמן אנימציית שבירה עוצרים תנועה כדי שיראו את המכה
+        // בזמן שבירה עוצרים תנועה כדי שיראו את המכה
         if (isBreaking)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -126,12 +124,104 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
+        // תנועה רגילה של Rage
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
         if (rageAnimator != null)
             rageAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
+    // נקרא כשהסטאמינה של Rage נגמרת
+    public void HandleStaminaDepleted()
+    {
+        if (isFailing) return;
+
+        isFailing = true;
+        isBreaking = false;
+
+        StartCoroutine(RageFailure());
+    }
+
+    private IEnumerator RageFailure()
+    {
+        float timer = 0f;
+
+        // כיוון התנועה הראשוני
+        float direction = 1f;
+
+        // טיימר פנימי להחלפת כיוון
+        float switchTimer = 0f;
+
+        if (rageAnimator != null)
+        {
+            rageAnimator.SetFloat("speed", 0f);
+            rageAnimator.ResetTrigger("Break");
+        }
+
+        // שומרים את הסקייל המקורי כדי להחזיר אותו בסוף
+        Vector3 originalScale = transform.localScale;
+
+        while (timer < failureDuration)
+        {
+            timer += Time.deltaTime;
+            switchTimer += Time.deltaTime;
+
+            // מחליפים כיוון בצורה חדה כל כמה רגעים
+            if (switchTimer >= directionSwitchInterval)
+            {
+                direction *= -1f;
+                switchTimer = 0f;
+            }
+
+            // תנועה חדה מצד לצד על הרצפה
+            // שומרים על Y הנוכחי כדי שלא יקפוץ/ירחף
+            rb.linearVelocity = new Vector2(
+                direction * failureMoveSpeed * 3f,
+                rb.linearVelocity.y
+            );
+
+            // רעידה רק בציר X כדי שישתגע לצדדים בלי לעלות לאוויר
+            Vector3 shakeOffset = new Vector3(
+                Random.Range(-failureShakeAmount * 4f, failureShakeAmount * 4f),
+                0f,
+                0f
+            );
+
+            transform.position += shakeOffset;
+
+            // פולס בסקייל: מתרחב ונמחץ קצת, אבל נשאר על הרצפה
+            float pulse = Mathf.Sin(Time.time * 18f);
+
+            float xPulse = 1f + pulse * 0.18f;
+            float yPulse = 1f - pulse * 0.08f;
+
+            transform.localScale = new Vector3(
+                originalScale.x * xPulse,
+                originalScale.y * yPulse,
+                originalScale.z
+            );
+
+            yield return null;
+        }
+
+        // מחזירים מצב תקין לפני פתיחת Game Over
+        rb.linearVelocity = Vector2.zero;
+        transform.localScale = originalScale;
+
+        PauseMenuInputSystem pauseMenu =
+            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
+
+        if (pauseMenu != null)
+        {
+            pauseMenu.GameOver();
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
+        }
+    }
+
+    // מפעיל אנימציית שבירה
     private void PlayBreakAnimation()
     {
         if (rageAnimator == null)
@@ -144,7 +234,8 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rageAnimator.SetTrigger("Break");
     }
 
-    private System.Collections.IEnumerator BreakAnimationLock()
+    // נועל תנועה לזמן קצר בזמן אנימציית השבירה
+    private IEnumerator BreakAnimationLock()
     {
         isBreaking = true;
 
@@ -153,11 +244,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isBreaking = false;
     }
 
-    private System.Collections.IEnumerator BreakAfterDelay(IBreakable target)
+    // שוברת את האובייקט אחרי דיליי קטן, כדי להתאים לאנימציה
+    private IEnumerator BreakAfterDelay(IBreakable target)
     {
         yield return new WaitForSeconds(breakDelay);
 
-        // אם עדיין קיימת מטרה אחרי הדיליי - שוברים אותה
         if (target != null)
         {
             Debug.Log("Breaking target: " + target);
@@ -176,5 +267,15 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         }
 
         return null;
+    }
+
+    private void ResolveRageAnimator()
+    {
+        if (rageAnimator != null) return;
+
+        Transform rageVisual = transform.Find("RageVisual");
+
+        if (rageVisual != null)
+            rageAnimator = rageVisual.GetComponent<Animator>();
     }
 }

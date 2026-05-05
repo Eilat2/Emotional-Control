@@ -1,33 +1,49 @@
-using UnityEngine;
+ο»Ώusing UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerSceneReset : MonoBehaviour
 {
-    // ωεξψ ΰϊ δβεγμ δξχεψι ωμ δωηχο
-    private Vector3 originalScale;
+    [Header("Reset Settings")]
+    [SerializeField] private float normalGravityScale = 4f; // Χ›Χ•Χ— Χ›Χ‘Χ™Χ“Χ” Χ¨Χ’Χ™Χ Χ©Χ Χ”Χ©Χ—Χ§Χ
+
+    private Vector3 originalScale; // Χ©Χ•ΧΧ¨ ΧΧª Χ”Χ’Χ•Χ“Χ Χ”ΧΧ§Χ•Χ¨Χ™ Χ©Χ Χ”Χ©Χ—Χ§Χ
 
     private void Awake()
     {
-        // ωεξψιν ΰϊ δβεγμ δδϊημϊι ωμ δωηχο
+        // Χ©Χ•ΧΧ¨Χ™Χ ΧΧª Χ”Χ’Χ•Χ“Χ Χ”Χ”ΧªΧ—ΧΧªΧ™ Χ©Χ Χ”Χ©Χ—Χ§Χ
         originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
+        // Χ Χ¨Χ©ΧΧ™Χ ΧΧΧ™Χ¨Χ•ΧΆ Χ©Χ ΧΧΆΧ™Χ Χª Χ΅Χ¦Χ Χ”
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
+        // ΧΧ‘ΧΧΧ™Χ Χ”Χ¨Χ©ΧΧ” Χ›Χ“Χ™ ΧΧΧ Χ•ΧΆ Χ‘ΧΧ’Χ™Χ/Χ›Χ¤Χ™ΧΧ•Χ™Χ•Χª
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // ξηζιψιν ΰϊ δβεγμ δψβιμ ωμ δωηχο
+        // π”¥ ΧΧ—Χ–Χ™Χ¨Χ™Χ ΧΧª Χ”Χ©Χ—Χ§Χ ΧΧ Χ§Χ•Χ“Χª Χ”Χ”ΧªΧ—ΧΧ” Χ©Χ Χ”Χ©ΧΧ‘
+        GameObject respawn = GameObject.Find("PlayerSpawnPoint");
+
+        if (respawn != null)
+        {
+            transform.position = respawn.transform.position;
+        }
+        else
+        {
+            Debug.LogWarning("PlayerSpawnPoint not found in scene.");
+        }
+
+        // π”„ ΧΧ—Χ–Χ™Χ¨Χ™Χ Χ’Χ•Χ“Χ Χ¨Χ’Χ™Χ
         transform.localScale = originalScale;
 
-        // ξηζιψιν ΰϊ λμ δρτψιιθιν μωχιτεϊ ψβιμδ
+        // π¨ ΧΧ—Χ–Χ™Χ¨Χ™Χ Χ©Χ§Χ™Χ¤Χ•Χª Χ©Χ Χ›Χ Χ”Χ΅Χ¤Χ¨Χ™Χ™ΧΧ™Χ
         SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
         foreach (SpriteRenderer sr in renderers)
         {
@@ -36,41 +52,45 @@ public class PlayerSceneReset : MonoBehaviour
             sr.color = c;
         }
 
-        // ξτςιμιν ξηγω χεμιιγψιν
+        // π§± ΧΧ¤ΧΆΧ™ΧΧ™Χ ΧΧ—Χ“Χ© Χ§Χ•ΧΧ™Χ™Χ“Χ¨Χ™Χ
         Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
         foreach (Collider2D col in colliders)
         {
             col.enabled = true;
         }
 
-        // ξΰτριν Rigidbody
+        // β™οΈ ΧΧΧ¤Χ΅Χ™Χ Rigidbody (Χ¤Χ™Χ–Χ™Χ§Χ”)
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
-            rb.gravityScale = 1f;
+            rb.gravityScale = normalGravityScale;
             rb.simulated = true;
         }
 
-        // ξηζιψιν ξφα ψβωι μπιθψμι
+        // π§  ΧΧΧ¤Χ΅Χ™Χ ΧΧª ΧΧΆΧ¨Χ›Χª Χ”Χ¨Χ’Χ©Χ•Χª
+        PlayerEmotionContext context = GetComponent<PlayerEmotionContext>();
+        if (context != null)
+        {
+            context.ResetToNeutral();
+        }
+
+        // π’΅ Χ’Χ ΧΧª EmotionController (ΧΧ Χ§Χ™Χ™Χ)
         EmotionController emotion = GetComponent<EmotionController>();
         if (emotion != null)
         {
             emotion.current = EmotionController.Emotion.Neutral;
         }
 
-        // ξΰτριν ρθΰξιπδ
+        // π”‹ ΧΧΧ¤Χ΅Χ™Χ Χ΅ΧΧΧΧ™Χ Χ”
         Stamina[] staminaComponents = GetComponentsInChildren<Stamina>(true);
-        Debug.Log("Found stamina components: " + staminaComponents.Length);
-
         foreach (Stamina stamina in staminaComponents)
         {
             stamina.ResetForNewScene();
-            Debug.Log("Reset stamina: " + stamina.type + " -> " + stamina.currentStamina);
         }
 
-        // ξτςιμιν ξηγω ΰϊ λμ δρχψιτθιν ςμ δωηχο
+        // π”„ ΧΧ¤ΧΆΧ™ΧΧ™Χ ΧΧ—Χ“Χ© Χ›Χ Χ”Χ΅Χ§Χ¨Χ™Χ¤ΧΧ™Χ (ΧΧΧ§Χ¨Χ” Χ©Χ”Χ Χ›Χ•Χ‘Χ•)
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
