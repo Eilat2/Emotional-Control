@@ -51,7 +51,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isBreaking = false;
         isFailing = false;
 
-        if (rageAnimator != null)
+        if (CanUseRageAnimator())
             rageAnimator.SetFloat("speed", 0f);
     }
 
@@ -63,7 +63,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (rb != null)
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
-        if (rageAnimator != null)
+        if (CanUseRageAnimator())
             rageAnimator.SetFloat("speed", 0f);
     }
 
@@ -105,7 +105,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         if (hurtLock != null && hurtLock.IsLocked)
         {
-            if (rageAnimator != null)
+            if (CanUseRageAnimator())
                 rageAnimator.SetFloat("speed", 0f);
 
             return;
@@ -118,7 +118,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
-            if (rageAnimator != null)
+            if (CanUseRageAnimator())
                 rageAnimator.SetFloat("speed", 0f);
 
             return;
@@ -127,7 +127,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         // תנועה רגילה של Rage
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
-        if (rageAnimator != null)
+        if (CanUseRageAnimator())
             rageAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
@@ -152,7 +152,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         // טיימר פנימי להחלפת כיוון
         float switchTimer = 0f;
 
-        if (rageAnimator != null)
+        if (CanUseRageAnimator())
         {
             rageAnimator.SetFloat("speed", 0f);
             rageAnimator.ResetTrigger("Break");
@@ -224,7 +224,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     // מפעיל אנימציית שבירה
     private void PlayBreakAnimation()
     {
-        if (rageAnimator == null)
+        if (!CanUseRageAnimator())
             return;
 
         StopCoroutine(nameof(BreakAnimationLock));
@@ -277,5 +277,13 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         if (rageVisual != null)
             rageAnimator = rageVisual.GetComponent<Animator>();
+    }
+
+    private bool CanUseRageAnimator()
+    {
+        return rageAnimator != null &&
+               rageAnimator.isActiveAndEnabled &&
+               rageAnimator.gameObject.activeInHierarchy &&
+               rageAnimator.runtimeAnimatorController != null;
     }
 }

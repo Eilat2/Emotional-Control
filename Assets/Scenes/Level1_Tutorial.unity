@@ -1911,6 +1911,43 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!70 &194889455
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194889403}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 6200000, guid: 789ae93c82bbfc248884f2e26c021f9d, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.010891259, y: 0}
+  m_Size: {x: 1.0217824, y: 1.0217824}
+  m_Direction: 0
 --- !u!1 &298988693
 GameObject:
   m_ObjectHideFlags: 0
@@ -2073,7 +2110,7 @@ CompositeCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_GeometryType: 0
+  m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
   m_ColliderPaths:
@@ -13067,6 +13104,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3126607631450794264, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3126607631450794264, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4040764713569367810, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -13163,6 +13208,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.7
       objectReference: {fileID: 0}
+    - target: {fileID: 8213838363953559434, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8313243847825221586, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: breakDelay
       value: 0.45
@@ -13215,6 +13264,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       insertIndex: -1
       addedObject: {fileID: 194889438}
+    - targetCorrespondingSourceObject: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 194889455}
     - targetCorrespondingSourceObject: {fileID: 8878236238191029557, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2056802271}

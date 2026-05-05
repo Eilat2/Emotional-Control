@@ -32,13 +32,13 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         isFailing = false;
 
-        if (neutralAnimator != null)
+        if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", 0f);
     }
 
     public void Exit()
     {
-        if (neutralAnimator != null)
+        if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", 0f);
     }
 
@@ -60,7 +60,7 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         if (hurtLock != null && hurtLock.IsLocked)
         {
-            if (neutralAnimator != null)
+            if (CanUseNeutralAnimator())
                 neutralAnimator.SetFloat("speed", 0f);
 
             return;
@@ -70,7 +70,7 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
-        if (neutralAnimator != null)
+        if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
@@ -83,7 +83,7 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         rb.linearVelocity = Vector2.zero;
 
-        if (neutralAnimator != null)
+        if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", 0f);
 
         // קריאה למסך Game Over שלך
@@ -107,5 +107,13 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         if (neutralVisual != null)
             neutralAnimator = neutralVisual.GetComponent<Animator>();
+    }
+
+    private bool CanUseNeutralAnimator()
+    {
+        return neutralAnimator != null &&
+               neutralAnimator.isActiveAndEnabled &&
+               neutralAnimator.gameObject.activeInHierarchy &&
+               neutralAnimator.runtimeAnimatorController != null;
     }
 }
