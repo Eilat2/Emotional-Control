@@ -26,6 +26,10 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [Header("Animation")]
     [SerializeField] private Animator joyAnimator;
 
+    [Header("Glide Trail")]
+    [SerializeField] private ParticleSystem glideTrail;
+    [SerializeField] private float jumpTrailDuration = 0.25f;
+
     [Header("Joy Failure")]
     [SerializeField] private float failureDuration = 3.5f;      // זמן הפסילה
     [SerializeField] private float failureUpSpeed = 9f;         // מהירות עלייה
@@ -41,6 +45,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private bool jumpedFromGround = false;
     private bool glideEnabled = false;
     private bool jumpHeld = false;
+
+    private Coroutine jumpTrailCoroutine;
 
     private bool isFailing = false; // האם Joy כרגע באמצע פסילה
 
@@ -85,6 +91,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         jumpHeld = false;
         jumpedFromGround = false;
         moveInput = Vector2.zero;
+        jumpTrailCoroutine = null;
 
         // מחזירים קוליידר ליתר ביטחון
         if (playerCollider != null)
@@ -104,6 +111,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             joyAnimator.SetFloat("speed", 0f);
             joyAnimator.SetBool("isGliding", false);
+        }
+
+        // מכבים שובל ריחוף
+        if (glideTrail != null && glideTrail.isPlaying)
+        {
+            glideTrail.Stop();
         }
     }
 
@@ -133,6 +146,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             jumpedFromGround = false;
             glideEnabled = false;
             rb.gravityScale = normalGravity;
+
+            // מכבים שובל ריחוף
+            if (glideTrail != null && glideTrail.isPlaying)
+            {
+                glideTrail.Stop();
+            }
         }
 
         // אם שחררנו את הכפתור בזמן ריחוף – מפסיקים לרחף
@@ -140,6 +159,13 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             glideEnabled = false;
             rb.gravityScale = normalGravity;
+
+            // מכבים שובל ריחוף
+            if (glideTrail != null && glideTrail.isPlaying)
+            {
+                glideTrail.Stop();
+            }
+
             return;
         }
 
@@ -151,6 +177,13 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * joyJumpForce, ForceMode2D.Impulse);
+
+            // מפעילים שובל גם בקפיצה רגילה לזמן קצר
+            if (jumpTrailCoroutine != null)
+                StopCoroutine(jumpTrailCoroutine);
+
+            jumpTrailCoroutine = StartCoroutine(PlayJumpTrail());
+
             return;
         }
 
@@ -168,6 +201,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * floatUpImpulse, ForceMode2D.Impulse);
+
+            // מפעילים שובל ריחוף
+            if (glideTrail != null && !glideTrail.isPlaying)
+            {
+                glideTrail.Play();
+            }
         }
     }
 
@@ -193,6 +232,13 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (!glideEnabled)
         {
             rb.gravityScale = normalGravity;
+
+            // מכבים שובל אם לא מרחפים וגם לא באמצע שובל של קפיצה רגילה
+            if (jumpTrailCoroutine == null && glideTrail != null && glideTrail.isPlaying)
+            {
+                glideTrail.Stop();
+            }
+
             return;
         }
 
@@ -237,6 +283,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         glideEnabled = false;
         jumpHeld = false;
         moveInput = Vector2.zero;
+
+        // מכבים שובל ריחוף
+        if (glideTrail != null && glideTrail.isPlaying)
+        {
+            glideTrail.Stop();
+        }
 
         // מאפסים פיזיקה לפני תעופה
         rb.linearVelocity = Vector2.zero;
@@ -286,6 +338,23 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             Debug.LogWarning("PauseMenuInputSystem not found in scene.");
         }
+    }
+
+    private IEnumerator PlayJumpTrail()
+    {
+        if (glideTrail != null && !glideTrail.isPlaying)
+        {
+            glideTrail.Play();
+        }
+
+        yield return new WaitForSeconds(jumpTrailDuration);
+
+        if (!glideEnabled && glideTrail != null && glideTrail.isPlaying)
+        {
+            glideTrail.Stop();
+        }
+
+        jumpTrailCoroutine = null;
     }
 
     private bool IsGrounded()

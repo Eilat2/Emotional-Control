@@ -18,9 +18,6 @@ public class PauseMenuInputSystem : MonoBehaviour
     [Header("Game Over Button")]
     [SerializeField] private Button gameOverRestartButton;
 
-    [Header("Player Reset")]
-    [SerializeField] private float normalGravityScale = 4f;
-
     private void Start()
     {
         // סוגרים פאנלים בהתחלה

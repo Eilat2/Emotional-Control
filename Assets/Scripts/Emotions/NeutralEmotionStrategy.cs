@@ -87,7 +87,7 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
             neutralAnimator.SetFloat("speed", 0f);
 
         // קריאה למסך Game Over שלך
-        PauseMenuInputSystem pauseMenu = FindObjectOfType<PauseMenuInputSystem>();
+        PauseMenuInputSystem pauseMenu =FindFirstObjectByType<PauseMenuInputSystem>();
 
         if (pauseMenu != null)
         {
