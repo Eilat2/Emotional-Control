@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class ArmoredEnemyPatrol : MonoBehaviour
 {
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyData enemyData;
+
     [Header("Patrol Points")]
     [SerializeField] private Transform[] patrolPoints;
     // מערך של נקודות שהאויב ילך ביניהן
@@ -20,6 +23,13 @@ public class ArmoredEnemyPatrol : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // אם יש EnemyData, לוקחים ממנו את הנתונים
+        if (enemyData != null)
+        {
+            speed = enemyData.speed;
+            reachDistance = enemyData.reachDistance;
+        }
 
         // אם אין נקודות – לעצור את הסקריפט ולתת שגיאה
         if (patrolPoints == null || patrolPoints.Length == 0)

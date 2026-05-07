@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class FlyingEnemyMovement : MonoBehaviour
 {
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyData enemyData;
+
     [Header("Patrol Points")]
     [SerializeField] private Transform[] patrolPoints; // נקודות מסלול (אפשר משולש / ריבוע וכו')
 
@@ -10,6 +13,16 @@ public class FlyingEnemyMovement : MonoBehaviour
     [SerializeField] private float reachDistance = 0.1f; // מרחק הגעה לנקודה
 
     private int currentPointIndex = 0; // אינדקס הנקודה הנוכחית
+
+    private void Awake()
+    {
+        // אם יש EnemyData, לוקחים ממנו את הנתונים
+        if (enemyData != null)
+        {
+            speed = enemyData.speed;
+            reachDistance = enemyData.reachDistance;
+        }
+    }
 
     void Update()
     {

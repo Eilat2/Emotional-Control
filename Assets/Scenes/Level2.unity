@@ -219,6 +219,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1923295664059325346, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: 7705be893e95d4149ba989c8a6accbf8, type: 2}
+    - target: {fileID: 1923295664059325346, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
       propertyPath: patrolPoints.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -5570,6 +5574,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7115047470405517368, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
+      propertyPath: enemyData
+      value: 
+      objectReference: {fileID: 11400000, guid: ce333985513f80f40aa0e89c939023bf, type: 2}
     - target: {fileID: 7115047470405517368, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
       propertyPath: patrolPoints.Array.size
       value: 2

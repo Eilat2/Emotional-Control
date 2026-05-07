@@ -9,6 +9,9 @@ public class EnemyTouchDamage : MonoBehaviour
         SlamDown
     }
 
+    [Header("Enemy Data")]
+    [SerializeField] private EnemyData enemyData;
+
     [Header("Stamina Drain")]
     [SerializeField] float drainAmount = 15f; // כמה סטאמינה יורדת בפגיעה
 
@@ -47,6 +50,25 @@ public class EnemyTouchDamage : MonoBehaviour
     private void Awake()
     {
         myCol = GetComponent<Collider2D>();
+
+        // אם יש EnemyData, לוקחים ממנו את נתוני הפגיעה
+        if (enemyData != null)
+        {
+            drainAmount = enemyData.drainAmount;
+            hitCooldown = enemyData.hitCooldown;
+            hurtLockTime = enemyData.hurtLockTime;
+            invincibleTime = enemyData.invincibleTime;
+            neutralGameOverDelay = enemyData.neutralGameOverDelay;
+            rageKnockbackX = enemyData.rageKnockbackX;
+            rageKnockbackY = enemyData.rageKnockbackY;
+            joyReaction = enemyData.joyReaction;
+            joyKnockbackX = enemyData.joyKnockbackX;
+            joyKnockbackY = enemyData.joyKnockbackY;
+            joySlamDownY = enemyData.joySlamDownY;
+            joyPushBackX = enemyData.joyPushBackX;
+            ignoreIfPlayerStompsFromAbove = enemyData.ignoreIfPlayerStompsFromAbove;
+            stompTolerance = enemyData.stompTolerance;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision) => TryHit(collision);
