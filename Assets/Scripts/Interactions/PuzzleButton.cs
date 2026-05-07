@@ -78,6 +78,10 @@ public class PuzzleButton : MonoBehaviour
         if (wasPressed)
             return;
 
+        // אם הפאזל כבר נפתר, לא מאפשרים עוד לחיצות
+        if (levelManager != null && levelManager.PuzzleSolved)
+            return;
+
         // שומרים את הרגש הנוכחי של השחקן בזמן הלחיצה
         EmotionType currentEmotion = playerEmotion.GetCurrentEmotion();
 
@@ -113,10 +117,10 @@ public class PuzzleButton : MonoBehaviour
             interactionPopup.SetActive(false);
         }
 
-        // מעדכנים את מנהל הפאזל כדי שיבדוק אם כל הכפתורים נלחצו נכון
+        // מעדכנים את מנהל הפאזל כדי שיבדוק אם הלחיצה נכונה לפי הסדר
         if (levelManager != null)
         {
-            levelManager.CheckPuzzleState();
+            levelManager.RegisterButtonPress(this, currentEmotion, pressedCorrectly);
         }
         else
         {

@@ -18,6 +18,12 @@ public class PuzzleManager : MonoBehaviour
     // האש שתכבה רק כשהמים נוגעים בה
     public GameObject fireObject;
 
+    [Header("Wrong Order UI")]
+    private GameObject orderNotCorrectText; // טקסט שיופיע כשסדר הכפתורים לא נכון
+
+    [SerializeField] private float wrongOrderMessageDuration = 3f;
+    // כמה זמן הטקסט יופיע לפני Game Over
+
     [Header("Door")]
     public GameObject doorObject;
     public DoorController doorController;
@@ -32,6 +38,31 @@ public class PuzzleManager : MonoBehaviour
 
     private bool puzzleSolved = false;
     private bool fireExtinguished = false;
+    private bool puzzleFailed = false;
+
+    // האם הייתה טעות כלשהי במהלך הפאזל
+    private bool sequenceHasMistake = false;
+
+    private int currentSequenceIndex = 0;
+
+    // רק אם הפאזל נפתר חוסמים לחיצות
+    public bool PuzzleSolved => puzzleSolved;
+
+    private void OnEnable()
+    {
+        // מוצאים גם אובייקט כבוי מתוך DontDestroyOnLoad
+        orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
+
+        // מכבים את הודעת הטעות ישר כשהשלב נטען
+        if (orderNotCorrectText != null)
+        {
+            orderNotCorrectText.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("OrderNotCorrectText was not found in scene.");
+        }
+    }
 
     private void Start()
     {
@@ -59,6 +90,46 @@ public class PuzzleManager : MonoBehaviour
         {
             breakableStone.SetActive(false);
         }
+    }
+
+    public void RegisterButtonPress(PuzzleButton button, EmotionType pressedEmotion, bool pressedCorrectly)
+    {
+        if (puzzleSolved || puzzleFailed)
+            return;
+
+        // אם עברנו כבר את כל הכפתורים
+        if (currentSequenceIndex >= 3)
+            return;
+
+        // בודקים איזה כפתור היה אמור להילחץ עכשיו
+        PuzzleButton expectedButton = null;
+
+        switch (currentSequenceIndex)
+        {
+            case 0:
+                expectedButton = neutralButton;
+                break;
+
+            case 1:
+                expectedButton = rageButton;
+                break;
+
+            case 2:
+                expectedButton = joyButton;
+                break;
+        }
+
+        // אם לחצו על כפתור לא נכון או עם רגש לא נכון —
+        // לא מפסילים מיד, רק מסמנים טעות
+        if (!pressedCorrectly || button != expectedButton)
+        {
+            sequenceHasMistake = true;
+            Debug.Log("Puzzle mistake recorded.");
+        }
+
+        currentSequenceIndex++;
+
+        CheckPuzzleState();
     }
 
     public void CheckPuzzleState()
@@ -91,7 +162,14 @@ public class PuzzleManager : MonoBehaviour
             joyButton.PressedCorrectly &&
             rageButton.PressedCorrectly;
 
-        if (allCorrect && !puzzleSolved)
+        bool sequenceComplete =
+            currentSequenceIndex == 3;
+
+        // הצלחה
+        if (allCorrect &&
+            sequenceComplete &&
+            !sequenceHasMistake &&
+            !puzzleSolved)
         {
             puzzleSolved = true;
             Debug.Log("Puzzle solved!");
@@ -131,9 +209,47 @@ public class PuzzleManager : MonoBehaviour
                 Debug.LogWarning("Camera sequence or focus point is not assigned.");
             }
         }
-        else if (!allCorrect)
+
+        // כישלון
+        else if (sequenceComplete)
         {
-            Debug.Log("Puzzle failed. Not all buttons were pressed with the correct emotion.");
+            Debug.Log("Puzzle failed after all buttons were pressed.");
+            StartCoroutine(ShowWrongOrderThenGameOver());
+        }
+    }
+
+    private IEnumerator ShowWrongOrderThenGameOver()
+    {
+        if (puzzleFailed)
+            yield break;
+
+        puzzleFailed = true;
+
+        // אם המים הופעלו איכשהו, מכבים אותם
+        if (waterSpray != null)
+        {
+            waterSpray.SetActive(false);
+        }
+
+        // מציגים הודעת סדר לא נכון
+        if (orderNotCorrectText != null)
+        {
+            orderNotCorrectText.SetActive(true);
+        }
+
+        yield return new WaitForSeconds(wrongOrderMessageDuration);
+
+        // מפעילים Game Over אחרי ההודעה
+        PauseMenuInputSystem pauseMenu =
+            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
+
+        if (pauseMenu != null)
+        {
+            pauseMenu.GameOver();
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
         }
     }
 
@@ -204,5 +320,19 @@ public class PuzzleManager : MonoBehaviour
         {
             Debug.LogWarning("Door controller is not assigned.");
         }
+    }
+
+    // מוצא גם אובייקטים כבויים
+    private GameObject FindInactiveObjectByName(string objectName)
+    {
+        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name == objectName && obj.scene.IsValid())
+                return obj;
+        }
+
+        return null;
     }
 }

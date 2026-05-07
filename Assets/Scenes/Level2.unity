@@ -583,6 +583,7 @@ MonoBehaviour:
   waterSpray: {fileID: 1190621274}
   waterDuration: 4
   fireObject: {fileID: 1225648433}
+  wrongOrderMessageDuration: 3
   doorObject: {fileID: 1462902141}
   doorController: {fileID: 1462902143}
   unbreakableStone: {fileID: 1106521424}
