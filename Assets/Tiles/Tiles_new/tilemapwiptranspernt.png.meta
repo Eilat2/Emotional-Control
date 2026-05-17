@@ -1,0 +1,429 @@
+fileFormatVersion: 2
+guid: 3a88465d59a1a034fb0f0fb177b0e5ad
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2554292114245116993
+    second: tilemapwiptranspernt_0
+  - first:
+      213: -5067459131697715865
+    second: tilemapwiptranspernt_1
+  - first:
+      213: -897441023712203778
+    second: tilemapwiptranspernt_2
+  - first:
+      213: 6020081676806559788
+    second: tilemapwiptranspernt_3
+  - first:
+      213: -8402064751273087172
+    second: tilemapwiptranspernt_4
+  - first:
+      213: -8889807939686524631
+    second: tilemapwiptranspernt_5
+  - first:
+      213: -1813190340601726405
+    second: tilemapwiptranspernt_6
+  - first:
+      213: -3653867480270639510
+    second: tilemapwiptranspernt_7
+  - first:
+      213: 4455326385508224468
+    second: tilemapwiptranspernt_8
+  - first:
+      213: 3096124171940302955
+    second: tilemapwiptranspernt_9
+  - first:
+      213: 2751088256273814346
+    second: tilemapwiptranspernt_10
+  - first:
+      213: -2149450166419534286
+    second: tilemapwiptranspernt_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_0
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 417
+        width: 143
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 144692a052ba27320800000000000000
+      internalID: 2554292114245116993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_1
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 417
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 765295da4c4cca9b0800000000000000
+      internalID: -5067459131697715865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_2
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 417
+        width: 143
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efb65cec426ab83f0800000000000000
+      internalID: -897441023712203778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_3
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 279
+        width: 132
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2894e8a360ab8350800000000000000
+      internalID: 6020081676806559788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_4
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 279
+        width: 131
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3f6980ff9ed56b80800000000000000
+      internalID: -8402064751273087172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_5
+      rect:
+        serializedVersion: 2
+        x: 418
+        y: 279
+        width: 132
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 929998177ce01a480800000000000000
+      internalID: -8889807939686524631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_6
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 137
+        width: 130
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3ab34eedf046d6e0800000000000000
+      internalID: -1813190340601726405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_7
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 138
+        width: 130
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6eed1eb2eada4dc0800000000000000
+      internalID: -3653867480270639510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_8
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 137
+        width: 130
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4dd84a60ebf74dd30800000000000000
+      internalID: 4455326385508224468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_9
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 42
+        width: 143
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b609009c784a7fa20800000000000000
+      internalID: 3096124171940302955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_10
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 41
+        width: 131
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4313f47134dd2620800000000000000
+      internalID: 2751088256273814346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tilemapwiptranspernt_11
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 45
+        width: 143
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23ec820467e9b22e0800000000000000
+      internalID: -2149450166419534286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      tilemapwiptranspernt_0: 2554292114245116993
+      tilemapwiptranspernt_1: -5067459131697715865
+      tilemapwiptranspernt_10: 2751088256273814346
+      tilemapwiptranspernt_11: -2149450166419534286
+      tilemapwiptranspernt_2: -897441023712203778
+      tilemapwiptranspernt_3: 6020081676806559788
+      tilemapwiptranspernt_4: -8402064751273087172
+      tilemapwiptranspernt_5: -8889807939686524631
+      tilemapwiptranspernt_6: -1813190340601726405
+      tilemapwiptranspernt_7: -3653867480270639510
+      tilemapwiptranspernt_8: 4455326385508224468
+      tilemapwiptranspernt_9: 3096124171940302955
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

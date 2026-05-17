@@ -1,19 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DoorNextLevel : MonoBehaviour
 {
-    [SerializeField] private string nextSceneName;          // שם הסצנה הבאה
-    [SerializeField] private SceneFader sceneFader;         // מעבר עם Fade
-    [SerializeField] private DoorGlowController glow;       // glow של הדלת
-    [SerializeField] private Transform portalCenter;        // נקודה במרכז השער
-    [SerializeField] private float suckDuration = 0.5f;     // כמה זמן היניקה תיקח
-    [SerializeField] private bool fadePlayer = true;        // האם להעלים את השחקן תוך כדי
+    [SerializeField] private string nextSceneName;
+    [SerializeField] private SceneFader sceneFader;
+    [SerializeField] private DoorGlowController glow;
+    [SerializeField] private Transform portalCenter;
+    [SerializeField] private float suckDuration = 0.5f;
+    [SerializeField] private bool fadePlayer = true;
 
     private bool canLoad = true;
 
     private readonly List<MonoBehaviour> disabledScripts = new List<MonoBehaviour>();
+
+    private void Start()
+    {
+        // מחפש SceneFader אוטומטית אם לא חובר ידנית
+        if (sceneFader == null)
+        {
+            sceneFader = FindFirstObjectByType<SceneFader>();
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -48,22 +58,23 @@ public class DoorNextLevel : MonoBehaviour
     private IEnumerator SuckPlayerAndLoad(GameObject player)
     {
         Transform playerTransform = player.transform;
+
         Vector3 startPos = playerTransform.position;
         Vector3 endPos = portalCenter != null ? portalCenter.position : transform.position;
 
-        // שומרים את הגודל ההתחלתי של השחקן
         Vector3 startScale = playerTransform.localScale;
         Vector3 endScale = startScale * 0.2f;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+
         float originalGravity = 0f;
 
         if (rb != null)
             originalGravity = rb.gravityScale;
 
-        // לוקחים את כל ה-SpriteRenderer של הילדים,
-        // כי אצלך הוויזואליים נמצאים בתוך ילדים של Player
-        SpriteRenderer[] renderers = player.GetComponentsInChildren<SpriteRenderer>(true);
+        SpriteRenderer[] renderers =
+            player.GetComponentsInChildren<SpriteRenderer>(true);
+
         Color[] startColors = new Color[renderers.Length];
 
         for (int i = 0; i < renderers.Length; i++)
@@ -71,7 +82,7 @@ public class DoorNextLevel : MonoBehaviour
             startColors[i] = renderers[i].color;
         }
 
-        // מכבים שליטה רק אחרי ששמרנו את המצב המקורי
+        // מכבים שליטה זמנית
         DisablePlayerControl(player);
 
         float time = 0f;
@@ -79,15 +90,18 @@ public class DoorNextLevel : MonoBehaviour
         while (time < suckDuration)
         {
             time += Time.deltaTime;
+
             float t = Mathf.Clamp01(time / suckDuration);
 
-            // תנועה חלקה למרכז השער
-            playerTransform.position = Vector3.Lerp(startPos, endPos, t);
+            // תנועה לשער
+            playerTransform.position =
+                Vector3.Lerp(startPos, endPos, t);
 
-            // הקטנה הדרגתית של כל אובייקט השחקן
-            playerTransform.localScale = Vector3.Lerp(startScale, endScale, t);
+            // הקטנה
+            playerTransform.localScale =
+                Vector3.Lerp(startScale, endScale, t);
 
-            // העלמה הדרגתית של כל הספרייטים של השחקן
+            // Fade לשחקן
             if (fadePlayer)
             {
                 for (int i = 0; i < renderers.Length; i++)
@@ -96,6 +110,7 @@ public class DoorNextLevel : MonoBehaviour
 
                     Color c = startColors[i];
                     c.a = Mathf.Lerp(startColors[i].a, 0f, t);
+
                     renderers[i].color = c;
                 }
             }
@@ -103,7 +118,7 @@ public class DoorNextLevel : MonoBehaviour
             yield return null;
         }
 
-        // מאפסים מהירויות ופיזיקה בסיסית
+        // מאפסים פיזיקה
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -112,17 +127,30 @@ public class DoorNextLevel : MonoBehaviour
         }
 
         // מאפסים סטאמינה
-        Stamina[] staminaComponents = player.GetComponentsInChildren<Stamina>(true);
+        Stamina[] staminaComponents =
+            player.GetComponentsInChildren<Stamina>(true);
+
         foreach (Stamina stamina in staminaComponents)
         {
             stamina.ResetForNewScene();
         }
 
-        // מחזירים את הדמות לניטרלי לפני מעבר לשלב הבא
-        PlayerEmotionContext emotionContext = player.GetComponent<PlayerEmotionContext>();
+        // מחזירים לניטרלי
+        PlayerEmotionContext emotionContext =
+            player.GetComponent<PlayerEmotionContext>();
+
         if (emotionContext != null)
         {
             emotionContext.ResetToNeutral();
+        }
+
+        // מחזירים את הסקריפטים שכיבינו
+        foreach (MonoBehaviour script in disabledScripts)
+        {
+            if (script != null)
+            {
+                script.enabled = true;
+            }
         }
 
         // מעבר סצנה
@@ -130,11 +158,16 @@ public class DoorNextLevel : MonoBehaviour
         {
             sceneFader.FadeToScene(nextSceneName);
         }
+        else
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
     }
 
     private void DisablePlayerControl(GameObject player)
     {
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -144,9 +177,9 @@ public class DoorNextLevel : MonoBehaviour
 
         disabledScripts.Clear();
 
-        // מכבים רק סקריפטים של שליטה/תנועה,
-        // ולא מכבים סקריפטים שצריכים להמשיך לעבוד אחרי מעבר סצנה
-        MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
+        MonoBehaviour[] scripts =
+            player.GetComponents<MonoBehaviour>();
+
         foreach (MonoBehaviour script in scripts)
         {
             if (script is EmotionController) continue;
@@ -156,6 +189,7 @@ public class DoorNextLevel : MonoBehaviour
             if (!script.enabled) continue;
 
             script.enabled = false;
+
             disabledScripts.Add(script);
         }
     }

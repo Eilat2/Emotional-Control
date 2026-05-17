@@ -15,26 +15,25 @@ public class CameraFollow2D : MonoBehaviour
     [Header("Return Settings")]
     [SerializeField] private float returnBelowY = 2f;
 
-    // האם כרגע המצלמה צריכה לעקוב גם אחרי Y של השחקן
     private bool followY = false;
 
-    // מיקום ברירת המחדל של המצלמה
+    // האם כרגע המצלמה עוקבת אחרי מטרה מיוחדת כמו מעלית
+    private bool followingSpecialTarget = false;
+
     private float defaultX;
     private float defaultY;
 
     private void Start()
     {
-        // שומרים את מיקום ברירת המחדל של המצלמה בתחילת הסצנה
         defaultX = transform.position.x;
         defaultY = transform.position.y;
 
         if (target == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
+
             if (player != null)
-            {
                 target = player.transform;
-            }
         }
     }
 
@@ -50,31 +49,55 @@ public class CameraFollow2D : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // מאפסים את מיקום הבסיס של המצלמה בכל טעינת סצנה
         defaultX = transform.position.x;
         defaultY = transform.position.y;
+
         followY = false;
+        followingSpecialTarget = false;
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+
         if (player != null)
-        {
             target = player.transform;
-        }
     }
 
-    // מפעיל מעקב אחרי הגובה של השחקן
     public void EnableFollowY()
     {
         followY = true;
+    }
+
+    public void DisableFollowY()
+    {
+        followY = false;
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+        followingSpecialTarget = true;
+    }
+
+    public void ReturnToPlayer()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
+            target = player.transform;
+
+        followingSpecialTarget = false;
+    }
+
+    public void SetMaxY(float newMaxY)
+    {
+        maxY = newMaxY;
     }
 
     private void LateUpdate()
     {
         if (target == null) return;
 
-        // אם המצלמה במצב followY אבל השחקן ירד נמוך מספיק,
-        // חוזרים למיקום הרגיל של המצלמה
-        if (followY && target.position.y < returnBelowY)
+        // מחזירים למצב רגיל רק כשהמטרה היא השחקן, לא כשזו מעלית
+        if (!followingSpecialTarget && followY && target.position.y < returnBelowY)
         {
             followY = false;
         }
@@ -84,20 +107,15 @@ public class CameraFollow2D : MonoBehaviour
 
         if (followY)
         {
-            // בזמן מעקב לגובה - עוקבים אחרי Y של השחקן
             targetY = target.position.y + offset.y;
-
-            // אם בעתיד תרצי גם לעקוב אחרי X, אפשר לשנות פה
             targetX = defaultX;
         }
         else
         {
-            // במצב רגיל - חוזרים למיקום ברירת המחדל
             targetY = defaultY;
             targetX = defaultX;
         }
 
-        // מגבילים את הגובה בין מינימום למקסימום
         targetY = Mathf.Clamp(targetY, minY, maxY);
 
         Vector3 desiredPosition = new Vector3(

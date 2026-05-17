@@ -1,102 +1,118 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EmotionController : MonoBehaviour
 {
-    // הגדרת סוג נתונים חדש שמייצג את שלושת הרגשות האפשריים של הדמות
     public enum Emotion { Neutral, Joy, Rage }
 
-    // משתנה ששומר איזה רגש פעיל כרגע (ברירת מחדל Neutral)
     public Emotion current = Emotion.Neutral;
 
-    // ---------- סקריפטים של Neutral ----------
     [Header("Neutral scripts")]
-    // הסקריפט שמפעיל את התנועה של הדמות במצב Neutral
     [SerializeField] MonoBehaviour neutralMovement;
 
-    // ---------- סקריפטים של Joy ----------
     [Header("Joy scripts")]
-    // הסקריפט שמפעיל את התנועה של הדמות במצב Joy
     [SerializeField] MonoBehaviour joyMovement;
 
-    // ---------- סקריפטים של Rage ----------
     [Header("Rage scripts")]
-    // הסקריפט של התנועה במצב Rage
     [SerializeField] MonoBehaviour rageMovement;
-
-    // הסקריפט שמאפשר לשבור קירות במצב Rage
     [SerializeField] MonoBehaviour rageBreak;
 
-    // ---------- חלק ויזואלי ----------
+    [Header("Emotion World - Level Specific")]
+    // הסקריפט שמדליק/מכבה אובייקטים בעולם לפי הרגש.
+    // הוא קיים רק בשלבים מסוימים, למשל Level 3.
+    // לכן לא חובה לחבר אותו ידנית ב-Inspector.
+    [SerializeField] private EmotionWorldSwitcher emotionWorldSwitcher;
+
     [Header("Visual")]
-
-    // אם עדיין יש SpriteRenderer על ה-Player הראשי
     [SerializeField] SpriteRenderer playerRenderer;
-
-    // הקומפוננטה שמנהלת את הרגש של הדמות במערכת המשחק
     [SerializeField] PlayerEmotionContext context;
-
-    // הסקריפט שמחליף בין שלושת הוויזואלים של הדמות
     [SerializeField] PlayerVisualSwitcher visualSwitcher;
 
-    // צבעים שונים לכל רגש
     public Color neutralColor = Color.white;
     public Color joyColor = Color.yellow;
     public Color rageColor = Color.red;
 
+    void OnEnable()
+    {
+        // מאזינים לטעינת סצנה חדשה.
+        // חשוב במיוחד כי השחקן Persistent ועובר בין סצנות.
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        // מפסיקים להאזין כדי למנוע כפילויות או בעיות בזיכרון.
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     void Start()
     {
-        // אם לא חיברנו ידנית SpriteRenderer דרך ה-Inspector,
-        // Unity ימצא אותו אוטומטית על האובייקט
         if (!playerRenderer) playerRenderer = GetComponent<SpriteRenderer>();
-
-        // אם לא חיברנו את PlayerEmotionContext,
-        // Unity ינסה למצוא אותו על אותו אובייקט
         if (!context) context = GetComponent<PlayerEmotionContext>();
-
-        // אם לא חיברנו את PlayerVisualSwitcher,
-        // Unity ינסה למצוא אותו על אותו אובייקט
         if (!visualSwitcher) visualSwitcher = GetComponent<PlayerVisualSwitcher>();
 
-        // מפעיל את הרגש ההתחלתי של הדמות
+        // מנסה למצוא EmotionWorldSwitcher בסצנה הנוכחית.
+        // אם אין כזה בסצנה, זה פשוט יישאר null ולא יקרה כלום.
+        FindEmotionWorldSwitcher();
+
         ApplyInitial(current);
     }
 
-    // פונקציות שמחליפות את הרגש כאשר קוראים להן (למשל דרך כפתורים או Input)
+    // נקרא אוטומטית בכל פעם שסצנה חדשה נטענת
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // מחפשים מחדש את ה-Switcher כי הוא שייך לסצנה החדשה
+        FindEmotionWorldSwitcher();
+
+        // מיישמים מחדש את מצב העולם לפי הרגש הנוכחי
+        ApplyWorld(current);
+    }
+
+    void FindEmotionWorldSwitcher()
+    {
+        emotionWorldSwitcher = FindFirstObjectByType<EmotionWorldSwitcher>();
+    }
+
     public void OnJoy() => Apply(Emotion.Joy);
     public void OnAnger() => Apply(Emotion.Rage);
     public void OnNeutral() => Apply(Emotion.Neutral);
 
-    // פונקציה שמחליפה את הרגש של הדמות בזמן המשחק
     void Apply(Emotion e)
     {
-        // אם הדמות כבר ברגש הזה לא עושים שינוי
         if (current == e) return;
 
         current = e;
 
-        // מעדכן את מערכת הרגשות במשחק
         context?.SetEmotion(e);
-
-        // משנה את הוויזואל של הדמות לפי הרגש החדש
+        ApplyWorld(e);
         ApplyVisual(e);
     }
 
-    // הפעלה ראשונית של הרגש כשהמשחק מתחיל
     void ApplyInitial(Emotion e)
     {
         current = e;
 
-        // מעדכן את מערכת הרגשות
         context?.SetEmotion(e);
-
-        // משנה את הוויזואל של הדמות
+        ApplyWorld(e);
         ApplyVisual(e);
     }
 
-    // פונקציה שמעדכנת את הוויזואל של הדמות לפי הרגש
+    void ApplyWorld(Emotion e)
+    {
+        // אם בסצנה אין EmotionWorldSwitcher, לא עושים כלום.
+        // ככה שלבים אחרים לא נפגעים.
+        if (emotionWorldSwitcher == null) return;
+
+        if (e == Emotion.Joy)
+            emotionWorldSwitcher.ShowJoyWorld();
+        else if (e == Emotion.Rage)
+            emotionWorldSwitcher.ShowRageWorld();
+        else
+            emotionWorldSwitcher.ShowNeutralWorld();
+    }
+
     void ApplyVisual(Emotion e)
     {
-        // קודם כל מחליפים את הדמות המוצגת
         if (visualSwitcher != null)
         {
             if (e == Emotion.Joy)
@@ -107,8 +123,6 @@ public class EmotionController : MonoBehaviour
                 visualSwitcher.ShowNeutral();
         }
 
-        // אופציונלי: אם עדיין יש SpriteRenderer על ה-Player הראשי,
-        // נשנה גם את הצבע שלו
         if (!playerRenderer) return;
 
         if (e == Emotion.Joy)
@@ -118,14 +132,17 @@ public class EmotionController : MonoBehaviour
         else
             playerRenderer.color = neutralColor;
     }
+
     public EmotionType GetCurrentEmotion()
     {
         switch (current)
         {
             case Emotion.Joy:
                 return EmotionType.Joy;
+
             case Emotion.Rage:
                 return EmotionType.Rage;
+
             default:
                 return EmotionType.Neutral;
         }
