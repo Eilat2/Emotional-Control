@@ -136,6 +136,12 @@ public class PlayerEmotionContext : MonoBehaviour
 
         currentStrategy = next;
 
+        // מאפסים את מצב הקפיצה בכל החלפת רגש
+        // כדי שלא יישאר מצב שבו המשחק חושב שהכפתור עדיין לחוץ
+        jumpHeld = false;
+        pressedThisFrame = false;
+        releasedThisFrame = false;
+
         currentStrategy?.Enter();
     }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// אזור אש שמוריד סטאמינה ומפעיל הבהוב
+// אזור אש שמוריד סטאמינה רק לרגש הפעיל ומפעיל הבהוב
 public class FireDamageZone : MonoBehaviour
 {
     [Header("Stamina Drain")]
@@ -9,31 +9,32 @@ public class FireDamageZone : MonoBehaviour
     [Header("Hit Feedback")]
     [SerializeField] private float feedbackInterval = 0.2f;
 
-    // האם השחקן כרגע בתוך האש
     private bool playerInside = false;
 
-    // רפרנסים לסטאמינה של שמחה וזעם
     private Stamina joyStamina;
     private Stamina rageStamina;
-
-    // רפרנס לסקריפט ההבהוב האמיתי שלך
+    private EmotionController emotionController;
     private PlayerHitFeedback playerHitFeedback;
 
-    // מתי מותר להפעיל שוב הבהוב
     private float nextFeedbackTime = 0f;
 
     void Update()
     {
-        if (!playerInside)
+        if (!playerInside || emotionController == null)
             return;
 
         float drainAmount = drainPerSecond * Time.deltaTime;
 
-        if (joyStamina != null)
-            joyStamina.Use(drainAmount);
+        EmotionType currentEmotion = emotionController.GetCurrentEmotion();
 
-        if (rageStamina != null)
+        if (currentEmotion == EmotionType.Joy && joyStamina != null)
+        {
+            joyStamina.Use(drainAmount);
+        }
+        else if (currentEmotion == EmotionType.Rage && rageStamina != null)
+        {
             rageStamina.Use(drainAmount);
+        }
 
         if (playerHitFeedback != null && Time.time >= nextFeedbackTime)
         {
@@ -51,7 +52,8 @@ public class FireDamageZone : MonoBehaviour
 
         joyStamina = null;
         rageStamina = null;
-        playerHitFeedback = null;
+        emotionController = other.GetComponentInParent<EmotionController>();
+        playerHitFeedback = other.GetComponentInChildren<PlayerHitFeedback>();
 
         Stamina[] staminas = other.GetComponentsInChildren<Stamina>();
 
@@ -62,8 +64,6 @@ public class FireDamageZone : MonoBehaviour
             else if (stamina.type == Stamina.StaminaType.Rage)
                 rageStamina = stamina;
         }
-
-        playerHitFeedback = other.GetComponentInChildren<PlayerHitFeedback>();
 
         nextFeedbackTime = 0f;
 
@@ -79,6 +79,7 @@ public class FireDamageZone : MonoBehaviour
 
         joyStamina = null;
         rageStamina = null;
+        emotionController = null;
         playerHitFeedback = null;
 
         Debug.Log("Player left fire zone.");

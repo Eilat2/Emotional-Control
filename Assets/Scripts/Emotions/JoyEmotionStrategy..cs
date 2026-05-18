@@ -20,7 +20,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundRadius = 0.15f;
+    [SerializeField] private float groundRadius = 0.25f;
     [SerializeField] private LayerMask groundLayer;
 
     [Header("Animation")]
