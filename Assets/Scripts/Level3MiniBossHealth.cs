@@ -10,6 +10,9 @@ public class Level3MiniBossHealth : MonoBehaviour, IBreakable
     [Header("תצוגת חיים מעל הבוס")]
     [SerializeField] private GameObject[] hpVisuals;
 
+    [Header("Joy Attack")]
+    [SerializeField] private float stompBounceForce = 6f;
+
     [Header("Debris")]
     [SerializeField] private GameObject debrisPrefab;
     [SerializeField] private int debrisCount = 8;
@@ -22,57 +25,78 @@ public class Level3MiniBossHealth : MonoBehaviour, IBreakable
     [Header("הדלת שתופיע אחרי ניצחון על הבוס")]
     [SerializeField] private GameObject exitDoor;
 
-    // כמה פגיעות הבוס כבר קיבל
     private int currentHits = 0;
-
-    // מונע מצב שבו הבוס מת יותר מפעם אחת
     private bool isDead = false;
 
     private void Start()
     {
-        // בהתחלה מציגים את כל החיים
         UpdateHPVisuals();
 
-        // הדלת מוסתרת בתחילת הקרב
-        // אם את מעדיפה לכבות ידנית באינספקטור, זה עדיין בסדר.
         if (exitDoor != null)
         {
             exitDoor.SetActive(false);
         }
     }
 
+    // פגיעה של Joy כשהיא קופצת על הבוס מלמעלה
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isDead) return;
+
+        if (!collision.gameObject.CompareTag("Player")) return;
+
+        EmotionController emotionController =
+            collision.gameObject.GetComponent<EmotionController>();
+
+        if (emotionController == null) return;
+
+        // בודק שהשחקן במצב Joy
+        if (emotionController.current != EmotionController.Emotion.Joy) return;
+
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            // אם השחקן פגע בבוס מלמעלה
+            if (contact.normal.y < -0.5f)
+            {
+                OnBreak();
+
+                Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
+
+                if (rb != null)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, stompBounceForce);
+                }
+
+                break;
+            }
+        }
+    }
+
     // נקרא כשהשחקן פוגע בבוס
     public void OnBreak()
     {
-        // אם הבוס כבר מת, לא עושים כלום
         if (isDead) return;
 
         currentHits++;
 
         Debug.Log("Mini Boss Hit: " + currentHits + "/" + hitsToKill);
 
-        // מעדכן את תצוגת החיים מעל הראש
         UpdateHPVisuals();
 
-        // אם עדיין לא הגיע למספר הפגיעות הדרוש — לא מת
         if (currentHits < hitsToKill)
         {
             return;
         }
 
-        // אם הגיע למספר הפגיעות הדרוש — מת
         Die();
     }
 
-    // מעדכן אילו חיים מוצגים מעל הבוס
     private void UpdateHPVisuals()
     {
         for (int i = 0; i < hpVisuals.Length; i++)
         {
             if (hpVisuals[i] == null) continue;
 
-            // מציג חיים רק אם האינדקס שלהם גדול/שווה לכמות הפגיעות
-            // לדוגמה: אחרי פגיעה אחת HP_1 ייכבה, והשאר יישארו
             hpVisuals[i].SetActive(i >= currentHits);
         }
     }
@@ -83,16 +107,13 @@ public class Level3MiniBossHealth : MonoBehaviour, IBreakable
 
         Debug.Log("Mini Boss Defeated!");
 
-        // יוצר שברים / אפקט מוות
         SpawnDebris();
 
-        // מאפשר למעלית לרדת חזרה
         if (elevator != null)
         {
             elevator.UnlockReturnDown();
         }
 
-        // מציג את הדלת לשלב הבא בחדר הראשי
         if (exitDoor != null)
         {
             exitDoor.SetActive(true);
@@ -102,7 +123,6 @@ public class Level3MiniBossHealth : MonoBehaviour, IBreakable
             Debug.LogWarning("Exit Door is not connected to Level3MiniBossHealth");
         }
 
-        // מוחק את הבוס מהסצנה
         Destroy(gameObject);
     }
 

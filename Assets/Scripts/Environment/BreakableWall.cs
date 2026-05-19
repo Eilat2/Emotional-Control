@@ -16,9 +16,17 @@ public class BreakableWall : MonoBehaviour, IBreakable
     [Header("Tutorial")]
     [SerializeField] GameObject tutorialPopup;      // הפופאפ של הטוטוריאל (אם קיים)
 
+    // מונע שבירה כפולה של אותו קיר
+    private bool isBroken = false;
+
     // פונקציה שמופעלת כשהשחקן שובר את הקיר
     public void OnBreak()
     {
+        // אם הקיר כבר נשבר - לא עושים כלום
+        if (isBroken) return;
+
+        isBroken = true;
+
         SpawnDebris(); // יוצרים שברים
 
         // אם יש פופאפ מחובר - נכבה אותו
