@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: d23bea5bb067ef848a515ae7b9b5a163
+guid: 98f6b8369683aff4e81c2efb7c76a569
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4105620035005126877
-    second: Icon_Neutral_0
+      213: -461091460304599353
+    second: Anger Icon V2_0
+  - first:
+      213: -4540048891722321286
+    second: Anger Icon V2_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +103,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Icon_Neutral_0
+      name: Anger Icon V2_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 350
-        width: 978
-        height: 956
+        x: 15
+        y: 0
+        width: 474
+        height: 500
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 327eac6a458e507c0800000000000000
-      internalID: -4105620035005126877
+      spriteID: 7c6049382cfd999f0800000000000000
+      internalID: -461091460304599353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Anger Icon V2_1
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 493
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a723cf156918ef0c0800000000000000
+      internalID: -4540048891722321286
       vertices: []
       indices: 
       edges: []
@@ -125,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b3a0085f34b111544ab6cc843988c028
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Icon_Neutral_0: -4105620035005126877
+      Anger Icon V2_0: -461091460304599353
+      Anger Icon V2_1: -4540048891722321286
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

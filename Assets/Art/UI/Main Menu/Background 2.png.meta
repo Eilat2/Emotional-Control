@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b8601ff5147f9df469a3fea9a06193bf
+guid: 2ad96ca3ca9810f4fba779191e4ddd68
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3218302101225761472
-    second: Happiness Icon_0
+      213: 1553302592239620020
+    second: Background 2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Happiness Icon_0
+      name: Background 2_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 126
-        height: 129
+        width: 1920
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0ca6473b5b4b9ac20800000000000000
-      internalID: 3218302101225761472
+      spriteID: 4bfc2275a707e8510800000000000000
+      internalID: 1553302592239620020
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Happiness Icon_0: 3218302101225761472
+      Background 2_0: 1553302592239620020
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
