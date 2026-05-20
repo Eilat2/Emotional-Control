@@ -11,6 +11,26 @@ public class EmotionWorldSwitcher : MonoBehaviour
     [Header("Neutral Objects")]
     [SerializeField] private GameObject[] neutralObjects;
 
+    private void OnEnable()
+    {
+        GameEvents.OnEmotionChanged += HandleEmotionChanged;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnEmotionChanged -= HandleEmotionChanged;
+    }
+
+    private void HandleEmotionChanged(EmotionController.Emotion emotion)
+    {
+        if (emotion == EmotionController.Emotion.Joy)
+            ShowJoyWorld();
+        else if (emotion == EmotionController.Emotion.Rage)
+            ShowRageWorld();
+        else
+            ShowNeutralWorld();
+    }
+
     public void ShowJoyWorld()
     {
         SetObjects(joyObjects, true);

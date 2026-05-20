@@ -76,11 +76,14 @@ public class PlayerSceneReset : MonoBehaviour
             context.ResetToNeutral();
         }
 
-        // 💡 גם את EmotionController (אם קיים)
+        // 💡 גם את EmotionController
         EmotionController emotion = GetComponent<EmotionController>();
         if (emotion != null)
         {
             emotion.current = EmotionController.Emotion.Neutral;
+
+            // מודיעים לכל המאזינים שהרגש חזר ל-Neutral
+            GameEvents.RaiseEmotionChanged(EmotionController.Emotion.Neutral);
         }
 
         // 🔋 מאפסים סטאמינה
@@ -90,7 +93,7 @@ public class PlayerSceneReset : MonoBehaviour
             stamina.ResetForNewScene();
         }
 
-        // 🔄 מפעילים מחדש כל הסקריפטים (למקרה שהם כובו)
+        // 🔄 מפעילים מחדש כל הסקריפטים
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {

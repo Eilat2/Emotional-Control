@@ -18,6 +18,20 @@ public class PauseMenuInputSystem : MonoBehaviour
     [Header("Game Over Button")]
     [SerializeField] private Button gameOverRestartButton;
 
+    private void OnEnable()
+    {
+        // מאזין ל-Events
+        GameEvents.OnGameOver += GameOver;
+        GameEvents.OnRestartRequested += Restart;
+    }
+
+    private void OnDisable()
+    {
+        // מפסיק להאזין
+        GameEvents.OnGameOver -= GameOver;
+        GameEvents.OnRestartRequested -= Restart;
+    }
+
     private void Start()
     {
         // סוגרים פאנלים בהתחלה
@@ -61,7 +75,13 @@ public class PauseMenuInputSystem : MonoBehaviour
         if (gameOverRestartButton != null)
         {
             gameOverRestartButton.onClick.RemoveAllListeners();
-            gameOverRestartButton.onClick.AddListener(Restart);
+
+            // במקום לקרוא ישירות ל-Restart
+            // הכפתור רק שולח Event
+            gameOverRestartButton.onClick.AddListener(() =>
+            {
+                GameEvents.RaiseRestartRequested();
+            });
         }
     }
 
@@ -94,16 +114,16 @@ public class PauseMenuInputSystem : MonoBehaviour
     }
 
     // =======================
-    // 🔄 RESTART (תוקן!)
+    // 🔄 RESTART
     // =======================
     public void Restart()
     {
         Debug.Log("GAME OVER RESTART CLICKED");
 
-        // מחזירים זמן רגיל (קריטי!)
+        // מחזירים זמן רגיל
         Time.timeScale = 1f;
 
-        // מנקים UI כדי שלא ייתקע
+        // מנקים UI
         if (EventSystem.current != null)
             EventSystem.current.SetSelectedGameObject(null);
 
@@ -113,9 +133,6 @@ public class PauseMenuInputSystem : MonoBehaviour
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
-
-        // ❌ חשוב: לא מאפסים שחקן כאן!
-        // PlayerSceneReset יעשה את זה אחרי טעינת הסצנה
 
         // טוענים מחדש את הסצנה
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -136,6 +153,7 @@ public class PauseMenuInputSystem : MonoBehaviour
         }
 
         gameOverPanel.SetActive(true);
+
         Time.timeScale = 0f;
 
         StopPlayerMovement();
@@ -155,9 +173,11 @@ public class PauseMenuInputSystem : MonoBehaviour
     private void StopPlayerMovement()
     {
         GameObject player = GameObject.FindWithTag("Player");
+
         if (player == null) return;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;

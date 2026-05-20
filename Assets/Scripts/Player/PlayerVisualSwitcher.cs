@@ -7,38 +7,55 @@ public class PlayerVisualSwitcher : MonoBehaviour
     [SerializeField] private GameObject joyVisual;
     [SerializeField] private GameObject rageVisual;
 
-    // שומר את הכיוון האחרון של הדמות
-    // 1 = ימינה, -1 = שמאלה
     private int facingDirection = 1;
+
+    private void OnEnable()
+    {
+        GameEvents.OnEmotionChanged += HandleEmotionChanged;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnEmotionChanged -= HandleEmotionChanged;
+    }
+
+    private void HandleEmotionChanged(EmotionController.Emotion emotion)
+    {
+        if (emotion == EmotionController.Emotion.Joy)
+            ShowJoy();
+        else if (emotion == EmotionController.Emotion.Rage)
+            ShowRage();
+        else
+            ShowNeutral();
+    }
 
     public void ShowNeutral()
     {
-        neutralVisual.SetActive(true);
-        joyVisual.SetActive(false);
-        rageVisual.SetActive(false);
+        if (neutralVisual) neutralVisual.SetActive(true);
+        if (joyVisual) joyVisual.SetActive(false);
+        if (rageVisual) rageVisual.SetActive(false);
 
         ApplyDirection();
     }
 
     public void ShowJoy()
     {
-        neutralVisual.SetActive(false);
-        joyVisual.SetActive(true);
-        rageVisual.SetActive(false);
+        if (neutralVisual) neutralVisual.SetActive(false);
+        if (joyVisual) joyVisual.SetActive(true);
+        if (rageVisual) rageVisual.SetActive(false);
 
         ApplyDirection();
     }
 
     public void ShowRage()
     {
-        neutralVisual.SetActive(false);
-        joyVisual.SetActive(false);
-        rageVisual.SetActive(true);
+        if (neutralVisual) neutralVisual.SetActive(false);
+        if (joyVisual) joyVisual.SetActive(false);
+        if (rageVisual) rageVisual.SetActive(true);
 
         ApplyDirection();
     }
 
-    // נקרא מהתנועה של השחקן ומעדכן לאיזה כיוון הוא מסתכל
     public void SetDirection(float moveX)
     {
         if (moveX > 0.01f)
@@ -53,7 +70,6 @@ public class PlayerVisualSwitcher : MonoBehaviour
         }
     }
 
-    // הופך את כל הוויזואל לפי הכיוון
     private void ApplyDirection()
     {
         SetVisualDirection(neutralVisual);

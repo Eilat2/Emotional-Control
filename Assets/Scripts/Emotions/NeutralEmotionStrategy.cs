@@ -86,17 +86,9 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", 0f);
 
-        // קריאה למסך Game Over שלך
-        PauseMenuInputSystem pauseMenu =FindFirstObjectByType<PauseMenuInputSystem>();
-
-        if (pauseMenu != null)
-        {
-            pauseMenu.GameOver();
-        }
-        else
-        {
-            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
-        }
+        // במקום לחפש ישירות את PauseMenuInputSystem,
+        // שולחים Event של Game Over
+        GameEvents.RaiseGameOver();
     }
 
     private void ResolveNeutralAnimator()

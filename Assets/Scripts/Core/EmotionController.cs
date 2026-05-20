@@ -17,16 +17,9 @@ public class EmotionController : MonoBehaviour
     [SerializeField] MonoBehaviour rageMovement;
     [SerializeField] MonoBehaviour rageBreak;
 
-    [Header("Emotion World - Level Specific")]
-    // הסקריפט שמדליק/מכבה אובייקטים בעולם לפי הרגש.
-    // הוא קיים רק בשלבים מסוימים, למשל Level 3.
-    // לכן לא חובה לחבר אותו ידנית ב-Inspector.
-    [SerializeField] private EmotionWorldSwitcher emotionWorldSwitcher;
-
     [Header("Visual")]
     [SerializeField] SpriteRenderer playerRenderer;
     [SerializeField] PlayerEmotionContext context;
-    [SerializeField] PlayerVisualSwitcher visualSwitcher;
 
     public Color neutralColor = Color.white;
     public Color joyColor = Color.yellow;
@@ -34,14 +27,11 @@ public class EmotionController : MonoBehaviour
 
     void OnEnable()
     {
-        // מאזינים לטעינת סצנה חדשה.
-        // חשוב במיוחד כי השחקן Persistent ועובר בין סצנות.
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void OnDisable()
     {
-        // מפסיקים להאזין כדי למנוע כפילויות או בעיות בזיכרון.
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
@@ -49,28 +39,15 @@ public class EmotionController : MonoBehaviour
     {
         if (!playerRenderer) playerRenderer = GetComponent<SpriteRenderer>();
         if (!context) context = GetComponent<PlayerEmotionContext>();
-        if (!visualSwitcher) visualSwitcher = GetComponent<PlayerVisualSwitcher>();
-
-        // מנסה למצוא EmotionWorldSwitcher בסצנה הנוכחית.
-        // אם אין כזה בסצנה, זה פשוט יישאר null ולא יקרה כלום.
-        FindEmotionWorldSwitcher();
 
         ApplyInitial(current);
     }
 
-    // נקרא אוטומטית בכל פעם שסצנה חדשה נטענת
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // מחפשים מחדש את ה-Switcher כי הוא שייך לסצנה החדשה
-        FindEmotionWorldSwitcher();
-
-        // מיישמים מחדש את מצב העולם לפי הרגש הנוכחי
-        ApplyWorld(current);
-    }
-
-    void FindEmotionWorldSwitcher()
-    {
-        emotionWorldSwitcher = FindFirstObjectByType<EmotionWorldSwitcher>();
+        // בגלל שהשחקן Persistent, כשעוברים סצנה נשלח שוב את הרגש הנוכחי
+        // כדי שכל מערכות הסצנה החדשה, כמו EmotionWorldSwitcher, יתעדכנו.
+        GameEvents.RaiseEmotionChanged(current);
     }
 
     public void OnJoy() => Apply(Emotion.Joy);
@@ -84,8 +61,11 @@ public class EmotionController : MonoBehaviour
         current = e;
 
         context?.SetEmotion(e);
-        ApplyWorld(e);
-        ApplyVisual(e);
+        ApplyColor(e);
+
+        // כאן EmotionController רק מודיע שהרגש השתנה.
+        // הוא לא קורא ישירות ל-WorldSwitcher או ל-VisualSwitcher.
+        GameEvents.RaiseEmotionChanged(e);
     }
 
     void ApplyInitial(Emotion e)
@@ -93,36 +73,13 @@ public class EmotionController : MonoBehaviour
         current = e;
 
         context?.SetEmotion(e);
-        ApplyWorld(e);
-        ApplyVisual(e);
+        ApplyColor(e);
+
+        GameEvents.RaiseEmotionChanged(e);
     }
 
-    void ApplyWorld(Emotion e)
+    void ApplyColor(Emotion e)
     {
-        // אם בסצנה אין EmotionWorldSwitcher, לא עושים כלום.
-        // ככה שלבים אחרים לא נפגעים.
-        if (emotionWorldSwitcher == null) return;
-
-        if (e == Emotion.Joy)
-            emotionWorldSwitcher.ShowJoyWorld();
-        else if (e == Emotion.Rage)
-            emotionWorldSwitcher.ShowRageWorld();
-        else
-            emotionWorldSwitcher.ShowNeutralWorld();
-    }
-
-    void ApplyVisual(Emotion e)
-    {
-        if (visualSwitcher != null)
-        {
-            if (e == Emotion.Joy)
-                visualSwitcher.ShowJoy();
-            else if (e == Emotion.Rage)
-                visualSwitcher.ShowRage();
-            else
-                visualSwitcher.ShowNeutral();
-        }
-
         if (!playerRenderer) return;
 
         if (e == Emotion.Joy)

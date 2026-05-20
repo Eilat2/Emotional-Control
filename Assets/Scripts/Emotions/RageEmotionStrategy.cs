@@ -21,10 +21,10 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float breakAnimationLockTime = 0.35f;
 
     [Header("Rage Failure (על הרצפה)")]
-    [SerializeField] private float failureDuration = 2.5f;          // כמה זמן הזעם משתגע לפני Game Over
-    [SerializeField] private float failureMoveSpeed = 8f;           // מהירות תנועה בזמן פסילה
-    [SerializeField] private float failureShakeAmount = 0.10f;      // עוצמת רעידה בציר X
-    [SerializeField] private float directionSwitchInterval = 0.12f; // כל כמה זמן מחליף כיוון
+    [SerializeField] private float failureDuration = 2.5f;
+    [SerializeField] private float failureMoveSpeed = 8f;
+    [SerializeField] private float failureShakeAmount = 0.10f;
+    [SerializeField] private float directionSwitchInterval = 0.12f;
 
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
@@ -89,7 +89,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         IBreakable targetToBreak = sensor.current;
 
-        // אם אין סטאמינה -> מפעילים פסילה מיד
         if (rageStamina != null && !rageStamina.Use(breakCost))
         {
             HandleStaminaDepleted();
@@ -113,7 +112,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         float x = Mathf.Clamp(moveInput.x, -1f, 1f);
 
-        // בזמן שבירה עוצרים תנועה כדי שיראו את המכה
         if (isBreaking)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -124,14 +122,12 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // תנועה רגילה של Rage
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
         if (CanUseRageAnimator())
             rageAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
-    // נקרא כשהסטאמינה של Rage נגמרת
     public void HandleStaminaDepleted()
     {
         if (isFailing) return;
@@ -146,10 +142,8 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         float timer = 0f;
 
-        // כיוון התנועה הראשוני
         float direction = 1f;
 
-        // טיימר פנימי להחלפת כיוון
         float switchTimer = 0f;
 
         if (CanUseRageAnimator())
@@ -158,7 +152,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rageAnimator.ResetTrigger("Break");
         }
 
-        // שומרים את הסקייל המקורי כדי להחזיר אותו בסוף
         Vector3 originalScale = transform.localScale;
 
         while (timer < failureDuration)
@@ -166,21 +159,17 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             timer += Time.deltaTime;
             switchTimer += Time.deltaTime;
 
-            // מחליפים כיוון בצורה חדה כל כמה רגעים
             if (switchTimer >= directionSwitchInterval)
             {
                 direction *= -1f;
                 switchTimer = 0f;
             }
 
-            // תנועה חדה מצד לצד על הרצפה
-            // שומרים על Y הנוכחי כדי שלא יקפוץ/ירחף
             rb.linearVelocity = new Vector2(
                 direction * failureMoveSpeed * 3f,
                 rb.linearVelocity.y
             );
 
-            // רעידה רק בציר X כדי שישתגע לצדדים בלי לעלות לאוויר
             Vector3 shakeOffset = new Vector3(
                 Random.Range(-failureShakeAmount * 4f, failureShakeAmount * 4f),
                 0f,
@@ -189,7 +178,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             transform.position += shakeOffset;
 
-            // פולס בסקייל: מתרחב ונמחץ קצת, אבל נשאר על הרצפה
             float pulse = Mathf.Sin(Time.time * 18f);
 
             float xPulse = 1f + pulse * 0.18f;
@@ -204,24 +192,13 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             yield return null;
         }
 
-        // מחזירים מצב תקין לפני פתיחת Game Over
         rb.linearVelocity = Vector2.zero;
         transform.localScale = originalScale;
 
-        PauseMenuInputSystem pauseMenu =
-            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
-
-        if (pauseMenu != null)
-        {
-            pauseMenu.GameOver();
-        }
-        else
-        {
-            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
-        }
+        // שולחים Event של Game Over
+        GameEvents.RaiseGameOver();
     }
 
-    // מפעיל אנימציית שבירה
     private void PlayBreakAnimation()
     {
         if (!CanUseRageAnimator())
@@ -234,7 +211,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rageAnimator.SetTrigger("Break");
     }
 
-    // נועל תנועה לזמן קצר בזמן אנימציית השבירה
     private IEnumerator BreakAnimationLock()
     {
         isBreaking = true;
@@ -244,7 +220,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isBreaking = false;
     }
 
-    // שוברת את האובייקט אחרי דיליי קטן, כדי להתאים לאנימציה
     private IEnumerator BreakAfterDelay(IBreakable target)
     {
         yield return new WaitForSeconds(breakDelay);

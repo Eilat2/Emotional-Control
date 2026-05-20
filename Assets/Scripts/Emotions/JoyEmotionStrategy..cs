@@ -10,12 +10,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float joyJumpForce = 6f;
 
     [Header("Glide (2nd press)")]
-    [SerializeField] private float normalGravity = 4f;      // כבידה רגילה
-    [SerializeField] private float glideGravity = 1.2f;     // כבידה בזמן ריחוף
-    [SerializeField] private float floatUpImpulse = 8f;     // דחיפה למעלה בתחילת ריחוף
+    [SerializeField] private float normalGravity = 4f;
+    [SerializeField] private float glideGravity = 1.2f;
+    [SerializeField] private float floatUpImpulse = 8f;
 
     [Header("Stamina (Joy)")]
-    [SerializeField] private float glideCostPerSecond = 15f; // כמה סטאמינה יורדת לשנייה בזמן ריחוף
+    [SerializeField] private float glideCostPerSecond = 15f;
     [SerializeField] private Stamina joyStamina;
 
     [Header("Ground Check")]
@@ -31,10 +31,10 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float jumpTrailDuration = 0.25f;
 
     [Header("Joy Failure")]
-    [SerializeField] private float failureDuration = 3.5f;      // זמן הפסילה
-    [SerializeField] private float failureUpSpeed = 9f;         // מהירות עלייה
-    [SerializeField] private float failureSideAmount = 2.5f;    // מרחק תנועה ימינה ושמאלה
-    [SerializeField] private float failureSideSpeed = 3.5f;     // מהירות התנועה לצדדים
+    [SerializeField] private float failureDuration = 3.5f;
+    [SerializeField] private float failureUpSpeed = 9f;
+    [SerializeField] private float failureSideAmount = 2.5f;
+    [SerializeField] private float failureSideSpeed = 3.5f;
 
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
@@ -48,7 +48,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private Coroutine jumpTrailCoroutine;
 
-    private bool isFailing = false; // האם Joy כרגע באמצע פסילה
+    private bool isFailing = false;
 
     void Awake()
     {
@@ -66,16 +66,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Enter()
     {
-        // כשנכנסים ל-Joy מתחילים ממצב נקי
         StopAllCoroutines();
         ResetJoyState();
     }
 
     public void Exit()
     {
-        // חשוב:
-        // אם Joy באמצע פסילה, אסור לעצור את ה-Coroutine.
-        // אחרת היא תעוף החוצה אבל לא תגיע לשלב של פתיחת Game Over.
         if (isFailing)
             return;
 
@@ -85,7 +81,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private void ResetJoyState()
     {
-        // מאפסים דגלים פנימיים
         isFailing = false;
         glideEnabled = false;
         jumpHeld = false;
@@ -93,11 +88,9 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         moveInput = Vector2.zero;
         jumpTrailCoroutine = null;
 
-        // מחזירים קוליידר ליתר ביטחון
         if (playerCollider != null)
             playerCollider.enabled = true;
 
-        // מחזירים פיזיקה תקינה
         if (rb != null)
         {
             rb.simulated = true;
@@ -106,14 +99,12 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.gravityScale = normalGravity;
         }
 
-        // מאפסים אנימציה
         if (joyAnimator != null)
         {
             joyAnimator.SetFloat("speed", 0f);
             joyAnimator.SetBool("isGliding", false);
         }
 
-        // מכבים שובל ריחוף
         if (glideTrail != null && glideTrail.isPlaying)
         {
             glideTrail.Stop();
@@ -122,7 +113,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleMove(Vector2 move)
     {
-        // בזמן פסילה אין שליטה בתנועה
         if (isFailing) return;
 
         moveInput = move;
@@ -130,7 +120,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        // בזמן פסילה לא מאפשרים קפיצה/ריחוף
         if (isFailing) return;
 
         jumpHeld = isHeld;
@@ -140,27 +129,23 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         bool grounded = IsGrounded();
 
-        // אם נחתנו – מאפסים מצב ריחוף
         if (grounded && rb.linearVelocity.y <= 0.01f)
         {
             jumpedFromGround = false;
             glideEnabled = false;
             rb.gravityScale = normalGravity;
 
-            // מכבים שובל ריחוף
             if (glideTrail != null && glideTrail.isPlaying)
             {
                 glideTrail.Stop();
             }
         }
 
-        // אם שחררנו את הכפתור בזמן ריחוף – מפסיקים לרחף
         if (glideEnabled && releasedThisFrame)
         {
             glideEnabled = false;
             rb.gravityScale = normalGravity;
 
-            // מכבים שובל ריחוף
             if (glideTrail != null && glideTrail.isPlaying)
             {
                 glideTrail.Stop();
@@ -169,7 +154,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // קפיצה רגילה מהקרקע
         if (pressedThisFrame && grounded)
         {
             jumpedFromGround = true;
@@ -178,7 +162,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * joyJumpForce, ForceMode2D.Impulse);
 
-            // מפעילים שובל גם בקפיצה רגילה לזמן קצר
             if (jumpTrailCoroutine != null)
                 StopCoroutine(jumpTrailCoroutine);
 
@@ -187,10 +170,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // התחלת ריחוף באוויר בלחיצה שנייה
         if (pressedThisFrame && !grounded && jumpedFromGround && !glideEnabled)
         {
-            // אם אין סטאמינה בכלל – נפסלים מיד
             if (joyStamina != null && joyStamina.currentStamina <= 0f)
             {
                 HandleStaminaDepleted();
@@ -202,7 +183,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * floatUpImpulse, ForceMode2D.Impulse);
 
-            // מפעילים שובל ריחוף
             if (glideTrail != null && !glideTrail.isPlaying)
             {
                 glideTrail.Play();
@@ -212,28 +192,23 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Tick()
     {
-        // בזמן פסילה לא מריצים תנועה רגילה
         if (isFailing) return;
 
         if (hurtLock != null && hurtLock.IsLocked)
             return;
 
-        // תנועה אופקית רגילה
         rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
-        // עדכון אנימציות
         if (joyAnimator != null)
         {
             joyAnimator.SetFloat("speed", Mathf.Abs(moveInput.x));
             joyAnimator.SetBool("isGliding", glideEnabled);
         }
 
-        // אם לא מרחפים – כבידה רגילה
         if (!glideEnabled)
         {
             rb.gravityScale = normalGravity;
 
-            // מכבים שובל אם לא מרחפים וגם לא באמצע שובל של קפיצה רגילה
             if (jumpTrailCoroutine == null && glideTrail != null && glideTrail.isPlaying)
             {
                 glideTrail.Stop();
@@ -242,7 +217,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        // אם מרחפים ומחזיקים כפתור – צורכים סטאמינה
         if (jumpHeld)
         {
             float cost = glideCostPerSecond * Time.deltaTime;
@@ -251,7 +225,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             {
                 bool hasStamina = joyStamina.Use(cost);
 
-                // ברגע שהסטאמינה מגיעה ל-0 – מפעילים פסילה מיד
                 if (!hasStamina)
                 {
                     HandleStaminaDepleted();
@@ -269,7 +242,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleStaminaDepleted()
     {
-        // הגנה כדי שהפסילה לא תופעל יותר מפעם אחת
         if (isFailing) return;
 
         isFailing = true;
@@ -279,29 +251,23 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private IEnumerator JoyFailure()
     {
-        // מבטלים שליטה וריחוף רגיל
         glideEnabled = false;
         jumpHeld = false;
         moveInput = Vector2.zero;
 
-        // מכבים שובל ריחוף
         if (glideTrail != null && glideTrail.isPlaying)
         {
             glideTrail.Stop();
         }
 
-        // מאפסים פיזיקה לפני תעופה
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
-        // מבטלים כבידה כדי שתוכל לעוף למעלה בלי ליפול
         rb.gravityScale = 0f;
 
-        // לא מכבים Collider כדי שלא יהיו נפילות דרך רצפה אחרי Restart
         if (playerCollider != null)
             playerCollider.enabled = true;
 
-        // משאירים אנימציית ריחוף בזמן הפסילה
         if (joyAnimator != null)
         {
             joyAnimator.SetFloat("speed", 0f);
@@ -315,10 +281,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             timer += Time.deltaTime;
 
-            // עלייה גבוהה למעלה כדי לצאת מהמסך
             float upMovement = timer * failureUpSpeed;
 
-            // תנועה איטית מצד לצד בשביל דרמה
             float sideMovement = Mathf.Sin(timer * failureSideSpeed) * failureSideAmount;
 
             transform.position = startPosition + new Vector3(sideMovement, upMovement, 0f);
@@ -326,18 +290,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             yield return null;
         }
 
-        // בסוף הפסילה פותחים את מסך ה-Game Over
-        PauseMenuInputSystem pauseMenu =
-            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
-
-        if (pauseMenu != null)
-        {
-            pauseMenu.GameOver();
-        }
-        else
-        {
-            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
-        }
+        // שולחים Event של Game Over
+        GameEvents.RaiseGameOver();
     }
 
     private IEnumerator PlayJumpTrail()
