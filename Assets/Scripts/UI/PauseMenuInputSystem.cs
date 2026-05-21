@@ -18,6 +18,18 @@ public class PauseMenuInputSystem : MonoBehaviour
     [Header("Game Over Button")]
     [SerializeField] private Button gameOverRestartButton;
 
+    private bool isPaused = false;
+
+    private void Awake()
+    {
+        // אם לא חיברת באינספקטור, מנסה למצוא לבד
+        if (pausePanel == null)
+            pausePanel = FindInactiveObjectByName("PausePanel");
+
+        if (gameOverPanel == null)
+            gameOverPanel = FindInactiveObjectByName("GameOverPanel");
+    }
+
     private void OnEnable()
     {
         // מאזין ל-Events
@@ -34,13 +46,18 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("PauseMenuInputSystem STARTED");
+
         // סוגרים פאנלים בהתחלה
         if (pausePanel != null)
             pausePanel.SetActive(false);
+        else
+            Debug.LogWarning("PauseMenuInputSystem: PausePanel לא מחובר.");
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
+        isPaused = false;
         Time.timeScale = 1f;
 
         // מחברים את כפתור הריסטארט דרך קוד
@@ -49,19 +66,27 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current == null)
-            return;
+        // ESC דרך New Input System
+        bool escapePressed = Keyboard.current != null &&
+                             Keyboard.current.escapeKey.wasPressedThisFrame;
 
-        // ESC פותח/סוגר Pause
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        // גיבוי: גם P יפתח פאוז, כדי לבדוק אם הבעיה רק ב-ESC
+        bool pPressed = Keyboard.current != null &&
+                        Keyboard.current.pKey.wasPressedThisFrame;
+
+        if (escapePressed || pPressed)
         {
-            bool panelIsOpen = pausePanel != null && pausePanel.activeSelf;
-
-            if (panelIsOpen)
-                Resume();
-            else
-                Pause();
+            Debug.Log("PauseMenuInputSystem: Pause key pressed");
+            TogglePause();
         }
+    }
+
+    private void TogglePause()
+    {
+        if (isPaused)
+            Resume();
+        else
+            Pause();
     }
 
     // =======================
@@ -90,7 +115,16 @@ public class PauseMenuInputSystem : MonoBehaviour
     // =======================
     public void Pause()
     {
-        if (pausePanel == null) return;
+        if (pausePanel == null)
+            pausePanel = FindInactiveObjectByName("PausePanel");
+
+        if (pausePanel == null)
+        {
+            Debug.LogWarning("PauseMenuInputSystem: אי אפשר לפתוח Pause כי PausePanel לא מחובר.");
+            return;
+        }
+
+        isPaused = true;
 
         pausePanel.SetActive(true);
         Time.timeScale = 0f;
@@ -102,15 +136,31 @@ public class PauseMenuInputSystem : MonoBehaviour
             EventSystem.current.SetSelectedGameObject(null);
             EventSystem.current.SetSelectedGameObject(firstSelectedButton);
         }
+
+        Debug.Log("PauseMenuInputSystem: Pause opened");
     }
 
     // ▶️ RESUME
     public void Resume()
     {
-        if (pausePanel == null) return;
+        if (pausePanel == null)
+            pausePanel = FindInactiveObjectByName("PausePanel");
+
+        if (pausePanel == null)
+        {
+            Debug.LogWarning("PauseMenuInputSystem: אי אפשר לסגור Pause כי PausePanel לא מחובר.");
+            return;
+        }
+
+        isPaused = false;
 
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
+
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
+
+        Debug.Log("PauseMenuInputSystem: Pause closed");
     }
 
     // =======================
@@ -122,6 +172,7 @@ public class PauseMenuInputSystem : MonoBehaviour
 
         // מחזירים זמן רגיל
         Time.timeScale = 1f;
+        isPaused = false;
 
         // מנקים UI
         if (EventSystem.current != null)

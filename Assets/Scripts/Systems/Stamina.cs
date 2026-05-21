@@ -34,9 +34,8 @@ public class Stamina : MonoBehaviour
 
     void Start()
     {
-        currentStamina = maxStamina;
-
-        GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
+        // בכל סצנה חדשה הסטאמינה מתחילה מלאה
+        ResetForNewScene();
     }
 
     void Update()
@@ -115,6 +114,7 @@ public class Stamina : MonoBehaviour
 
     public void ResetForNewScene()
     {
+        // איפוס מלא להתחלה נקייה של כל סצנה
         currentStamina = maxStamina;
         lastUseTime = 0f;
         depletedTriggered = false;

@@ -19,7 +19,7 @@ public class PuzzleManager : MonoBehaviour
     public GameObject fireObject;
 
     [Header("Wrong Order UI")]
-    private GameObject orderNotCorrectText; // טקסט שיופיע כשסדר הכפתורים לא נכון
+    [SerializeField] private GameObject orderNotCorrectText; // טקסט שיופיע כשסדר הכפתורים לא נכון
 
     [SerializeField] private float wrongOrderMessageDuration = 3f;
     // כמה זמן הטקסט יופיע לפני Game Over
@@ -48,19 +48,22 @@ public class PuzzleManager : MonoBehaviour
     // רק אם הפאזל נפתר חוסמים לחיצות
     public bool PuzzleSolved => puzzleSolved;
 
+    private void Awake()
+    {
+        // אם לא גררת ידנית באינספקטור,
+        // נחפש את הטקסט לפי השם גם אם הוא כבוי
+        if (orderNotCorrectText == null)
+        {
+            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
+        }
+    }
+
     private void OnEnable()
     {
-        // מוצאים גם אובייקט כבוי מתוך DontDestroyOnLoad
-        orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
-
         // מכבים את הודעת הטעות ישר כשהשלב נטען
         if (orderNotCorrectText != null)
         {
             orderNotCorrectText.SetActive(false);
-        }
-        else
-        {
-            Debug.LogWarning("OrderNotCorrectText was not found in scene.");
         }
     }
 
@@ -89,6 +92,19 @@ public class PuzzleManager : MonoBehaviour
         if (breakableStone != null)
         {
             breakableStone.SetActive(false);
+        }
+
+        // בדיקה אחרונה אחרי שכל הסצנה נטענה
+        if (orderNotCorrectText == null)
+        {
+            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
+        }
+
+        // אם אין טקסט כזה בסצנה, לא נזרוק אזהרה כל הזמן
+        // פשוט המשחק יעבוד בלי להציג את הודעת הטעות
+        if (orderNotCorrectText != null)
+        {
+            orderNotCorrectText.SetActive(false);
         }
     }
 
@@ -229,6 +245,12 @@ public class PuzzleManager : MonoBehaviour
         if (waterSpray != null)
         {
             waterSpray.SetActive(false);
+        }
+
+        // אם לא מצאנו את הטקסט קודם, ננסה שוב לפני ההצגה
+        if (orderNotCorrectText == null)
+        {
+            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
         }
 
         // מציגים הודעת סדר לא נכון

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class EmotionController : MonoBehaviour
 {
@@ -25,29 +24,21 @@ public class EmotionController : MonoBehaviour
     public Color joyColor = Color.yellow;
     public Color rageColor = Color.red;
 
-    void OnEnable()
+    // 🔹 מאתחלים רפרנסים אם חסרים
+    void Awake()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
+        if (!playerRenderer)
+            playerRenderer = GetComponent<SpriteRenderer>();
 
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (!context)
+            context = GetComponent<PlayerEmotionContext>();
     }
 
     void Start()
     {
-        if (!playerRenderer) playerRenderer = GetComponent<SpriteRenderer>();
-        if (!context) context = GetComponent<PlayerEmotionContext>();
-
-        ApplyInitial(current);
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // בגלל שהשחקן Persistent, כשעוברים סצנה נשלח שוב את הרגש הנוכחי
-        // כדי שכל מערכות הסצנה החדשה, כמו EmotionWorldSwitcher, יתעדכנו.
-        GameEvents.RaiseEmotionChanged(current);
+        // 🔥 בכל סצנה השחקן מתחיל מחדש כ-Normal/Neutral
+        // כי כבר לא משתמשים ב-DontDestroyOnLoad
+        ApplyInitial(Emotion.Neutral);
     }
 
     public void OnJoy() => Apply(Emotion.Joy);
@@ -76,6 +67,12 @@ public class EmotionController : MonoBehaviour
         ApplyColor(e);
 
         GameEvents.RaiseEmotionChanged(e);
+    }
+
+    // 🔹 פונקציה שאפשר לקרוא לה אם רוצים לאפס את השחקן לניטרלי
+    public void ResetToNeutral()
+    {
+        ApplyInitial(Emotion.Neutral);
     }
 
     void ApplyColor(Emotion e)

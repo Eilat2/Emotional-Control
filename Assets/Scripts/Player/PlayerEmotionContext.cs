@@ -51,10 +51,9 @@ public class PlayerEmotionContext : MonoBehaviour
 
     private void Start()
     {
-        if (currentStrategy == null)
-        {
-            SetEmotion(EmotionController.Emotion.Neutral);
-        }
+        // 🔥 בכל טעינת סצנה מתחילים מחדש במצב Neutral
+        // כי עכשיו לכל סצנה יש Player חדש
+        ResetToNeutral();
     }
 
     private void Update()
@@ -161,15 +160,19 @@ public class PlayerEmotionContext : MonoBehaviour
 
     public void ResetToNeutral()
     {
+        // 🔹 מאפסים מצב כישלון
         isFailing = false;
 
+        // 🔹 מאפסים אינפוטים
         moveInput = Vector2.zero;
         jumpHeld = false;
         pressedThisFrame = false;
         releasedThisFrame = false;
 
+        // 🔹 מחזירים את השחקן לניטרלי
         SetEmotion(EmotionController.Emotion.Neutral);
 
+        // 🔹 מאפסים גם את הויזואל
         if (visualSwitcher != null)
         {
             visualSwitcher.ShowNeutral();
