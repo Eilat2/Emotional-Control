@@ -1,49 +1,51 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// ============================================================
+//  PlayerSceneReset  (עדכון)
+//
+//  שינוי יחיד מהגרסה הקודמת:
+//    נוספה שורה אחת בסוף OnSceneLoaded שמאפסת את
+//    ה-StateMachine החדשה → ResetMachine()
+//
+//  שאר הקוד זהה לחלוטין.
+// ============================================================
+
 public class PlayerSceneReset : MonoBehaviour
 {
     [Header("Reset Settings")]
-    [SerializeField] private float normalGravityScale = 4f; // כוח כבידה רגיל של השחקן
+    [SerializeField] private float normalGravityScale = 4f;
 
-    private Vector3 originalScale; // שומר את הגודל המקורי של השחקן
+    private Vector3 originalScale;
 
     private void Awake()
     {
-        // שומרים את הגודל ההתחלתי של השחקן
         originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
-        // נרשמים לאירוע של טעינת סצנה
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        // מבטלים הרשמה כדי למנוע באגים/כפילויות
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 🔥 מחזירים את השחקן לנקודת ההתחלה של השלב
+        // 🔥 מחזירים לנקודת ספאון
         GameObject respawn = GameObject.Find("PlayerSpawnPoint");
-
         if (respawn != null)
-        {
             transform.position = respawn.transform.position;
-        }
         else
-        {
             Debug.LogWarning("PlayerSpawnPoint not found in scene.");
-        }
 
-        // 🔄 מחזירים גודל רגיל
+        // 🔄 גודל רגיל
         transform.localScale = originalScale;
 
-        // 🎨 מחזירים שקיפות של כל הספרייטים
+        // 🎨 שקיפות ספרייטים
         SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
         foreach (SpriteRenderer sr in renderers)
         {
@@ -52,14 +54,12 @@ public class PlayerSceneReset : MonoBehaviour
             sr.color = c;
         }
 
-        // 🧱 מפעילים מחדש קוליידרים
+        // 🧱 קוליידרים
         Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
         foreach (Collider2D col in colliders)
-        {
             col.enabled = true;
-        }
 
-        // ⚙️ מאפסים Rigidbody (פיזיקה)
+        // ⚙️ פיזיקה
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
@@ -69,35 +69,32 @@ public class PlayerSceneReset : MonoBehaviour
             rb.simulated = true;
         }
 
-        // 🧠 מאפסים את מערכת הרגשות
+        // 🧠 מערכת רגשות
         PlayerEmotionContext context = GetComponent<PlayerEmotionContext>();
         if (context != null)
-        {
             context.ResetToNeutral();
-        }
 
-        // 💡 גם את EmotionController
+        // 💡 EmotionController
         EmotionController emotion = GetComponent<EmotionController>();
         if (emotion != null)
         {
             emotion.current = EmotionController.Emotion.Neutral;
-
-            // מודיעים לכל המאזינים שהרגש חזר ל-Neutral
             GameEvents.RaiseEmotionChanged(EmotionController.Emotion.Neutral);
         }
 
-        // 🔋 מאפסים סטאמינה
+        // 🔋 סטאמינה
         Stamina[] staminaComponents = GetComponentsInChildren<Stamina>(true);
         foreach (Stamina stamina in staminaComponents)
-        {
             stamina.ResetForNewScene();
-        }
 
-        // 🔄 מפעילים מחדש כל הסקריפטים
+        // 🔄 מפעילים מחדש סקריפטים
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
-        {
             script.enabled = true;
-        }
+
+        // ✅ [חדש] מאפסים את ה-State Machine → חזרה ל-IdleState
+        PlayerStateMachine sm = GetComponent<PlayerStateMachine>();
+        if (sm != null)
+            sm.ResetMachine();
     }
 }

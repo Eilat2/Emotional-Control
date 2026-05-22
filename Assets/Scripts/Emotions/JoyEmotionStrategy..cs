@@ -39,6 +39,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
     private Collider2D playerCollider;
+    private PlayerStateMachine stateMachine;
 
     private Vector2 moveInput;
 
@@ -55,6 +56,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
         playerCollider = GetComponent<Collider2D>();
+        stateMachine = GetComponent<PlayerStateMachine>();
     }
 
     void Start()
@@ -88,6 +90,9 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         moveInput = Vector2.zero;
         jumpTrailCoroutine = null;
 
+        if (stateMachine != null)
+            stateMachine.StopGlide();
+
         if (playerCollider != null)
             playerCollider.enabled = true;
 
@@ -106,9 +111,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         }
 
         if (glideTrail != null && glideTrail.isPlaying)
-        {
             glideTrail.Stop();
-        }
     }
 
     public void HandleMove(Vector2 move)
@@ -132,24 +135,28 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (grounded && rb.linearVelocity.y <= 0.01f)
         {
             jumpedFromGround = false;
+
+            if (glideEnabled && stateMachine != null)
+                stateMachine.StopGlide();
+
             glideEnabled = false;
             rb.gravityScale = normalGravity;
 
             if (glideTrail != null && glideTrail.isPlaying)
-            {
                 glideTrail.Stop();
-            }
         }
 
         if (glideEnabled && releasedThisFrame)
         {
             glideEnabled = false;
+
+            if (stateMachine != null)
+                stateMachine.StopGlide();
+
             rb.gravityScale = normalGravity;
 
             if (glideTrail != null && glideTrail.isPlaying)
-            {
                 glideTrail.Stop();
-            }
 
             return;
         }
@@ -180,13 +187,14 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             glideEnabled = true;
 
+            if (stateMachine != null)
+                stateMachine.StartGlide();
+
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * floatUpImpulse, ForceMode2D.Impulse);
 
             if (glideTrail != null && !glideTrail.isPlaying)
-            {
                 glideTrail.Play();
-            }
         }
     }
 
@@ -210,9 +218,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.gravityScale = normalGravity;
 
             if (jumpTrailCoroutine == null && glideTrail != null && glideTrail.isPlaying)
-            {
                 glideTrail.Stop();
-            }
 
             return;
         }
@@ -246,6 +252,9 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         isFailing = true;
 
+        if (stateMachine != null)
+            stateMachine.StopGlide();
+
         StartCoroutine(JoyFailure());
     }
 
@@ -256,13 +265,10 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         moveInput = Vector2.zero;
 
         if (glideTrail != null && glideTrail.isPlaying)
-        {
             glideTrail.Stop();
-        }
 
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
-
         rb.gravityScale = 0f;
 
         if (playerCollider != null)
@@ -282,7 +288,6 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             timer += Time.deltaTime;
 
             float upMovement = timer * failureUpSpeed;
-
             float sideMovement = Mathf.Sin(timer * failureSideSpeed) * failureSideAmount;
 
             transform.position = startPosition + new Vector3(sideMovement, upMovement, 0f);
@@ -290,23 +295,18 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             yield return null;
         }
 
-        // שולחים Event של Game Over
         GameEvents.RaiseGameOver();
     }
 
     private IEnumerator PlayJumpTrail()
     {
         if (glideTrail != null && !glideTrail.isPlaying)
-        {
             glideTrail.Play();
-        }
 
         yield return new WaitForSeconds(jumpTrailDuration);
 
         if (!glideEnabled && glideTrail != null && glideTrail.isPlaying)
-        {
             glideTrail.Stop();
-        }
 
         jumpTrailCoroutine = null;
     }

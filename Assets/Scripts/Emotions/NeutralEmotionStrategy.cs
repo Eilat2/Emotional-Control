@@ -15,6 +15,8 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
+    private PlayerStateMachine stateMachine;
+
     private Vector2 moveInput;
 
     // כדי שלא יופעל Game Over כמה פעמים
@@ -24,6 +26,8 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
+
+        stateMachine = GetComponent<PlayerStateMachine>();
 
         ResolveNeutralAnimator();
     }
@@ -44,7 +48,8 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleMove(Vector2 move)
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         moveInput = move;
     }
@@ -56,7 +61,8 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void Tick()
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         if (hurtLock != null && hurtLock.IsLocked)
         {
@@ -74,10 +80,12 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
             neutralAnimator.SetFloat("speed", Mathf.Abs(x));
     }
 
-    // במצב ניטרלי אין סטאמינה, אז כל פסילה היא Game Over מיידי
+    // במצב ניטרלי אין סטאמינה,
+    // אז כל פסילה היא Game Over מיידי
     public void HandleStaminaDepleted()
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         isFailing = true;
 
@@ -86,14 +94,13 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (CanUseNeutralAnimator())
             neutralAnimator.SetFloat("speed", 0f);
 
-        // במקום לחפש ישירות את PauseMenuInputSystem,
-        // שולחים Event של Game Over
         GameEvents.RaiseGameOver();
     }
 
     private void ResolveNeutralAnimator()
     {
-        if (neutralAnimator != null) return;
+        if (neutralAnimator != null)
+            return;
 
         Transform neutralVisual = transform.Find("NeutralVisual");
 

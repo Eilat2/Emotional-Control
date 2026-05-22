@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-// מנהל פאוז + ריסטארט + GAME OVER
 public class PauseMenuInputSystem : MonoBehaviour
 {
     [Header("Pause UI")]
@@ -22,7 +21,6 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void Awake()
     {
-        // אם לא חיברת באינספקטור, מנסה למצוא לבד
         if (pausePanel == null)
             pausePanel = FindInactiveObjectByName("PausePanel");
 
@@ -32,14 +30,12 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        // מאזין ל-Events
         GameEvents.OnGameOver += GameOver;
         GameEvents.OnRestartRequested += Restart;
     }
 
     private void OnDisable()
     {
-        // מפסיק להאזין
         GameEvents.OnGameOver -= GameOver;
         GameEvents.OnRestartRequested -= Restart;
     }
@@ -48,7 +44,6 @@ public class PauseMenuInputSystem : MonoBehaviour
     {
         Debug.Log("PauseMenuInputSystem STARTED");
 
-        // סוגרים פאנלים בהתחלה
         if (pausePanel != null)
             pausePanel.SetActive(false);
         else
@@ -60,24 +55,40 @@ public class PauseMenuInputSystem : MonoBehaviour
         isPaused = false;
         Time.timeScale = 1f;
 
-        // מחברים את כפתור הריסטארט דרך קוד
         SetupRestartButton();
     }
 
     private void Update()
     {
-        // ESC דרך New Input System
         bool escapePressed = Keyboard.current != null &&
                              Keyboard.current.escapeKey.wasPressedThisFrame;
 
-        // גיבוי: גם P יפתח פאוז, כדי לבדוק אם הבעיה רק ב-ESC
         bool pPressed = Keyboard.current != null &&
                         Keyboard.current.pKey.wasPressedThisFrame;
 
         if (escapePressed || pPressed)
         {
             Debug.Log("PauseMenuInputSystem: Pause key pressed");
-            TogglePause();
+
+            if (GameStateMachine.Instance != null)
+            {
+                if (GameStateMachine.Instance.CurrentState ==
+                    GameStateMachine.Instance.PlayingState)
+                {
+                    GameStateMachine.Instance
+                        .TransitionTo(GameStateMachine.Instance.PausedState);
+                }
+                else if (GameStateMachine.Instance.CurrentState ==
+                         GameStateMachine.Instance.PausedState)
+                {
+                    GameStateMachine.Instance
+                        .TransitionTo(GameStateMachine.Instance.PlayingState);
+                }
+            }
+            else
+            {
+                TogglePause();
+            }
         }
     }
 
@@ -89,9 +100,6 @@ public class PauseMenuInputSystem : MonoBehaviour
             Pause();
     }
 
-    // =======================
-    // 🔥 חיבור כפתור ריסטארט
-    // =======================
     private void SetupRestartButton()
     {
         if (gameOverRestartButton == null && gameOverFirstSelectedButton != null)
@@ -101,8 +109,6 @@ public class PauseMenuInputSystem : MonoBehaviour
         {
             gameOverRestartButton.onClick.RemoveAllListeners();
 
-            // במקום לקרוא ישירות ל-Restart
-            // הכפתור רק שולח Event
             gameOverRestartButton.onClick.AddListener(() =>
             {
                 GameEvents.RaiseRestartRequested();
@@ -110,9 +116,6 @@ public class PauseMenuInputSystem : MonoBehaviour
         }
     }
 
-    // =======================
-    // ⏸️ PAUSE
-    // =======================
     public void Pause()
     {
         if (pausePanel == null)
@@ -140,7 +143,6 @@ public class PauseMenuInputSystem : MonoBehaviour
         Debug.Log("PauseMenuInputSystem: Pause opened");
     }
 
-    // ▶️ RESUME
     public void Resume()
     {
         if (pausePanel == null)
@@ -163,35 +165,25 @@ public class PauseMenuInputSystem : MonoBehaviour
         Debug.Log("PauseMenuInputSystem: Pause closed");
     }
 
-    // =======================
-    // 🔄 RESTART
-    // =======================
     public void Restart()
     {
         Debug.Log("GAME OVER RESTART CLICKED");
 
-        // מחזירים זמן רגיל
         Time.timeScale = 1f;
         isPaused = false;
 
-        // מנקים UI
         if (EventSystem.current != null)
             EventSystem.current.SetSelectedGameObject(null);
 
-        // סוגרים פאנלים
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        // טוענים מחדש את הסצנה
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    // =======================
-    // 💀 GAME OVER
-    // =======================
     public void GameOver()
     {
         if (gameOverPanel == null)
@@ -218,14 +210,12 @@ public class PauseMenuInputSystem : MonoBehaviour
         Debug.Log("Game Over menu opened.");
     }
 
-    // =======================
-    // 🧠 עצירת שחקן
-    // =======================
     private void StopPlayerMovement()
     {
         GameObject player = GameObject.FindWithTag("Player");
 
-        if (player == null) return;
+        if (player == null)
+            return;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
 
@@ -236,9 +226,6 @@ public class PauseMenuInputSystem : MonoBehaviour
         }
     }
 
-    // =======================
-    // 🔍 חיפוש אובייקט גם אם כבוי
-    // =======================
     private GameObject FindInactiveObjectByName(string objectName)
     {
         GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();

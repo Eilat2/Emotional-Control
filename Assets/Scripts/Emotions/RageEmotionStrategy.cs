@@ -1,9 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-// אסטרטגיה של מצב Rage:
-// - תנועה רגילה + שבירה
-// - כשהסטאמינה נגמרת -> מאבד שליטה מצד לצד על הרצפה ואז Game Over
 public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
     [Header("Movement")]
@@ -17,7 +14,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private Animator rageAnimator;
 
     [Header("Break Timing")]
-    [SerializeField] private float breakDelay = 0.2f;
     [SerializeField] private float breakAnimationLockTime = 0.35f;
 
     [Header("Rage Failure (על הרצפה)")]
@@ -28,7 +24,9 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private Rigidbody2D rb;
     private PlayerHurtLock hurtLock;
+    private PlayerStateMachine stateMachine;
     private Stamina rageStamina;
+
     private Vector2 moveInput;
 
     private bool isBreaking = false;
@@ -38,6 +36,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
+        stateMachine = GetComponent<PlayerStateMachine>();
     }
 
     private void Start()
@@ -69,15 +68,19 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleMove(Vector2 move)
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         moveInput = move;
     }
 
     public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        if (isFailing) return;
-        if (!pressedThisFrame) return;
+        if (isFailing)
+            return;
+
+        if (!pressedThisFrame)
+            return;
 
         if (hurtLock != null && hurtLock.IsLocked)
             return;
@@ -95,12 +98,20 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             return;
         }
 
-        StartCoroutine(BreakAfterDelay(targetToBreak));
+        if (stateMachine != null)
+        {
+            stateMachine.TriggerBreak(targetToBreak);
+        }
+        else
+        {
+            targetToBreak.OnBreak();
+        }
     }
 
     public void Tick()
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         if (hurtLock != null && hurtLock.IsLocked)
         {
@@ -130,7 +141,8 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     public void HandleStaminaDepleted()
     {
-        if (isFailing) return;
+        if (isFailing)
+            return;
 
         isFailing = true;
         isBreaking = false;
@@ -141,9 +153,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private IEnumerator RageFailure()
     {
         float timer = 0f;
-
         float direction = 1f;
-
         float switchTimer = 0f;
 
         if (CanUseRageAnimator())
@@ -195,7 +205,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rb.linearVelocity = Vector2.zero;
         transform.localScale = originalScale;
 
-        // שולחים Event של Game Over
         GameEvents.RaiseGameOver();
     }
 
@@ -220,17 +229,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isBreaking = false;
     }
 
-    private IEnumerator BreakAfterDelay(IBreakable target)
-    {
-        yield return new WaitForSeconds(breakDelay);
-
-        if (target != null)
-        {
-            Debug.Log("Breaking target: " + target);
-            target.OnBreak();
-        }
-    }
-
     private Stamina GetStamina(Stamina.StaminaType wantedType)
     {
         Stamina[] staminas = GetComponents<Stamina>();
@@ -246,7 +244,8 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private void ResolveRageAnimator()
     {
-        if (rageAnimator != null) return;
+        if (rageAnimator != null)
+            return;
 
         Transform rageVisual = transform.Find("RageVisual");
 
