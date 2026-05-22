@@ -108,6 +108,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             joyAnimator.SetFloat("speed", 0f);
             joyAnimator.SetBool("isGliding", false);
+            joyAnimator.SetFloat("yVelocity", 0f);
+            joyAnimator.SetBool("isGrounded", true);
         }
 
         if (glideTrail != null && glideTrail.isPlaying)
@@ -207,10 +209,16 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
+        bool grounded = IsGrounded();
+
         if (joyAnimator != null)
         {
             joyAnimator.SetFloat("speed", Mathf.Abs(moveInput.x));
             joyAnimator.SetBool("isGliding", glideEnabled);
+
+            // פרמטרים בשביל Fall Animation
+            joyAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            joyAnimator.SetBool("isGrounded", grounded);
         }
 
         if (!glideEnabled)
@@ -278,6 +286,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         {
             joyAnimator.SetFloat("speed", 0f);
             joyAnimator.SetBool("isGliding", true);
+            joyAnimator.SetFloat("yVelocity", 0f);
+            joyAnimator.SetBool("isGrounded", false);
         }
 
         float timer = 0f;

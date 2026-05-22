@@ -10,13 +10,18 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float breakCost = 20f;
     [SerializeField] private BreakableSensor sensor;
 
+    [Header("Ground Check")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundRadius = 0.25f;
+    [SerializeField] private LayerMask groundLayer;
+
     [Header("Animation")]
     [SerializeField] private Animator rageAnimator;
 
     [Header("Break Timing")]
     [SerializeField] private float breakAnimationLockTime = 0.35f;
 
-    [Header("Rage Failure (על הרצפה)")]
+    [Header("Rage Failure")]
     [SerializeField] private float failureDuration = 2.5f;
     [SerializeField] private float failureMoveSpeed = 8f;
     [SerializeField] private float failureShakeAmount = 0.10f;
@@ -51,7 +56,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isFailing = false;
 
         if (CanUseRageAnimator())
+        {
             rageAnimator.SetFloat("speed", 0f);
+            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            rageAnimator.SetBool("isGrounded", IsGrounded());
+        }
     }
 
     public void Exit()
@@ -63,7 +72,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
         if (CanUseRageAnimator())
+        {
             rageAnimator.SetFloat("speed", 0f);
+            rageAnimator.SetFloat("yVelocity", 0f);
+            rageAnimator.SetBool("isGrounded", true);
+        }
     }
 
     public void HandleMove(Vector2 move)
@@ -99,13 +112,9 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         }
 
         if (stateMachine != null)
-        {
             stateMachine.TriggerBreak(targetToBreak);
-        }
         else
-        {
             targetToBreak.OnBreak();
-        }
     }
 
     public void Tick()
@@ -113,10 +122,16 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (isFailing)
             return;
 
+        bool grounded = IsGrounded();
+
         if (hurtLock != null && hurtLock.IsLocked)
         {
             if (CanUseRageAnimator())
+            {
                 rageAnimator.SetFloat("speed", 0f);
+                rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+                rageAnimator.SetBool("isGrounded", grounded);
+            }
 
             return;
         }
@@ -128,7 +143,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
             if (CanUseRageAnimator())
+            {
                 rageAnimator.SetFloat("speed", 0f);
+                rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+                rageAnimator.SetBool("isGrounded", grounded);
+            }
 
             return;
         }
@@ -136,7 +155,11 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
         if (CanUseRageAnimator())
+        {
             rageAnimator.SetFloat("speed", Mathf.Abs(x));
+            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            rageAnimator.SetBool("isGrounded", grounded);
+        }
     }
 
     public void HandleStaminaDepleted()
@@ -159,6 +182,8 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (CanUseRageAnimator())
         {
             rageAnimator.SetFloat("speed", 0f);
+            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            rageAnimator.SetBool("isGrounded", IsGrounded());
             rageAnimator.ResetTrigger("Break");
         }
 
@@ -175,10 +200,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
                 switchTimer = 0f;
             }
 
-            rb.linearVelocity = new Vector2(
-                direction * failureMoveSpeed * 3f,
-                rb.linearVelocity.y
-            );
+            rb.linearVelocity = new Vector2(direction * failureMoveSpeed * 3f, rb.linearVelocity.y);
 
             Vector3 shakeOffset = new Vector3(
                 Random.Range(-failureShakeAmount * 4f, failureShakeAmount * 4f),
@@ -227,6 +249,14 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         yield return new WaitForSeconds(breakAnimationLockTime);
 
         isBreaking = false;
+    }
+
+    private bool IsGrounded()
+    {
+        if (groundCheck == null)
+            return false;
+
+        return Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
 
     private Stamina GetStamina(Stamina.StaminaType wantedType)

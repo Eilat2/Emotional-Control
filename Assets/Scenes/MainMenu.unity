@@ -223,7 +223,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Animators: \nAdi Lutenberg\nEli Josephson"
+  m_text: "Animation & Design: \nAdi Lutenberg\nEli Josephson"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ffa5ecf109adf2047a125516c42ed600, type: 2}
   m_sharedMaterial: {fileID: 8347407726488398929, guid: ffa5ecf109adf2047a125516c42ed600, type: 2}
@@ -2237,7 +2237,7 @@ MonoBehaviour:
     Each emotion
     has unique abilities.
 
-    Manage stamina carefully.'
+    Manage energy carefully.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ffa5ecf109adf2047a125516c42ed600, type: 2}
   m_sharedMaterial: {fileID: 8347407726488398929, guid: ffa5ecf109adf2047a125516c42ed600, type: 2}

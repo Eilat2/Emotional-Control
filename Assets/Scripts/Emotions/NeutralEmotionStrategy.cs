@@ -4,11 +4,16 @@ using UnityEngine;
 // - תנועה ימינה/שמאלה בלבד
 // - Space לא עושה כלום
 // - אם נפסלים במצב ניטרלי -> Game Over מיידי
-// - מעדכן אנימציית Idle / Walk לפי מהירות
+// - מעדכן אנימציית Idle / Walk / Fall
 public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
+
+    [Header("Ground Check")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundRadius = 0.25f;
+    [SerializeField] private LayerMask groundLayer;
 
     [Header("Animation")]
     [SerializeField] private Animator neutralAnimator;
@@ -19,14 +24,12 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private Vector2 moveInput;
 
-    // כדי שלא יופעל Game Over כמה פעמים
     private bool isFailing = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         hurtLock = GetComponent<PlayerHurtLock>();
-
         stateMachine = GetComponent<PlayerStateMachine>();
 
         ResolveNeutralAnimator();
@@ -37,13 +40,21 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         isFailing = false;
 
         if (CanUseNeutralAnimator())
+        {
             neutralAnimator.SetFloat("speed", 0f);
+            neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            neutralAnimator.SetBool("isGrounded", IsGrounded());
+        }
     }
 
     public void Exit()
     {
         if (CanUseNeutralAnimator())
+        {
             neutralAnimator.SetFloat("speed", 0f);
+            neutralAnimator.SetFloat("yVelocity", 0f);
+            neutralAnimator.SetBool("isGrounded", true);
+        }
     }
 
     public void HandleMove(Vector2 move)
@@ -64,10 +75,16 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (isFailing)
             return;
 
+        bool grounded = IsGrounded();
+
         if (hurtLock != null && hurtLock.IsLocked)
         {
             if (CanUseNeutralAnimator())
+            {
                 neutralAnimator.SetFloat("speed", 0f);
+                neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+                neutralAnimator.SetBool("isGrounded", grounded);
+            }
 
             return;
         }
@@ -77,7 +94,11 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
 
         if (CanUseNeutralAnimator())
+        {
             neutralAnimator.SetFloat("speed", Mathf.Abs(x));
+            neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
+            neutralAnimator.SetBool("isGrounded", grounded);
+        }
     }
 
     // במצב ניטרלי אין סטאמינה,
@@ -92,9 +113,21 @@ public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
         rb.linearVelocity = Vector2.zero;
 
         if (CanUseNeutralAnimator())
+        {
             neutralAnimator.SetFloat("speed", 0f);
+            neutralAnimator.SetFloat("yVelocity", 0f);
+            neutralAnimator.SetBool("isGrounded", IsGrounded());
+        }
 
         GameEvents.RaiseGameOver();
+    }
+
+    private bool IsGrounded()
+    {
+        if (groundCheck == null)
+            return false;
+
+        return Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
     }
 
     private void ResolveNeutralAnimator()
