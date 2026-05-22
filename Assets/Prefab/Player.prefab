@@ -143,6 +143,7 @@ GameObject:
   - component: {fileID: 8604547392646540922}
   - component: {fileID: 6630320378166655186}
   - component: {fileID: 8903560399276812855}
+  - component: {fileID: 3046937688257876900}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -352,10 +353,8 @@ MonoBehaviour:
   joyMovement: {fileID: 0}
   rageMovement: {fileID: 0}
   rageBreak: {fileID: 0}
-  emotionWorldSwitcher: {fileID: 0}
   playerRenderer: {fileID: 0}
   context: {fileID: 6310416760156584816}
-  visualSwitcher: {fileID: 8808242607467473821}
   neutralColor: {r: 1, g: 1, b: 1, a: 1}
   joyColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   rageColor: {r: 1, g: 0, b: 0, a: 1}
@@ -634,6 +633,19 @@ CapsuleCollider2D:
   m_Offset: {x: 0.010891259, y: 0}
   m_Size: {x: 1.0217824, y: 1.0217824}
   m_Direction: 0
+--- !u!114 &3046937688257876900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988078068555310606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee2e48ff9ef36a4f90cc7e1eb283567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorTransition
+  fadePlayer: 1
 --- !u!1 &3665786181444937582
 GameObject:
   m_ObjectHideFlags: 0
