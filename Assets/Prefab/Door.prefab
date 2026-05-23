@@ -27,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 1903520131341790521}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.4816, y: 0.1917, z: 0}
-  m_LocalScale: {x: 0.5836937, y: 0.4918519, z: 1}
+  m_LocalPosition: {x: -0.0174, y: -0.28, z: 0}
+  m_LocalScale: {x: 0.20174, y: 0.23030998, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5394477420551646762}
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -676628513636133388, guid: 8d4238692040f2343bd06d1eb0e512f7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -153,6 +153,7 @@ GameObject:
   - component: {fileID: 2008345001623814494}
   - component: {fileID: 5332979815604470391}
   - component: {fileID: 7803487677806887060}
+  - component: {fileID: 6969219193324574241}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -169,8 +170,8 @@ Transform:
   m_GameObject: {fileID: 3915239080157023507}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22.69, y: 10.26, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.8, z: 1}
+  m_LocalPosition: {x: 17.7, y: 14.27, z: 0}
+  m_LocalScale: {x: 3.0826, y: 2.314, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6007944805567151840}
@@ -224,9 +225,9 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 3342396743719640207, guid: f74ef4b4da130a747a166671a048d6c2, type: 3}
+  m_Sprite: {fileID: 1724720710882007059, guid: fa92ed65c02ba4146adde5d9bbe68198, type: 3}
   m_Color: {r: 1, g: 0.9803922, b: 0.9803922, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -270,17 +271,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.546401, y: 0.2959665}
+  m_Offset: {x: -0.00415051, y: 0.032111466}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8.16, y: 8.66}
+    oldSize: {x: 2.42, y: 2.72}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 3.8621006, y: 4.9614096}
+  m_Size: {x: 2.476349, y: 3.1896381}
   m_EdgeRadius: 0
 --- !u!114 &7803487677806887060
 MonoBehaviour:
@@ -294,9 +295,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9aeaa4d2cef28ad4692575f5acc8bd18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorNextLevel
-  nextSceneName: Level2
+  nextSceneName: Level3
   sceneFader: {fileID: 0}
   glow: {fileID: 1422208810787799881}
   portalCenter: {fileID: 4066126954176511716}
   suckDuration: 0.5
-  fadePlayer: 1
+--- !u!114 &6969219193324574241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3915239080157023507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84b3a106a3b1a7d409343a97b5aa4513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorController
+  blockingCollider: {fileID: 0}
+  disableOnOpen: 0

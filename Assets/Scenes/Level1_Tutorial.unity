@@ -8292,13 +8292,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Size.x
+      value: 2.1365967
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Size.y
+      value: 2.7364597
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.06526023
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.049737453
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.9275453
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.1455407
+      objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18.88743
+      value: 17.9225
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14.0319605
+      value: 15.0208
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.z

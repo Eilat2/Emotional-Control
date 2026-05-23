@@ -7953,13 +7953,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Size.x
+      value: 2.3436565
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Size.y
+      value: 3.1684515
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.06219572
+      objectReference: {fileID: 0}
+    - target: {fileID: 5332979815604470391, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.0427047
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.86651
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.244117
+      objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 18.88
+      value: 17.4385
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.07
+      value: 14.1749
       objectReference: {fileID: 0}
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7992,10 +8016,6 @@ PrefabInstance:
     - target: {fileID: 5394477420551646762, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7803487677806887060, guid: bc01277d8ceadff4ba23853d802cb4d6, type: 3}
-      propertyPath: sceneFader
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

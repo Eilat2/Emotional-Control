@@ -104,7 +104,7 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
             rb.gravityScale = normalGravity;
         }
 
-        if (joyAnimator != null)
+        if (joyAnimator != null && joyAnimator.runtimeAnimatorController != null)
         {
             joyAnimator.SetFloat("speed", 0f);
             joyAnimator.SetBool("isGliding", false);
