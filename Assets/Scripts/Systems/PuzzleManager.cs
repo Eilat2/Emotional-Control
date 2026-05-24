@@ -48,64 +48,24 @@ public class PuzzleManager : MonoBehaviour
     // רק אם הפאזל נפתר חוסמים לחיצות
     public bool PuzzleSolved => puzzleSolved;
 
-    private void Awake()
-    {
-        // אם לא גררת ידנית באינספקטור,
-        // נחפש את הטקסט לפי השם גם אם הוא כבוי
-        if (orderNotCorrectText == null)
-        {
-            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
-        }
-    }
-
-    private void OnEnable()
-    {
-        // מכבים את הודעת הטעות ישר כשהשלב נטען
-        if (orderNotCorrectText != null)
-        {
-            orderNotCorrectText.SetActive(false);
-        }
-    }
-
     private void Start()
     {
+        if (orderNotCorrectText != null)
+            orderNotCorrectText.SetActive(false);
+
         if (doorObject != null)
-        {
             doorObject.SetActive(false);
-        }
         else
-        {
             Debug.LogWarning("Door object is not assigned.");
-        }
 
         if (waterSpray != null)
-        {
             waterSpray.SetActive(false);
-        }
 
-        // בתחילת השלב האבן הלא שבירה פעילה, והשבירה כבויה
         if (unbreakableStone != null)
-        {
             unbreakableStone.SetActive(true);
-        }
 
         if (breakableStone != null)
-        {
             breakableStone.SetActive(false);
-        }
-
-        // בדיקה אחרונה אחרי שכל הסצנה נטענה
-        if (orderNotCorrectText == null)
-        {
-            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
-        }
-
-        // אם אין טקסט כזה בסצנה, לא נזרוק אזהרה כל הזמן
-        // פשוט המשחק יעבוד בלי להציג את הודעת הטעות
-        if (orderNotCorrectText != null)
-        {
-            orderNotCorrectText.SetActive(false);
-        }
     }
 
     public void RegisterButtonPress(PuzzleButton button, EmotionType pressedEmotion, bool pressedCorrectly)
@@ -113,11 +73,9 @@ public class PuzzleManager : MonoBehaviour
         if (puzzleSolved || puzzleFailed)
             return;
 
-        // אם עברנו כבר את כל הכפתורים
         if (currentSequenceIndex >= 3)
             return;
 
-        // בודקים איזה כפתור היה אמור להילחץ עכשיו
         PuzzleButton expectedButton = null;
 
         switch (currentSequenceIndex)
@@ -135,8 +93,6 @@ public class PuzzleManager : MonoBehaviour
                 break;
         }
 
-        // אם לחצו על כפתור לא נכון או עם רגש לא נכון —
-        // לא מפסילים מיד, רק מסמנים טעות
         if (!pressedCorrectly || button != expectedButton)
         {
             sequenceHasMistake = true;
@@ -178,14 +134,10 @@ public class PuzzleManager : MonoBehaviour
             joyButton.PressedCorrectly &&
             rageButton.PressedCorrectly;
 
-        bool sequenceComplete =
-            currentSequenceIndex == 3;
+        bool sequenceComplete = currentSequenceIndex == 3;
 
         // הצלחה
-        if (allCorrect &&
-            sequenceComplete &&
-            !sequenceHasMistake &&
-            !puzzleSolved)
+        if (allCorrect && sequenceComplete && !sequenceHasMistake && !puzzleSolved)
         {
             puzzleSolved = true;
             Debug.Log("Puzzle solved!");
@@ -208,7 +160,6 @@ public class PuzzleManager : MonoBehaviour
                 }
 
                 StartCoroutine(StopWaterAfterTime());
-
                 Debug.Log("Water spray activated.");
             }
             else
@@ -217,13 +168,9 @@ public class PuzzleManager : MonoBehaviour
             }
 
             if (cameraSequence != null && focusPoint != null)
-            {
                 cameraSequence.PlayFocusSequence(focusPoint);
-            }
             else
-            {
                 Debug.LogWarning("Camera sequence or focus point is not assigned.");
-            }
         }
 
         // כישלון
@@ -241,38 +188,21 @@ public class PuzzleManager : MonoBehaviour
 
         puzzleFailed = true;
 
-        // אם המים הופעלו איכשהו, מכבים אותם
         if (waterSpray != null)
-        {
             waterSpray.SetActive(false);
-        }
 
-        // אם לא מצאנו את הטקסט קודם, ננסה שוב לפני ההצגה
-        if (orderNotCorrectText == null)
-        {
-            orderNotCorrectText = FindInactiveObjectByName("OrderNotCorrectText");
-        }
-
-        // מציגים הודעת סדר לא נכון
         if (orderNotCorrectText != null)
-        {
             orderNotCorrectText.SetActive(true);
-        }
 
         yield return new WaitForSeconds(wrongOrderMessageDuration);
 
-        // מפעילים Game Over אחרי ההודעה
         PauseMenuInputSystem pauseMenu =
             FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
 
         if (pauseMenu != null)
-        {
             pauseMenu.GameOver();
-        }
         else
-        {
             Debug.LogWarning("PauseMenuInputSystem not found in scene.");
-        }
     }
 
     private IEnumerator StopWaterAfterTime()
@@ -302,7 +232,6 @@ public class PuzzleManager : MonoBehaviour
             Debug.LogWarning("Fire object is not assigned.");
         }
 
-        // מחליפים מאבן לא שבירה לאבן שבירה
         if (unbreakableStone != null)
         {
             unbreakableStone.SetActive(false);
@@ -342,19 +271,5 @@ public class PuzzleManager : MonoBehaviour
         {
             Debug.LogWarning("Door controller is not assigned.");
         }
-    }
-
-    // מוצא גם אובייקטים כבויים
-    private GameObject FindInactiveObjectByName(string objectName)
-    {
-        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-
-        foreach (GameObject obj in allObjects)
-        {
-            if (obj.name == objectName && obj.scene.IsValid())
-                return obj;
-        }
-
-        return null;
     }
 }
