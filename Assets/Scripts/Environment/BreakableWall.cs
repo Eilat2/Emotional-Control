@@ -16,6 +16,10 @@ public class BreakableWall : MonoBehaviour, IBreakable
     [Header("Tutorial")]
     [SerializeField] GameObject tutorialPopup;      // הפופאפ של הטוטוריאל (אם קיים)
 
+    [Header("Puzzle Piece Unlock")]
+    [SerializeField] private Level3PuzzlePiecePickup puzzlePieceToUnlock;
+    // חלק הפאזל שייפתח לאיסוף רק אחרי שהאבן נשברת
+
     // מונע שבירה כפולה של אותו קיר
     private bool isBroken = false;
 
@@ -39,6 +43,13 @@ public class BreakableWall : MonoBehaviour, IBreakable
         if (hiddenButton != null)
         {
             hiddenButton.SetActive(true);
+        }
+
+        // פותח את האפשרות לאסוף את חלק הפאזל
+        // זה יקרה רק אחרי שזעם באמת שבר את האבן
+        if (puzzlePieceToUnlock != null)
+        {
+            puzzlePieceToUnlock.UnlockAfterStoneBroken();
         }
 
         // מוחקים את הקיר

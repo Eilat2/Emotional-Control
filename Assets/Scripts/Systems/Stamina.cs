@@ -121,4 +121,13 @@ public class Stamina : MonoBehaviour
 
         GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
     }
+    public void ForceDeplete()
+    {
+        currentStamina = 0f;
+        depletedTriggered = false;
+
+        GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
+
+        TriggerDepleted();
+    }
 }
