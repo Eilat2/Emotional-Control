@@ -9,6 +9,8 @@ public class KillableEnemy : MonoBehaviour, IBreakable
     [SerializeField] private float force = 4f;        // עוצמת העפה
     [SerializeField] private float torque = 4f;       // סיבוב לחתיכות
 
+    private bool isDead = false; // מונע ספירה כפולה אם האויב נפגע פעמיים מהר
+
     // פונקציה שנקראת כשהשחקן פוגע בו
     public void OnBreak()
     {
@@ -16,25 +18,43 @@ public class KillableEnemy : MonoBehaviour, IBreakable
     }
 
     // מוות של האויב
-    void Die()
+    private void Die()
     {
+        if (isDead)
+            return;
+
+        isDead = true;
+
         SpawnDebris();
 
-        // פה בעתיד:
-        // אנימציה / סאונד / פוף / ניקוד
+        // אם בסצנה קיים EnemyLevelCounter,
+        // נעדכן אותו שאויב אחד מת.
+        // אם אין כזה בסצנה - לא יקרה כלום.
+        EnemyLevelCounter counter = FindObjectOfType<EnemyLevelCounter>();
+
+        if (counter != null)
+        {
+            counter.EnemyDied();
+        }
+
         Destroy(gameObject);
     }
 
-    void SpawnDebris()
+    private void SpawnDebris()
     {
         if (debrisPrefab == null)
             return;
 
         for (int i = 0; i < debrisCount; i++)
         {
-            GameObject piece = Instantiate(debrisPrefab, transform.position, Quaternion.identity);
+            GameObject piece = Instantiate(
+                debrisPrefab,
+                transform.position,
+                Quaternion.identity
+            );
 
             Rigidbody2D rb = piece.GetComponent<Rigidbody2D>();
+
             if (rb != null)
             {
                 Vector2 dir = new Vector2(
