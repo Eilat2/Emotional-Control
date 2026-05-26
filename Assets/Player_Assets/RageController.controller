@@ -219,7 +219,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: "\u05D6\u05E2\u05DD \u05D4\u05D5\u05DC\u05DA_0 1"
+  m_Name: RageController
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: speed

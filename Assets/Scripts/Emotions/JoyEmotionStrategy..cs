@@ -50,7 +50,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
     private Coroutine jumpTrailCoroutine;
 
     private bool isFailing = false;
-
+    //TODO:
+    //bool grounded = true;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -170,7 +171,8 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * joyJumpForce, ForceMode2D.Impulse);
-
+            //TODO:
+            //grounded = false;
             if (jumpTrailCoroutine != null)
                 StopCoroutine(jumpTrailCoroutine);
 
@@ -351,4 +353,13 @@ public class JoyEmotionStrategy : MonoBehaviour, IEmotionStrategy
         if (joyVisual != null)
             joyAnimator = joyVisual.GetComponent<Animator>();
     }
+
+    //TODO: New ground check
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (collision.gameObject.layer == groundLayer )
+    //    {
+    //        grounded = true;
+    //    }
+    //}
 }
