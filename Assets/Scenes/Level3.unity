@@ -5940,14 +5940,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 509243373899275100, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103168689899035246, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904481927904618791, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2858727818404033992, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2988078068555310606, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4040764713569367810, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361198439502625577, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5368841696831007773, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.9
       objectReference: {fileID: 0}
     - target: {fileID: 5402626475424855663, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: groundCheck
       value: 
       objectReference: {fileID: 884571560}
+    - target: {fileID: 5402626475424855663, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5572963052459429787, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: m_LocalPosition.x
       value: -25
@@ -5988,10 +6020,58 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: groundRadius
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5949937731010101288, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275265361961194248, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275265361961194248, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 6573042402555808807, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8213838363953559434, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Size.x
+      value: 1.4488575
+      objectReference: {fileID: 0}
+    - target: {fileID: 8213838363953559434, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Size.y
+      value: 1.9221975
+      objectReference: {fileID: 0}
+    - target: {fileID: 8213838363953559434, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.07028735
+      objectReference: {fileID: 0}
+    - target: {fileID: 8213838363953559434, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.020063698
+      objectReference: {fileID: 0}
     - target: {fileID: 8313243847825221586, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
       propertyPath: groundCheck
       value: 
       objectReference: {fileID: 884571560}
+    - target: {fileID: 8313243847825221586, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8878236238191029557, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983909835394641621, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8604547392646540922, guid: 1e9edfd9809363e4c829429695a21158, type: 3}
     m_RemovedGameObjects: []
