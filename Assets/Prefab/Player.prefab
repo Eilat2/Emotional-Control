@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1904481927904618791}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 0}
+  m_LocalPosition: {x: 0, y: -1.5, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -140,7 +140,6 @@ GameObject:
   - component: {fileID: 4312077350362799660}
   - component: {fileID: 1339707294759412267}
   - component: {fileID: 6717332935841786417}
-  - component: {fileID: 8604547392646540922}
   - component: {fileID: 6630320378166655186}
   - component: {fileID: 8903560399276812855}
   - component: {fileID: 3046937688257876900}
@@ -439,8 +438,12 @@ MonoBehaviour:
   moveSpeed: 3
   breakCost: 20
   sensor: {fileID: 8657491866610749284}
+  groundCheck: {fileID: 0}
+  groundRadius: 0.25
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   rageAnimator: {fileID: 3254983424724673928}
-  breakDelay: 0.45
   breakAnimationLockTime: 0.75
   failureDuration: 2.5
   failureMoveSpeed: 8
@@ -459,6 +462,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerNeutralMove
   moveSpeed: 6
+  groundCheck: {fileID: 0}
+  groundRadius: 0.25
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   neutralAnimator: {fileID: 5938445516147868812}
 --- !u!114 &7535260335561414566
 MonoBehaviour:
@@ -562,18 +570,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElectricVFX
   sparks: {fileID: 4238959403518503933}
---- !u!114 &8604547392646540922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2988078068555310606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6024001211ae6b469d4cd69b20691a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PersistentPlayer
 --- !u!95 &6630320378166655186
 Animator:
   serializedVersion: 7
@@ -5648,7 +5644,7 @@ Transform:
   m_GameObject: {fileID: 4040764713569367810}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 0}
+  m_LocalPosition: {x: 0, y: -1.5, z: 0}
   m_LocalScale: {x: 0.35, y: 0.35, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10788,7 +10784,7 @@ Transform:
   m_GameObject: {fileID: 8878236238191029557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7, z: 0}
+  m_LocalPosition: {x: 0, y: -1.5, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

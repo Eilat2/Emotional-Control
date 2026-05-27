@@ -53,7 +53,7 @@ public class ElectricPlatform : MonoBehaviour
         GameObject playerObject = collision.attachedRigidbody != null
             ? collision.attachedRigidbody.gameObject
             : collision.gameObject;
-
+        Debug.Log(playerObject.name);
         // בודקים שזה באמת השחקן
         if (!playerObject.CompareTag("Player")) return;
 
