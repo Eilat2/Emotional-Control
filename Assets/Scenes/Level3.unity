@@ -2773,7 +2773,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level3PuzzlePiecePickup
   pieceVisualOnBoard: {fileID: 1051723054}
-  puzzleManager: {fileID: 0}
+  puzzleManager: {fileID: 1271777690}
   lockedUntilStoneBroken: 1
 --- !u!61 &429886089
 BoxCollider2D:
@@ -2809,7 +2809,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.6057722, y: -0.17307138}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0.04}
     pivot: {x: 0.5, y: 0.5}
@@ -2819,7 +2819,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4.2884955, y: 3.7692575}
   m_EdgeRadius: 0
 --- !u!212 &429886090
 SpriteRenderer:
