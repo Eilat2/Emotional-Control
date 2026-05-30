@@ -2833,7 +2833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Level3PuzzlePiecePickup
   pieceType: 1
   puzzleManager: {fileID: 0}
-  lockedUntilStoneBroken: 0
+  lockedUntilStoneBroken: 1
 --- !u!61 &429886089
 BoxCollider2D:
   m_ObjectHideFlags: 0
