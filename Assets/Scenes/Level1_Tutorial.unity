@@ -4031,6 +4031,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 182768884}
+  enemyToWatch: {fileID: 0}
 --- !u!61 &627234062
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4108,6 +4109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 1560114994}
+  enemyToWatch: {fileID: 0}
 --- !u!61 &654379627
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4193,6 +4195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 596019411}
+  enemyToWatch: {fileID: 0}
 --- !u!1 &718707775
 GameObject:
   m_ObjectHideFlags: 0
@@ -7016,7 +7019,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1676865597
 Transform:
   m_ObjectHideFlags: 0

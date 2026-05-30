@@ -3226,6 +3226,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 1199280993}
+  enemyToWatch: {fileID: 1440081871}
 --- !u!61 &343458272
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6356,6 +6357,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 932009909}
   m_CullTransparentMesh: 1
+--- !u!1 &1032215956 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8939766553357662217, guid: 003fb1fa8b879f941833781d42b6e14b, type: 3}
+  m_PrefabInstance: {fileID: 429989397}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1077922265
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6702,6 +6708,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 1398185153}
+  enemyToWatch: {fileID: 1032215956}
 --- !u!61 &1210969664
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7338,6 +7345,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1428901045}
   m_CullTransparentMesh: 1
+--- !u!1 &1440081871 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5213330765932311170, guid: c73ae7943f31e2c4681a5ab384616b44, type: 3}
+  m_PrefabInstance: {fileID: 1189597934}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1496428300
 GameObject:
   m_ObjectHideFlags: 0
@@ -7531,7 +7543,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1676865597
 Transform:
   m_ObjectHideFlags: 0
