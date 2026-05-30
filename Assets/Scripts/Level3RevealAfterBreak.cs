@@ -12,7 +12,6 @@ public class Level3RevealAfterBreak : MonoBehaviour
 
     private void Start()
     {
-        // החלק מוסתר בהתחלה
         if (objectToReveal != null)
             objectToReveal.SetActive(false);
     }
@@ -21,16 +20,22 @@ public class Level3RevealAfterBreak : MonoBehaviour
     {
         if (revealed) return;
 
-        // אם האובייקט נשבר / נעלם
         if (objectToWatch == null || !objectToWatch.activeInHierarchy)
         {
             revealed = true;
 
             Debug.Log("Level 3: Revealing puzzle piece");
 
-            // חושפים את החלק
             if (objectToReveal != null)
+            {
                 objectToReveal.SetActive(true);
+
+                Level3PuzzlePiecePickup pickup =
+                    objectToReveal.GetComponent<Level3PuzzlePiecePickup>();
+
+                if (pickup != null)
+                    pickup.UnlockAfterStoneBroken();
+            }
         }
     }
 }
