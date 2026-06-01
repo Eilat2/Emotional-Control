@@ -6,6 +6,16 @@ public class NeutralMushroomHide : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        CheckReveal(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        CheckReveal(other);
+    }
+
+    private void CheckReveal(Collider2D other)
+    {
         if (!other.CompareTag("Player")) return;
 
         EmotionController ec = other.GetComponent<EmotionController>();
