@@ -589,8 +589,6 @@ MonoBehaviour:
   waterSpray: {fileID: 1190621274}
   waterDuration: 4
   fireObject: {fileID: 1225648433}
-  orderNotCorrectText: {fileID: 1921620934}
-  wrongOrderMessageDuration: 3
   doorObject: {fileID: 1462902141}
   doorController: {fileID: 1462902143}
   unbreakableStone: {fileID: 1106521424}
@@ -26093,11 +26091,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
---- !u!1 &1921620934 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7241614932073748522, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
-  m_PrefabInstance: {fileID: 1921620933}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1921620935 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8350355026997243870, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}

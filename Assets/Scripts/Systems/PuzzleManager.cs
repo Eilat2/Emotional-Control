@@ -18,12 +18,6 @@ public class PuzzleManager : MonoBehaviour
     // האש שתכבה רק כשהמים נוגעים בה
     public GameObject fireObject;
 
-    [Header("Wrong Order UI")]
-    [SerializeField] private GameObject orderNotCorrectText; // טקסט שיופיע כשסדר הכפתורים לא נכון
-
-    [SerializeField] private float wrongOrderMessageDuration = 3f;
-    // כמה זמן הטקסט יופיע לפני Game Over
-
     [Header("Door")]
     public GameObject doorObject;
     public DoorController doorController;
@@ -38,21 +32,12 @@ public class PuzzleManager : MonoBehaviour
 
     private bool puzzleSolved = false;
     private bool fireExtinguished = false;
-    private bool puzzleFailed = false;
-
-    // האם הייתה טעות כלשהי במהלך הפאזל
-    private bool sequenceHasMistake = false;
-
-    private int currentSequenceIndex = 0;
 
     // רק אם הפאזל נפתר חוסמים לחיצות
     public bool PuzzleSolved => puzzleSolved;
 
     private void Start()
     {
-        if (orderNotCorrectText != null)
-            orderNotCorrectText.SetActive(false);
-
         if (doorObject != null)
             doorObject.SetActive(false);
         else
@@ -70,36 +55,19 @@ public class PuzzleManager : MonoBehaviour
 
     public void RegisterButtonPress(PuzzleButton button, EmotionType pressedEmotion, bool pressedCorrectly)
     {
-        if (puzzleSolved || puzzleFailed)
+        if (puzzleSolved)
             return;
 
-        if (currentSequenceIndex >= 3)
-            return;
-
-        PuzzleButton expectedButton = null;
-
-        switch (currentSequenceIndex)
+        // אין יותר בדיקת סדר.
+        // כל כפתור בודק רק אם לחצו עליו עם הרגש הנכון שלו.
+        if (pressedCorrectly)
         {
-            case 0:
-                expectedButton = neutralButton;
-                break;
-
-            case 1:
-                expectedButton = rageButton;
-                break;
-
-            case 2:
-                expectedButton = joyButton;
-                break;
+            Debug.Log("Button pressed correctly: " + button.name);
         }
-
-        if (!pressedCorrectly || button != expectedButton)
+        else
         {
-            sequenceHasMistake = true;
-            Debug.Log("Puzzle mistake recorded.");
+            Debug.Log("Button pressed with wrong emotion, but no Game Over.");
         }
-
-        currentSequenceIndex++;
 
         CheckPuzzleState();
     }
@@ -134,13 +102,11 @@ public class PuzzleManager : MonoBehaviour
             joyButton.PressedCorrectly &&
             rageButton.PressedCorrectly;
 
-        bool sequenceComplete = currentSequenceIndex == 3;
-
-        // הצלחה
-        if (allCorrect && sequenceComplete && !sequenceHasMistake && !puzzleSolved)
+        // הצלחה רק אם כל הכפתורים נלחצו עם הרגש הנכון שלהם
+        if (allCorrect && !puzzleSolved)
         {
             puzzleSolved = true;
-            Debug.Log("Puzzle solved!");
+            Debug.Log("Puzzle solved! All buttons were pressed correctly, no order required.");
 
             if (waterSpray != null)
             {
@@ -172,37 +138,12 @@ public class PuzzleManager : MonoBehaviour
             else
                 Debug.LogWarning("Camera sequence or focus point is not assigned.");
         }
-
-        // כישלון
-        else if (sequenceComplete)
-        {
-            Debug.Log("Puzzle failed after all buttons were pressed.");
-            StartCoroutine(ShowWrongOrderThenGameOver());
-        }
-    }
-
-    private IEnumerator ShowWrongOrderThenGameOver()
-    {
-        if (puzzleFailed)
-            yield break;
-
-        puzzleFailed = true;
-
-        if (waterSpray != null)
-            waterSpray.SetActive(false);
-
-        if (orderNotCorrectText != null)
-            orderNotCorrectText.SetActive(true);
-
-        yield return new WaitForSeconds(wrongOrderMessageDuration);
-
-        PauseMenuInputSystem pauseMenu =
-            FindFirstObjectByType<PauseMenuInputSystem>(FindObjectsInactive.Include);
-
-        if (pauseMenu != null)
-            pauseMenu.GameOver();
         else
-            Debug.LogWarning("PauseMenuInputSystem not found in scene.");
+        {
+            // אין Game Over יותר.
+            // אם כל הכפתורים נלחצו אבל אחד מהם לא נכון — פשוט לא פותרים את הפאזל.
+            Debug.Log("All buttons were pressed, but at least one was pressed with the wrong emotion. No Game Over.");
+        }
     }
 
     private IEnumerator StopWaterAfterTime()
