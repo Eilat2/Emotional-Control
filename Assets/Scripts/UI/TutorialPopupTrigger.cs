@@ -3,24 +3,19 @@ using UnityEngine;
 public class TutorialPopupTrigger : MonoBehaviour
 {
     [SerializeField] private GameObject popup;
-    [SerializeField] private GameObject enemyToWatch;
 
-    private void Update()
+    private bool tutorialFinished = false;
+
+    private void Start()
     {
-        if (enemyToWatch == null)
-        {
-            if (popup != null)
-                popup.SetActive(false);
-
-            gameObject.SetActive(false);
-        }
+        if (popup != null)
+            popup.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (tutorialFinished) return;
         if (!other.CompareTag("Player")) return;
-
-        if (enemyToWatch == null) return;
 
         if (popup != null)
             popup.SetActive(true);
@@ -29,6 +24,14 @@ public class TutorialPopupTrigger : MonoBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
+
+        if (popup != null)
+            popup.SetActive(false);
+    }
+
+    public void HidePopupForever()
+    {
+        tutorialFinished = true;
 
         if (popup != null)
             popup.SetActive(false);

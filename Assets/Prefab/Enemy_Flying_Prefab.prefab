@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7115047470405517368}
   - component: {fileID: 8685204949866716553}
   - component: {fileID: 1238976378730337406}
+  - component: {fileID: 863652050705916336}
   m_Layer: 8
   m_Name: Enemy_Flying_Prefab
   m_TagString: Enemy
@@ -33,7 +34,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9, y: 8, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -198,11 +199,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3795b021f01625a498504cc25a411b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemyMovement
+  enemyStats: {fileID: 11400000, guid: 0088ad0e7bd533948a39b2f9e8898ad4, type: 2}
   patrolPoints:
   - {fileID: 0}
   - {fileID: 0}
-  speed: 2
-  reachDistance: 0.1
 --- !u!114 &8685204949866716553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,6 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3171947947cec514883a172f2809c625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemyStomp
+  enemyStats: {fileID: 11400000, guid: 0088ad0e7bd533948a39b2f9e8898ad4, type: 2}
   stompBounceForce: 0.2
   stompHeightOffset: 0.15
 --- !u!114 &1238976378730337406
@@ -229,10 +230,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97f7bd29a11ac147ae50c3d3c95aaa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTouchDamage
-  drainAmount: 15
+  enemyStats: {fileID: 11400000, guid: 0088ad0e7bd533948a39b2f9e8898ad4, type: 2}
   hitCooldown: 0.35
   hurtLockTime: 0.18
   invincibleTime: 0.4
+  neutralGameOverDelay: 0.9
   rageKnockbackX: 6
   rageKnockbackY: 2
   joyReaction: 1
@@ -242,3 +244,16 @@ MonoBehaviour:
   joyPushBackX: 2.5
   ignoreIfPlayerStompsFromAbove: 1
   stompTolerance: 0.5
+--- !u!114 &863652050705916336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5213330765932311170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b304947c9dbb6741906549ae243ea03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealthSystem
+  enemyStats: {fileID: 11400000, guid: 0088ad0e7bd533948a39b2f9e8898ad4, type: 2}

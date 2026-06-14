@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 1923295664059325346}
   - component: {fileID: 5981287727614979036}
   - component: {fileID: 7900316194195270962}
+  - component: {fileID: 241972403277317694}
   m_Layer: 8
   m_Name: EnemyArmored_Prefab
   m_TagString: Enemy
@@ -63,7 +64,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9, y: -1.5, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 421700698850053474}
@@ -214,11 +215,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87aa5012fa808464c802387ac862fd5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArmoredEnemyPatrol
+  enemyStats: {fileID: 11400000, guid: 87c7f8f90b4aa8341b1b04db5ff39f78, type: 2}
   patrolPoints:
-  - {fileID: 421700698850053474}
-  - {fileID: 7795417006407300173}
-  speed: 2
-  reachDistance: 0.1
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &5981287727614979036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,10 +247,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97f7bd29a11ac147ae50c3d3c95aaa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTouchDamage
-  drainAmount: 15
+  enemyStats: {fileID: 11400000, guid: 87c7f8f90b4aa8341b1b04db5ff39f78, type: 2}
   hitCooldown: 0.35
   hurtLockTime: 0.18
   invincibleTime: 0.4
+  neutralGameOverDelay: 0.9
   rageKnockbackX: 14
   rageKnockbackY: 6
   joyReaction: 0
@@ -260,6 +261,19 @@ MonoBehaviour:
   joyPushBackX: 2.5
   ignoreIfPlayerStompsFromAbove: 0
   stompTolerance: 0.02
+--- !u!114 &241972403277317694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8939766553357662217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b304947c9dbb6741906549ae243ea03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealthSystem
+  enemyStats: {fileID: 11400000, guid: 87c7f8f90b4aa8341b1b04db5ff39f78, type: 2}
 --- !u!1 &9074584528757202342
 GameObject:
   m_ObjectHideFlags: 0

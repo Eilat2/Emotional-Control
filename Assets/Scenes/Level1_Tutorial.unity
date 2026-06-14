@@ -4031,7 +4031,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 182768884}
-  enemyToWatch: {fileID: 0}
 --- !u!61 &627234062
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4109,7 +4108,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 1560114994}
-  enemyToWatch: {fileID: 0}
 --- !u!61 &654379627
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4195,7 +4193,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialPopupTrigger
   popup: {fileID: 596019411}
-  enemyToWatch: {fileID: 0}
 --- !u!1 &718707775
 GameObject:
   m_ObjectHideFlags: 0
@@ -8308,19 +8305,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.6522636
+      value: 2.803973
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.1177323
+      value: 2.2399256
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.1672
+      value: -6.0967
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.7877
+      value: -10.6642
       objectReference: {fileID: 0}
     - target: {fileID: 2649122870317705141, guid: 73373e6a001103e4aac34d9b7f6f6f17, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8548,6 +8545,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 2204923022965377254, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
+    - {fileID: 7241614932073748522, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51b9eb85e2bf9dc4b9eff6fafe5a04a6, type: 3}

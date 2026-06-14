@@ -2,46 +2,35 @@ using UnityEngine;
 
 public class FlyingEnemyMovement : MonoBehaviour
 {
-    [Header("Enemy Data")]
-    [SerializeField] private EnemyData enemyData;
+    [Header("Enemy Stats")]
+    [SerializeField] private EnemyStats enemyStats;
 
     [Header("Patrol Points")]
-    [SerializeField] private Transform[] patrolPoints; // נקודות מסלול (אפשר משולש / ריבוע וכו')
+    [SerializeField] private Transform[] patrolPoints;
 
-    [Header("Movement")]
-    [SerializeField] private float speed = 2f; // מהירות תנועה
-    [SerializeField] private float reachDistance = 0.1f; // מרחק הגעה לנקודה
-
-    private int currentPointIndex = 0; // אינדקס הנקודה הנוכחית
+    private int currentPointIndex = 0;
 
     private void Awake()
     {
-        // אם יש EnemyData, לוקחים ממנו את הנתונים
-        if (enemyData != null)
-        {
-            speed = enemyData.speed;
-            reachDistance = enemyData.reachDistance;
-        }
+        if (enemyStats == null)
+            Debug.LogError($"{gameObject.name}: EnemyStats is not assigned on FlyingEnemyMovement!");
     }
 
-    void Update()
+    private void Update()
     {
-        // אם אין נקודות – לא עושים כלום
+        if (enemyStats == null) return;
         if (patrolPoints == null || patrolPoints.Length == 0) return;
 
-        Transform target = patrolPoints[currentPointIndex]; // היעד הבא
+        Transform target = patrolPoints[currentPointIndex];
 
-        // תנועה חלקה לנקודה
         transform.position = Vector2.MoveTowards(
             transform.position,
             target.position,
-            speed * Time.deltaTime
+            enemyStats.moveSpeed * Time.deltaTime
         );
 
-        // בדיקה אם הגענו לנקודה
-        if (Vector2.Distance(transform.position, target.position) < reachDistance)
+        if (Vector2.Distance(transform.position, target.position) < enemyStats.reachDistance)
         {
-            // מעבר לנקודה הבאה
             currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
         }
     }
