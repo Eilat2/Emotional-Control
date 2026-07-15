@@ -23,12 +23,20 @@ public class EmotionWorldSwitcher : MonoBehaviour
 
     private void HandleEmotionChanged(EmotionController.Emotion emotion)
     {
-        if (emotion == EmotionController.Emotion.Joy)
-            ShowJoyWorld();
-        else if (emotion == EmotionController.Emotion.Rage)
-            ShowRageWorld();
-        else
-            ShowNeutralWorld();
+        switch (emotion)
+        {
+            case EmotionController.Emotion.Joy:
+                ShowJoyWorld();
+                break;
+
+            case EmotionController.Emotion.Rage:
+                ShowRageWorld();
+                break;
+
+            default:
+                ShowNeutralWorld();
+                break;
+        }
     }
 
     public void ShowJoyWorld()
@@ -56,8 +64,18 @@ public class EmotionWorldSwitcher : MonoBehaviour
     {
         foreach (GameObject obj in objects)
         {
-            if (obj != null)
-                obj.SetActive(active);
+            if (obj == null)
+                continue;
+
+            FadeWorldObject fade = obj.GetComponent<FadeWorldObject>();
+
+            if (fade == null)
+                fade = obj.AddComponent<FadeWorldObject>();
+
+            if (active)
+                fade.Show();
+            else
+                fade.Hide();
         }
     }
 }

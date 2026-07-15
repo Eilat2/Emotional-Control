@@ -9,11 +9,12 @@ public class EnemyLevelCounter : MonoBehaviour
 
     private void Start()
     {
-        enemiesAlive = FindObjectsOfType<KillableEnemy>().Length;
+        enemiesAlive = FindObjectsByType<KillableEnemy>(
+            FindObjectsSortMode.None
+        ).Length;
 
         Debug.Log("Enemies alive: " + enemiesAlive);
 
-        // מתחילים עם דלת כבויה
         if (door != null)
         {
             door.SetActive(false);

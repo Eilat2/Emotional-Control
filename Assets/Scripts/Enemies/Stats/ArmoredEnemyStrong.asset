@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0da6f5ef46a4344ba64bc3f3719648, type: 3}
   m_Name: ArmoredEnemyStrong
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStats
-  maxHealth: 5
+  maxHealth: 4
   moveSpeed: 3
   reachDistance: 0.2
-  staminaDrain: 25
+  staminaDrain: 5
   canBeStompedByJoy: 1
   canBeDamagedByRage: 1
   stompDamage: 1

@@ -97,3 +97,8 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+EmotionalControlBuild/EmotionalControl_Data/sharedassets4.assets.resS
+EmotionalControlBuild/EmotionalControl_Data/sharedassets1.assets.resSEmotionalControlBuild/
+
+# Unity build output
+/EmotionalControlBuild/

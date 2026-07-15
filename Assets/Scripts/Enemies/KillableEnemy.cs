@@ -19,7 +19,6 @@ public class KillableEnemy : MonoBehaviour, IBreakable
             Debug.LogError($"{gameObject.name}: EnemyHealthSystem not found on KillableEnemy!");
     }
 
-    // נקרא מ-Rage או מכל התקפה שמפעילה IBreakable
     public void OnBreak()
     {
         if (healthSystem != null)
@@ -28,7 +27,6 @@ public class KillableEnemy : MonoBehaviour, IBreakable
             Die();
     }
 
-    // נקרא מ-EnemyHealthSystem בלבד כש-HP מגיע ל-0
     public void Die()
     {
         if (isDead) return;
@@ -36,7 +34,7 @@ public class KillableEnemy : MonoBehaviour, IBreakable
 
         SpawnDebris();
 
-        EnemyLevelCounter counter = FindObjectOfType<EnemyLevelCounter>();
+        EnemyLevelCounter counter = FindFirstObjectByType<EnemyLevelCounter>();
         if (counter != null)
             counter.EnemyDied();
 
@@ -50,10 +48,16 @@ public class KillableEnemy : MonoBehaviour, IBreakable
         for (int i = 0; i < debrisCount; i++)
         {
             GameObject piece = Instantiate(debrisPrefab, transform.position, Quaternion.identity);
+
             Rigidbody2D rb = piece.GetComponent<Rigidbody2D>();
+
             if (rb != null)
             {
-                Vector2 dir = new Vector2(Random.Range(-1f, 1f), Random.Range(0.5f, 1f)).normalized;
+                Vector2 dir = new Vector2(
+                    Random.Range(-1f, 1f),
+                    Random.Range(0.5f, 1f)
+                ).normalized;
+
                 rb.AddForce(dir * force, ForceMode2D.Impulse);
                 rb.AddTorque(Random.Range(-torque, torque), ForceMode2D.Impulse);
             }
