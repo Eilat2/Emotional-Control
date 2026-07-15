@@ -1,57 +1,55 @@
 ﻿using UnityEngine;
 
-public class PlayerRageBreakState : IPlayerState
+// ============================================================
+//  PlayerRageBreakState – Rage שוברת מטרה (IBreakable)
+//
+//  כניסה:  נקבעת מטרה (SetTarget) ואז TriggerBreak על ה-machine
+//  יציאה:  אחרי BreakLockDuration שניות → IdleState
+// ============================================================
+public class PlayerRageBreakState : PlayerStateBase
 {
-    private readonly PlayerStateMachine _machine;
-
     private IBreakable _target;
     private float _exitTime;
 
-    public PlayerRageBreakState(PlayerStateMachine machine)
-    {
-        _machine = machine;
-    }
+    public PlayerRageBreakState(PlayerStateMachine machine) : base(machine) { }
 
     public void SetTarget(IBreakable target)
     {
         _target = target;
     }
 
-    public void Enter()
+    public override void Enter()
     {
+        base.Enter();
+
         if (_target != null)
         {
             _target.OnBreak();
-            Debug.Log($"[RageBreakState] Broke: {_target}");
+            StateLogger.Log(nameof(PlayerRageBreakState), $"Broke: {_target}");
         }
         else
         {
-            Debug.LogWarning("[RageBreakState] No target to break!");
+            StateLogger.Warn(nameof(PlayerRageBreakState), "No target to break!");
         }
 
-        _exitTime = Time.time + _machine.BreakLockDuration;
+        _exitTime = Time.time + Machine.BreakLockDuration;
 
-        Rigidbody2D rb = _machine.Rb;
+        Rigidbody2D rb = Machine.Rb;
         if (rb != null)
-        {
             rb.linearVelocity = Vector2.zero;
-        }
-
-        Debug.Log("[RageBreakState] Enter - Rage breaking");
     }
 
-    public void Update()
+    public override void Update()
     {
         if (Time.time >= _exitTime)
-        {
-            _target = null;
-            _machine.TransitionTo(_machine.IdleState);
-        }
+            Machine.TransitionTo(Machine.IdleState);
     }
 
-    public void Exit()
+    public override void Exit()
     {
+        // איפוס המטרה מתבצע פעם אחת, כאן בלבד
+        // (לפני התיקון זה קרה גם ב-Update וגם ב-Exit).
         _target = null;
-        Debug.Log("[RageBreakState] Exit");
+        base.Exit();
     }
 }

@@ -12,115 +12,103 @@ public class PlayerEmotionContext : MonoBehaviour
     [Header("Visual")]
     [SerializeField] private PlayerVisualSwitcher visualSwitcher;
 
-    private IEmotionStrategy neutralStrategy;
-    private IEmotionStrategy joyStrategy;
-    private IEmotionStrategy rageStrategy;
+    private IEmotionStrategy _neutralStrategy;
+    private IEmotionStrategy _joyStrategy;
+    private IEmotionStrategy _rageStrategy;
 
-    private IEmotionStrategy currentStrategy;
+    private IEmotionStrategy _currentStrategy;
 
-    private Vector2 moveInput;
+    private Vector2 _moveInput;
 
-    private bool jumpHeld = false;
-    private bool pressedThisFrame = false;
-    private bool releasedThisFrame = false;
+    private bool _jumpHeld;
+    private bool _pressedThisFrame;
+    private bool _releasedThisFrame;
 
-    // 🔴 חדש – למנוע טריגר כפול
-    private bool isFailing = false;
+    // מונע טריגר כפול של HandleStaminaDepleted
+    private bool _isFailing;
+
+    // חוסם קלט בפעם אחת, במקום לבדוק Time.timeScale/isFailing
+    // בנפרד בכל method (Update / FixedUpdate / OnMove / OnJump_Break).
+    private bool IsInputBlocked => Time.timeScale == 0f || _isFailing;
 
     private void Awake()
     {
         if (visualSwitcher == null)
-        {
             visualSwitcher = GetComponentInChildren<PlayerVisualSwitcher>();
-        }
 
-        neutralStrategy = neutralStrategyBehaviour as IEmotionStrategy;
-        joyStrategy = joyStrategyBehaviour as IEmotionStrategy;
-        rageStrategy = rageStrategyBehaviour as IEmotionStrategy;
+        _neutralStrategy = neutralStrategyBehaviour as IEmotionStrategy;
+        _joyStrategy = joyStrategyBehaviour as IEmotionStrategy;
+        _rageStrategy = rageStrategyBehaviour as IEmotionStrategy;
 
-        if (neutralStrategy == null || joyStrategy == null || rageStrategy == null)
-        {
+        if (_neutralStrategy == null || _joyStrategy == null || _rageStrategy == null)
             Debug.LogError("PlayerEmotionContext: אחד ה-Strategies לא מממש IEmotionStrategy או לא שוייך באינספקטור.");
-        }
 
         if (visualSwitcher == null)
-        {
             Debug.LogWarning("PlayerEmotionContext: לא נמצא PlayerVisualSwitcher.");
-        }
     }
 
     private void Start()
     {
-        // 🔥 בכל טעינת סצנה מתחילים מחדש במצב Neutral
-        // כי עכשיו לכל סצנה יש Player חדש
+        // בכל טעינת סצנה מתחילים מחדש במצב Neutral
+        // כי לכל סצנה יש Player חדש.
         ResetToNeutral();
     }
 
     private void Update()
     {
-        if (Time.timeScale == 0f || isFailing)
+        if (IsInputBlocked || _currentStrategy == null)
             return;
 
-        if (currentStrategy == null)
-            return;
+        _currentStrategy.HandleMove(_moveInput);
+        visualSwitcher?.SetDirection(_moveInput.x);
 
-        currentStrategy.HandleMove(moveInput);
+        _currentStrategy.HandleJumpBreak(_jumpHeld, _pressedThisFrame, _releasedThisFrame);
 
-        if (visualSwitcher != null)
-        {
-            visualSwitcher.SetDirection(moveInput.x);
-        }
-
-        currentStrategy.HandleJumpBreak(jumpHeld, pressedThisFrame, releasedThisFrame);
-
-        pressedThisFrame = false;
-        releasedThisFrame = false;
+        _pressedThisFrame = false;
+        _releasedThisFrame = false;
     }
 
     private void FixedUpdate()
     {
-        if (Time.timeScale == 0f || isFailing)
+        if (IsInputBlocked || _currentStrategy == null)
             return;
 
-        if (currentStrategy == null)
-            return;
-
-        currentStrategy.Tick();
+        _currentStrategy.Tick();
     }
 
     public void OnMove(InputValue value)
     {
-        if (Time.timeScale == 0f || isFailing)
+        if (IsInputBlocked)
         {
-            moveInput = Vector2.zero;
+            _moveInput = Vector2.zero;
             return;
         }
 
-        moveInput = value.Get<Vector2>();
+        _moveInput = value.Get<Vector2>();
     }
 
     public void OnJump_Break(InputValue value)
     {
-        if (Time.timeScale == 0f || isFailing)
+        if (IsInputBlocked)
             return;
 
         bool pressed = value.isPressed;
 
-        if (pressed && !jumpHeld)
-            pressedThisFrame = true;
+        if (pressed && !_jumpHeld)
+            _pressedThisFrame = true;
 
-        if (!pressed && jumpHeld)
-            releasedThisFrame = true;
+        if (!pressed && _jumpHeld)
+            _releasedThisFrame = true;
 
-        jumpHeld = pressed;
+        _jumpHeld = pressed;
     }
 
     public void SetEmotion(EmotionController.Emotion e)
     {
         IEmotionStrategy next =
-            e == EmotionController.Emotion.Joy ? joyStrategy :
-            e == EmotionController.Emotion.Rage ? rageStrategy :
-                                                  neutralStrategy;
+            e == EmotionController.Emotion.Joy ? _joyStrategy :
+            e == EmotionController.Emotion.Rage ? _rageStrategy :
+                                                   _neutralStrategy;
 
         if (next == null)
         {
@@ -128,51 +116,41 @@ public class PlayerEmotionContext : MonoBehaviour
             return;
         }
 
-        if (next == currentStrategy)
+        if (next == _currentStrategy)
             return;
 
-        currentStrategy?.Exit();
-
-        currentStrategy = next;
+        _currentStrategy?.Exit();
+        _currentStrategy = next;
 
         // מאפסים את מצב הקפיצה בכל החלפת רגש
-        // כדי שלא יישאר מצב שבו המשחק חושב שהכפתור עדיין לחוץ
-        jumpHeld = false;
-        pressedThisFrame = false;
-        releasedThisFrame = false;
+        // כדי שלא יישאר מצב שבו המשחק חושב שהכפתור עדיין לחוץ.
+        _jumpHeld = false;
+        _pressedThisFrame = false;
+        _releasedThisFrame = false;
 
-        currentStrategy?.Enter();
+        _currentStrategy?.Enter();
     }
 
-    // 🔥🔥🔥 זה החלק החשוב החדש
     public void OnStaminaDepleted()
     {
-        if (isFailing)
+        if (_isFailing)
             return;
 
-        isFailing = true;
-
-        if (currentStrategy != null)
-        {
-            currentStrategy.HandleStaminaDepleted();
-        }
+        _isFailing = true;
+        _currentStrategy?.HandleStaminaDepleted();
     }
 
     public void ResetToNeutral()
     {
-        // 🔹 מאפסים מצב כישלון
-        isFailing = false;
+        _isFailing = false;
 
-        // 🔹 מאפסים אינפוטים
-        moveInput = Vector2.zero;
-        jumpHeld = false;
-        pressedThisFrame = false;
-        releasedThisFrame = false;
+        _moveInput = Vector2.zero;
+        _jumpHeld = false;
+        _pressedThisFrame = false;
+        _releasedThisFrame = false;
 
-        // 🔹 מחזירים את השחקן לניטרלי
         SetEmotion(EmotionController.Emotion.Neutral);
 
-        // 🔹 מאפסים גם את הויזואל
         if (visualSwitcher != null)
         {
             visualSwitcher.ShowNeutral();

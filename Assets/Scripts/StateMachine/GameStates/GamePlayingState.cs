@@ -1,39 +1,28 @@
 ﻿using UnityEngine;
 
 // ============================================================
-//  GamePlayingState  –  המשחק רץ
+//  GamePlayingState – המשחק רץ
 //
 //  כניסה:  Start() | Restart (OnRestartRequested)
 //  יציאה:  ESC       → PausedState
 //          Game Over → GameOverState
 // ============================================================
-
-public class GamePlayingState : IGameState
+public class GamePlayingState : GameStateBase
 {
-    private readonly GameStateMachine _machine;
+    public GamePlayingState(GameStateMachine machine) : base(machine) { }
 
-    public GamePlayingState(GameStateMachine machine)
-    {
-        _machine = machine;
-    }
-
-    public void Enter()
+    public override void Enter()
     {
         Time.timeScale = 1f;
-        Debug.Log("[GameState] Playing");
-        // כאן: ניגון מוזיקת gameplay, הצגת HUD וכו'
+        base.Enter();
+        // כאן: ניגון מוזיקת gameplay, הצגת HUD וכו'.
     }
 
-    public void Update()
-    {
-        // בדיקת ESC מועברת ל-PauseMenuInputSystem הקיים —
-        // הוא כבר עושה את זה. אם רוצים לנהל כאן:
-        // if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        //     _machine.TransitionTo(_machine.PausedState);
-    }
+    // בדיקת ESC מנוהלת ע"י PauseMenuInputSystem הקיים.
 
-    public void Exit()
+    public override void Exit()
     {
-        // כאן: עצירת מוזיקת gameplay וכו'
+        base.Exit();
+        // כאן: עצירת מוזיקת gameplay וכו'.
     }
 }

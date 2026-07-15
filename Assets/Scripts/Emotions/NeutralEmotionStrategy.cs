@@ -5,147 +5,67 @@ using UnityEngine;
 // - Space לא עושה כלום
 // - אם נפסלים במצב ניטרלי -> Game Over מיידי
 // - מעדכן אנימציית Idle / Walk / Fall
-public class NeutralEmotionStrategy : MonoBehaviour, IEmotionStrategy
+public class NeutralEmotionStrategy : EmotionStrategyBase
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 6f;
 
-    [Header("Ground Check")]
-    [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundRadius = 0.25f;
-    [SerializeField] private LayerMask groundLayer;
-
     [Header("Animation")]
     [SerializeField] private Animator neutralAnimator;
 
-    private Rigidbody2D rb;
-    private PlayerHurtLock hurtLock;
-    private PlayerStateMachine stateMachine;
-
-    private Vector2 moveInput;
-
-    private bool isFailing = false;
-
-    private void Awake()
+    protected override void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        hurtLock = GetComponent<PlayerHurtLock>();
-        stateMachine = GetComponent<PlayerStateMachine>();
-
-        ResolveNeutralAnimator();
+        base.Awake();
+        neutralAnimator = ResolveAnimator(neutralAnimator, "NeutralVisual");
     }
 
-    public void Enter()
+    public override void Enter()
     {
-        isFailing = false;
-
-        if (CanUseNeutralAnimator())
-        {
-            neutralAnimator.SetFloat("speed", 0f);
-            neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-            neutralAnimator.SetBool("isGrounded", IsGrounded());
-        }
+        IsFailing = false;
+        UpdateAnimatorParams(neutralAnimator, 0f, Rb.linearVelocity.y, IsGrounded());
     }
 
-    public void Exit()
+    public override void Exit()
     {
-        if (CanUseNeutralAnimator())
-        {
-            neutralAnimator.SetFloat("speed", 0f);
-            neutralAnimator.SetFloat("yVelocity", 0f);
-            neutralAnimator.SetBool("isGrounded", true);
-        }
+        UpdateAnimatorParams(neutralAnimator, 0f, 0f, true);
     }
 
-    public void HandleMove(Vector2 move)
-    {
-        if (isFailing)
-            return;
-
-        moveInput = move;
-    }
-
-    public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
+    public override void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
         // ניטרלי לא עושה כלום עם Space כרגע
     }
 
-    public void Tick()
+    public override void Tick()
     {
-        if (isFailing)
+        if (IsFailing)
             return;
 
         bool grounded = IsGrounded();
 
-        if (hurtLock != null && hurtLock.IsLocked)
+        if (HurtLock != null && HurtLock.IsLocked)
         {
-            if (CanUseNeutralAnimator())
-            {
-                neutralAnimator.SetFloat("speed", 0f);
-                neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-                neutralAnimator.SetBool("isGrounded", grounded);
-            }
-
+            UpdateAnimatorParams(neutralAnimator, 0f, Rb.linearVelocity.y, grounded);
             return;
         }
 
-        float x = Mathf.Clamp(moveInput.x, -1f, 1f);
+        float x = Mathf.Clamp(MoveInput.x, -1f, 1f);
+        Rb.linearVelocity = new Vector2(x * moveSpeed, Rb.linearVelocity.y);
 
-        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
-
-        if (CanUseNeutralAnimator())
-        {
-            neutralAnimator.SetFloat("speed", Mathf.Abs(x));
-            neutralAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-            neutralAnimator.SetBool("isGrounded", grounded);
-        }
+        UpdateAnimatorParams(neutralAnimator, Mathf.Abs(x), Rb.linearVelocity.y, grounded);
     }
 
     // במצב ניטרלי אין סטאמינה,
     // אז כל פסילה היא Game Over מיידי
-    public void HandleStaminaDepleted()
+    public override void HandleStaminaDepleted()
     {
-        if (isFailing)
+        if (IsFailing)
             return;
 
-        isFailing = true;
+        IsFailing = true;
+        Rb.linearVelocity = Vector2.zero;
 
-        rb.linearVelocity = Vector2.zero;
-
-        if (CanUseNeutralAnimator())
-        {
-            neutralAnimator.SetFloat("speed", 0f);
-            neutralAnimator.SetFloat("yVelocity", 0f);
-            neutralAnimator.SetBool("isGrounded", IsGrounded());
-        }
+        UpdateAnimatorParams(neutralAnimator, 0f, 0f, IsGrounded());
 
         GameEvents.RaiseGameOver();
-    }
-
-    private bool IsGrounded()
-    {
-        if (groundCheck == null)
-            return false;
-
-        return Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
-    }
-
-    private void ResolveNeutralAnimator()
-    {
-        if (neutralAnimator != null)
-            return;
-
-        Transform neutralVisual = transform.Find("NeutralVisual");
-
-        if (neutralVisual != null)
-            neutralAnimator = neutralVisual.GetComponent<Animator>();
-    }
-
-    private bool CanUseNeutralAnimator()
-    {
-        return neutralAnimator != null &&
-               neutralAnimator.isActiveAndEnabled &&
-               neutralAnimator.gameObject.activeInHierarchy &&
-               neutralAnimator.runtimeAnimatorController != null;
     }
 }

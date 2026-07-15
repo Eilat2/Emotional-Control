@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
 // ============================================================
-//  PlayerGlideState  –  Joy גולשת באוויר
+//  PlayerGlideState – Joy גולשת באוויר
 //
 //  כניסה:  JumpState → כשהרגש הופך Joy ו-jumpHeld == true
 //          (קוראים ל-TransitionTo מבחוץ מה-JoyStrategy)
 //
-//  יציאה:  נחתה        → Run / Idle
+//  יציאה:  נחתה        → Walk / Idle
 //          שחררה כפתור → JumpState (נפילה רגילה)
 //          מתה         → DeadState
 //
@@ -15,47 +15,33 @@
 //      machine.TransitionTo(machine.GlideState)  – בכניסה לגלישה
 //      machine.TransitionTo(machine.JumpState)   – ביציאה מגלישה
 // ============================================================
-
-public class PlayerGlideState : IPlayerState
+public class PlayerGlideState : PlayerStateBase
 {
-    private readonly PlayerStateMachine _machine;
-
-    // ─── כבידה מוחלשת בגלישה ───────────────────────────────
-    // הערך נשמר ב-Enter ומשוחזר ב-Exit
+    // כבידה מוחלשת בגלישה – נשמרת ב-Enter ומשוחזרת ב-Exit
     private float _originalGravity;
 
-    public PlayerGlideState(PlayerStateMachine machine)
-    {
-        _machine = machine;
-    }
+    public PlayerGlideState(PlayerStateMachine machine) : base(machine) { }
 
-    public void Enter()
+    public override void Enter()
     {
-        Rigidbody2D rb = _machine.Rb;
+        base.Enter();
 
+        Rigidbody2D rb = Machine.Rb;
         if (rb != null)
         {
             _originalGravity = rb.gravityScale;
-            rb.gravityScale = _machine.GlideGravityScale; // ברירת מחדל: 0.4
+            rb.gravityScale = Machine.GlideGravityScale;
         }
 
-        // כאן: animation trigger "Glide", particles, glide SFX וכו'
-        Debug.Log("[GlideState] Enter – Joy is gliding");
+        // כאן: animation trigger "Glide", particles, glide SFX וכו'.
     }
 
-    public void Update()
+    public override void Exit()
     {
-        // לוגיקת גלישה נוספת אפשר כאן –
-        // למשל: cap מהירות אנכית, glide particles וכו'
-    }
-
-    public void Exit()
-    {
-        // מחזירים כבידה רגילה
-        Rigidbody2D rb = _machine.Rb;
+        Rigidbody2D rb = Machine.Rb;
         if (rb != null)
             rb.gravityScale = _originalGravity;
 
-        Debug.Log("[GlideState] Exit");
+        base.Exit();
     }
 }

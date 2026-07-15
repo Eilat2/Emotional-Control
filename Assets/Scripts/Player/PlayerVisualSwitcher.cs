@@ -7,7 +7,7 @@ public class PlayerVisualSwitcher : MonoBehaviour
     [SerializeField] private GameObject joyVisual;
     [SerializeField] private GameObject rageVisual;
 
-    private int facingDirection = 1;
+    private int _facingDirection = 1;
 
     private void OnEnable()
     {
@@ -31,27 +31,24 @@ public class PlayerVisualSwitcher : MonoBehaviour
 
     public void ShowNeutral()
     {
-        if (neutralVisual) neutralVisual.SetActive(true);
-        if (joyVisual) joyVisual.SetActive(false);
-        if (rageVisual) rageVisual.SetActive(false);
-
-        ApplyDirection();
+        SetActiveVisual(neutralVisual);
     }
 
     public void ShowJoy()
     {
-        if (neutralVisual) neutralVisual.SetActive(false);
-        if (joyVisual) joyVisual.SetActive(true);
-        if (rageVisual) rageVisual.SetActive(false);
-
-        ApplyDirection();
+        SetActiveVisual(joyVisual);
     }
 
     public void ShowRage()
     {
-        if (neutralVisual) neutralVisual.SetActive(false);
-        if (joyVisual) joyVisual.SetActive(false);
-        if (rageVisual) rageVisual.SetActive(true);
+        SetActiveVisual(rageVisual);
+    }
+
+    private void SetActiveVisual(GameObject active)
+    {
+        if (neutralVisual) neutralVisual.SetActive(neutralVisual == active);
+        if (joyVisual) joyVisual.SetActive(joyVisual == active);
+        if (rageVisual) rageVisual.SetActive(rageVisual == active);
 
         ApplyDirection();
     }
@@ -60,12 +57,12 @@ public class PlayerVisualSwitcher : MonoBehaviour
     {
         if (moveX > 0.01f)
         {
-            facingDirection = 1;
+            _facingDirection = 1;
             ApplyDirection();
         }
         else if (moveX < -0.01f)
         {
-            facingDirection = -1;
+            _facingDirection = -1;
             ApplyDirection();
         }
     }
@@ -82,7 +79,7 @@ public class PlayerVisualSwitcher : MonoBehaviour
         if (visual == null) return;
 
         Vector3 scale = visual.transform.localScale;
-        scale.x = Mathf.Abs(scale.x) * facingDirection;
+        scale.x = Mathf.Abs(scale.x) * _facingDirection;
         visual.transform.localScale = scale;
     }
 }

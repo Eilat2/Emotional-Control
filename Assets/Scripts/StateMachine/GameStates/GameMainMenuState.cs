@@ -1,33 +1,26 @@
 using UnityEngine;
 
 // ============================================================
-//  GameMainMenuState  –  תפריט ראשי
+//  GameMainMenuState – תפריט ראשי
 //
-//  כרגע Main Menu הוא סצנה נפרדת אצלכן, אז המצב הזה
-//  קיים בעיקר לשלמות המבנה ולמצגת.
-//  אם בעתיד תרצו Main Menu באותה סצנה – הכל כאן.
+//  כרגע Main Menu הוא סצנה נפרדת, אז המצב הזה קיים
+//  בעיקר לשלמות המבנה. אם בעתיד יהיה Main Menu באותה
+//  סצנה – הכל כאן.
 // ============================================================
-
-public class GameMainMenuState : IGameState
+public class GameMainMenuState : GameStateBase
 {
-    private readonly GameStateMachine _machine;
+    public GameMainMenuState(GameStateMachine machine) : base(machine) { }
 
-    public GameMainMenuState(GameStateMachine machine)
-    {
-        _machine = machine;
-    }
-
-    public void Enter()
+    public override void Enter()
     {
         Time.timeScale = 1f;
-        Debug.Log("[GameState] Main Menu");
-        // כאן: הצגת Main Menu panel, ניגון מוזיקת תפריט וכו'
+        base.Enter();
+        // כאן: הצגת Main Menu panel, ניגון מוזיקת תפריט וכו'.
     }
 
-    public void Update() { }
-
-    public void Exit()
+    public override void Exit()
     {
-        // כאן: הסתרת Main Menu panel
+        base.Exit();
+        // כאן: הסתרת Main Menu panel.
     }
 }

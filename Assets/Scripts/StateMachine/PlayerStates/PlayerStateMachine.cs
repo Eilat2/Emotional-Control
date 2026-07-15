@@ -35,6 +35,8 @@ public class PlayerStateMachine : MonoBehaviour
     public bool IsMoving { get; private set; }
     public bool IsDead { get; private set; }
 
+    public PlayerEmotionContext EmotionContext => emotionContext;
+
     private void Awake()
     {
         if (rb == null)
@@ -63,7 +65,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("[StateMachine] STARTED");
+        StateLogger.Log(nameof(PlayerStateMachine), "Started");
         TransitionTo(IdleState);
     }
 
@@ -95,10 +97,9 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void AutoTransition()
     {
-        if (CurrentState == RageBreakState)
-            return;
-
-        if (CurrentState == GlideState)
+        // Glide ו-RageBreak מנוהלים ידנית ע"י Strategy/State עצמם –
+        // אין להם מעברים אוטומטיים מבוססי קרקע/תנועה.
+        if (CurrentState == RageBreakState || CurrentState == GlideState)
             return;
 
         if (CurrentState == IdleState)
@@ -133,7 +134,7 @@ public class PlayerStateMachine : MonoBehaviour
         CurrentState = nextState;
         CurrentState.Enter();
 
-        Debug.Log($"[StateMachine] → {CurrentStateLabel}");
+        StateLogger.Log(nameof(PlayerStateMachine), $"-> {CurrentStateLabel}");
     }
 
     public void TriggerBreak(IBreakable target)
@@ -153,9 +154,7 @@ public class PlayerStateMachine : MonoBehaviour
     public void StopGlide()
     {
         if (CurrentState == GlideState)
-        {
             TransitionTo(IsGrounded ? IdleState : JumpState);
-        }
     }
 
     private void HandleGameOver()
@@ -169,6 +168,4 @@ public class PlayerStateMachine : MonoBehaviour
         IsDead = false;
         TransitionTo(IdleState);
     }
-
-    public PlayerEmotionContext EmotionContext => emotionContext;
 }

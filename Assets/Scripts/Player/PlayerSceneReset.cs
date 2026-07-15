@@ -2,25 +2,28 @@
 using UnityEngine.SceneManagement;
 
 // ============================================================
-//  PlayerSceneReset  (עדכון)
+//  PlayerSceneReset – מאפס את מצב השחקן בכל טעינת סצנה
 //
-//  שינוי יחיד מהגרסה הקודמת:
-//    נוספה שורה אחת בסוף OnSceneLoaded שמאפסת את
-//    ה-StateMachine החדשה → ResetMachine()
+//  זהו כרגע המנגנון היחיד שאחראי על:
+//    - מיקום השחקן ב-spawn point
+//    - איפוס פיזיקה / ויזואל / קוליידרים
+//    - איפוס מערכת הרגשות וה-State Machine
+//    - איפוס Stamina
 //
-//  שאר הקוד זהה לחלוטין.
+//  (PlayerSceneHandler.cs ו-PlayerSpawnSetter.cs הוסרו –
+//   הם היו מנגנונים מקבילים/ישנים שכבר לא היו מחוברים
+//   בפועל בפרויקט, וגרמו לכפילות מבלבלת.)
 // ============================================================
-
 public class PlayerSceneReset : MonoBehaviour
 {
     [Header("Reset Settings")]
     [SerializeField] private float normalGravityScale = 4f;
 
-    private Vector3 originalScale;
+    private Vector3 _originalScale;
 
     private void Awake()
     {
-        originalScale = transform.localScale;
+        _originalScale = transform.localScale;
     }
 
     private void OnEnable()
@@ -35,17 +38,33 @@ public class PlayerSceneReset : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 🔥 מחזירים לנקודת ספאון
+        ResetPosition();
+        ResetTransformScale();
+        ResetSpriteVisibility();
+        ResetColliders();
+        ResetPhysics();
+        ResetEmotionState();
+        ResetStamina();
+        ReEnableAllScripts();
+        ResetStateMachine();
+    }
+
+    private void ResetPosition()
+    {
         GameObject respawn = GameObject.Find("PlayerSpawnPoint");
         if (respawn != null)
             transform.position = respawn.transform.position;
         else
             Debug.LogWarning("PlayerSpawnPoint not found in scene.");
+    }
 
-        // 🔄 גודל רגיל
-        transform.localScale = originalScale;
+    private void ResetTransformScale()
+    {
+        transform.localScale = _originalScale;
+    }
 
-        // 🎨 שקיפות ספרייטים
+    private void ResetSpriteVisibility()
+    {
         SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
         foreach (SpriteRenderer sr in renderers)
         {
@@ -53,46 +72,57 @@ public class PlayerSceneReset : MonoBehaviour
             c.a = 1f;
             sr.color = c;
         }
+    }
 
-        // 🧱 קוליידרים
+    private void ResetColliders()
+    {
         Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
         foreach (Collider2D col in colliders)
             col.enabled = true;
+    }
 
-        // ⚙️ פיזיקה
+    private void ResetPhysics()
+    {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-            rb.gravityScale = normalGravityScale;
-            rb.simulated = true;
-        }
+        if (rb == null)
+            return;
 
-        // 🧠 מערכת רגשות
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.gravityScale = normalGravityScale;
+        rb.simulated = true;
+    }
+
+    private void ResetEmotionState()
+    {
         PlayerEmotionContext context = GetComponent<PlayerEmotionContext>();
         if (context != null)
             context.ResetToNeutral();
 
-        // 💡 EmotionController
         EmotionController emotion = GetComponent<EmotionController>();
         if (emotion != null)
         {
             emotion.current = EmotionController.Emotion.Neutral;
             GameEvents.RaiseEmotionChanged(EmotionController.Emotion.Neutral);
         }
+    }
 
-        // 🔋 סטאמינה
+    private void ResetStamina()
+    {
         Stamina[] staminaComponents = GetComponentsInChildren<Stamina>(true);
         foreach (Stamina stamina in staminaComponents)
             stamina.ResetForNewScene();
+    }
 
-        // 🔄 מפעילים מחדש סקריפטים
+    private void ReEnableAllScripts()
+    {
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
             script.enabled = true;
+    }
 
-        // ✅ [חדש] מאפסים את ה-State Machine → חזרה ל-IdleState
+    private void ResetStateMachine()
+    {
         PlayerStateMachine sm = GetComponent<PlayerStateMachine>();
         if (sm != null)
             sm.ResetMachine();

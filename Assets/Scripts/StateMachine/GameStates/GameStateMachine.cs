@@ -15,6 +15,8 @@ public class GameStateMachine : MonoBehaviour
     public IGameState CurrentState { get; private set; }
     public string CurrentStateLabel => CurrentState?.GetType().Name ?? "None";
 
+    public PauseMenuInputSystem PauseMenu => pauseMenu;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -65,7 +67,7 @@ public class GameStateMachine : MonoBehaviour
         CurrentState = nextState;
         CurrentState.Enter();
 
-        Debug.Log($"[GameStateMachine] → {CurrentStateLabel}");
+        StateLogger.Log(nameof(GameStateMachine), $"-> {CurrentStateLabel}");
     }
 
     private void HandleGameOver()
@@ -77,6 +79,4 @@ public class GameStateMachine : MonoBehaviour
     {
         TransitionTo(PlayingState);
     }
-
-    public PauseMenuInputSystem PauseMenu => pauseMenu;
 }

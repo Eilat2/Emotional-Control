@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
+public class RageEmotionStrategy : EmotionStrategyBase
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 3f;
@@ -9,11 +9,6 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [Header("Break")]
     [SerializeField] private float breakCost = 20f;
     [SerializeField] private BreakableSensor sensor;
-
-    [Header("Ground Check")]
-    [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundRadius = 0.25f;
-    [SerializeField] private LayerMask groundLayer;
 
     [Header("Animation")]
     [SerializeField] private Animator rageAnimator;
@@ -27,75 +22,42 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
     [SerializeField] private float failureShakeAmount = 0.10f;
     [SerializeField] private float directionSwitchInterval = 0.12f;
 
-    private Rigidbody2D rb;
-    private PlayerHurtLock hurtLock;
-    private PlayerStateMachine stateMachine;
-    private Stamina rageStamina;
-
-    private Vector2 moveInput;
-
-    private bool isBreaking = false;
-    private bool isFailing = false;
-
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        hurtLock = GetComponent<PlayerHurtLock>();
-        stateMachine = GetComponent<PlayerStateMachine>();
-    }
+    private Stamina _rageStamina;
+    private bool _isBreaking;
 
     private void Start()
     {
-        rageStamina = GetStamina(Stamina.StaminaType.Rage);
-        ResolveRageAnimator();
+        if (_rageStamina == null)
+            _rageStamina = FindStamina(Stamina.StaminaType.Rage, includeChildren: false);
+
+        rageAnimator = ResolveAnimator(rageAnimator, "RageVisual");
     }
 
-    public void Enter()
+    public override void Enter()
     {
-        isBreaking = false;
-        isFailing = false;
+        _isBreaking = false;
+        IsFailing = false;
 
-        if (CanUseRageAnimator())
-        {
-            rageAnimator.SetFloat("speed", 0f);
-            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-            rageAnimator.SetBool("isGrounded", IsGrounded());
-        }
+        UpdateAnimatorParams(rageAnimator, 0f, Rb.linearVelocity.y, IsGrounded());
     }
 
-    public void Exit()
+    public override void Exit()
     {
-        isBreaking = false;
-        isFailing = false;
+        _isBreaking = false;
+        IsFailing = false;
 
-        if (rb != null)
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        if (Rb != null)
+            Rb.linearVelocity = new Vector2(0f, Rb.linearVelocity.y);
 
-        if (CanUseRageAnimator())
-        {
-            rageAnimator.SetFloat("speed", 0f);
-            rageAnimator.SetFloat("yVelocity", 0f);
-            rageAnimator.SetBool("isGrounded", true);
-        }
+        UpdateAnimatorParams(rageAnimator, 0f, 0f, true);
     }
 
-    public void HandleMove(Vector2 move)
+    public override void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
     {
-        if (isFailing)
+        if (IsFailing || !pressedThisFrame)
             return;
 
-        moveInput = move;
-    }
-
-    public void HandleJumpBreak(bool isHeld, bool pressedThisFrame, bool releasedThisFrame)
-    {
-        if (isFailing)
-            return;
-
-        if (!pressedThisFrame)
-            return;
-
-        if (hurtLock != null && hurtLock.IsLocked)
+        if (HurtLock != null && HurtLock.IsLocked)
             return;
 
         PlayBreakAnimation();
@@ -105,70 +67,51 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
         IBreakable targetToBreak = sensor.current;
 
-        if (rageStamina != null && !rageStamina.Use(breakCost))
+        if (_rageStamina != null && !_rageStamina.Use(breakCost))
         {
             HandleStaminaDepleted();
             return;
         }
 
-        if (stateMachine != null)
-            stateMachine.TriggerBreak(targetToBreak);
+        if (StateMachine != null)
+            StateMachine.TriggerBreak(targetToBreak);
         else
             targetToBreak.OnBreak();
     }
 
-    public void Tick()
+    public override void Tick()
     {
-        if (isFailing)
+        if (IsFailing)
             return;
 
         bool grounded = IsGrounded();
 
-        if (hurtLock != null && hurtLock.IsLocked)
+        if (HurtLock != null && HurtLock.IsLocked)
         {
-            if (CanUseRageAnimator())
-            {
-                rageAnimator.SetFloat("speed", 0f);
-                rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-                rageAnimator.SetBool("isGrounded", grounded);
-            }
-
+            UpdateAnimatorParams(rageAnimator, 0f, Rb.linearVelocity.y, grounded);
             return;
         }
 
-        float x = Mathf.Clamp(moveInput.x, -1f, 1f);
+        float x = Mathf.Clamp(MoveInput.x, -1f, 1f);
 
-        if (isBreaking)
+        if (_isBreaking)
         {
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-
-            if (CanUseRageAnimator())
-            {
-                rageAnimator.SetFloat("speed", 0f);
-                rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-                rageAnimator.SetBool("isGrounded", grounded);
-            }
-
+            Rb.linearVelocity = new Vector2(0f, Rb.linearVelocity.y);
+            UpdateAnimatorParams(rageAnimator, 0f, Rb.linearVelocity.y, grounded);
             return;
         }
 
-        rb.linearVelocity = new Vector2(x * moveSpeed, rb.linearVelocity.y);
-
-        if (CanUseRageAnimator())
-        {
-            rageAnimator.SetFloat("speed", Mathf.Abs(x));
-            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-            rageAnimator.SetBool("isGrounded", grounded);
-        }
+        Rb.linearVelocity = new Vector2(x * moveSpeed, Rb.linearVelocity.y);
+        UpdateAnimatorParams(rageAnimator, Mathf.Abs(x), Rb.linearVelocity.y, grounded);
     }
 
-    public void HandleStaminaDepleted()
+    public override void HandleStaminaDepleted()
     {
-        if (isFailing)
+        if (IsFailing)
             return;
 
-        isFailing = true;
-        isBreaking = false;
+        IsFailing = true;
+        _isBreaking = false;
 
         StartCoroutine(RageFailure());
     }
@@ -179,13 +122,9 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
         float direction = 1f;
         float switchTimer = 0f;
 
-        if (CanUseRageAnimator())
-        {
-            rageAnimator.SetFloat("speed", 0f);
-            rageAnimator.SetFloat("yVelocity", rb.linearVelocity.y);
-            rageAnimator.SetBool("isGrounded", IsGrounded());
+        UpdateAnimatorParams(rageAnimator, 0f, Rb.linearVelocity.y, IsGrounded());
+        if (CanUseAnimator(rageAnimator))
             rageAnimator.ResetTrigger("Break");
-        }
 
         Vector3 originalScale = transform.localScale;
 
@@ -200,7 +139,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
                 switchTimer = 0f;
             }
 
-            rb.linearVelocity = new Vector2(direction * failureMoveSpeed * 3f, rb.linearVelocity.y);
+            Rb.linearVelocity = new Vector2(direction * failureMoveSpeed * 3f, Rb.linearVelocity.y);
 
             Vector3 shakeOffset = new Vector3(
                 Random.Range(-failureShakeAmount * 4f, failureShakeAmount * 4f),
@@ -224,7 +163,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
             yield return null;
         }
 
-        rb.linearVelocity = Vector2.zero;
+        Rb.linearVelocity = Vector2.zero;
         transform.localScale = originalScale;
 
         GameEvents.RaiseGameOver();
@@ -232,7 +171,7 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private void PlayBreakAnimation()
     {
-        if (!CanUseRageAnimator())
+        if (!CanUseAnimator(rageAnimator))
             return;
 
         StopCoroutine(nameof(BreakAnimationLock));
@@ -244,50 +183,10 @@ public class RageEmotionStrategy : MonoBehaviour, IEmotionStrategy
 
     private IEnumerator BreakAnimationLock()
     {
-        isBreaking = true;
+        _isBreaking = true;
 
         yield return new WaitForSeconds(breakAnimationLockTime);
 
-        isBreaking = false;
-    }
-
-    private bool IsGrounded()
-    {
-        if (groundCheck == null)
-            return false;
-
-        return Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
-    }
-
-    private Stamina GetStamina(Stamina.StaminaType wantedType)
-    {
-        Stamina[] staminas = GetComponents<Stamina>();
-
-        foreach (Stamina s in staminas)
-        {
-            if (s.type == wantedType)
-                return s;
-        }
-
-        return null;
-    }
-
-    private void ResolveRageAnimator()
-    {
-        if (rageAnimator != null)
-            return;
-
-        Transform rageVisual = transform.Find("RageVisual");
-
-        if (rageVisual != null)
-            rageAnimator = rageVisual.GetComponent<Animator>();
-    }
-
-    private bool CanUseRageAnimator()
-    {
-        return rageAnimator != null &&
-               rageAnimator.isActiveAndEnabled &&
-               rageAnimator.gameObject.activeInHierarchy &&
-               rageAnimator.runtimeAnimatorController != null;
+        _isBreaking = false;
     }
 }

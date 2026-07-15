@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-
-// ============================================================
-//  PlayerJumpState  –  השחקן באוויר (קפיצה / נפילה)
+﻿// ============================================================
+//  PlayerJumpState – השחקן באוויר (קפיצה / נפילה)
 //
-//  כניסה:  Idle / Run (עזב את הקרקע)
-//  יציאה:  נחת + זז   → RunState
+//  כניסה:  Idle / Walk (עזב את הקרקע)
+//  יציאה:  נחת + זז   → WalkState
 //          נחת + עצר  → IdleState
 //          מת         → DeadState
 //
@@ -12,30 +10,9 @@
 //        JumpState רק "יודע" שאנחנו באוויר ומנגן
 //        את ה-animation / הלוגיקה ה-aerial.
 // ============================================================
-
-public class PlayerJumpState : IPlayerState
+public class PlayerJumpState : PlayerStateBase
 {
-    private readonly PlayerStateMachine _machine;
+    public PlayerJumpState(PlayerStateMachine machine) : base(machine) { }
 
-    public PlayerJumpState(PlayerStateMachine machine)
-    {
-        _machine = machine;
-    }
-
-    public void Enter()
-    {
-        // טריגר ל-Jump animation, jump SFX וכו'
-        Debug.Log("[JumpState] Enter");
-    }
-
-    public void Update()
-    {
-        // לוגיקה אווירית אפשר להוסיף כאן –
-        // למשל: coyote time, jump buffer, air control מיוחד
-    }
-
-    public void Exit()
-    {
-        Debug.Log("[JumpState] Exit");
-    }
+    // מקום טבעי להוסיף בעתיד: coyote time, jump buffer, air control.
 }

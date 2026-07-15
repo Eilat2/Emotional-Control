@@ -1,38 +1,16 @@
-﻿using UnityEngine;
-
-// ============================================================
-//  PlayerIdleState  –  השחקן עומד, לא זז
+﻿// ============================================================
+//  PlayerIdleState – השחקן עומד, לא זז
 //
-//  כניסה:  מגיע מ-Run (עצר) או מ-Jump (נחת ולא זז)
-//  יציאה:  המשחקן מתחיל לזוז → RunState
-//          המשחקן באוויר      → JumpState
+//  כניסה:  מגיע מ-Walk (עצר) או מ-Jump (נחת ולא זז)
+//  יציאה:  השחקן מתחיל לזוז → WalkState
+//          השחקן באוויר      → JumpState
 //          Game Over          → DeadState
 // ============================================================
-
-public class PlayerIdleState : IPlayerState
+public class PlayerIdleState : PlayerStateBase
 {
-    private readonly PlayerStateMachine _machine;
+    public PlayerIdleState(PlayerStateMachine machine) : base(machine) { }
 
-    public PlayerIdleState(PlayerStateMachine machine)
-    {
-        _machine = machine;
-    }
-
-    public void Enter()
-    {
-        // כאן אפשר לשים: animation trigger, sound, particles וכו'
-        Debug.Log("[IdleState] Enter");
-    }
-
-    public void Update()
-    {
-        // Idle לא צריך לוגיקה מיוחדת –
-        // המעברים האוטומטיים ב-PlayerStateMachine.AutoTransition
-        // יטפלו בכל הבדיקות.
-    }
-
-    public void Exit()
-    {
-        Debug.Log("[IdleState] Exit");
-    }
+    // Idle לא צריך לוגיקת Update מיוחדת –
+    // המעברים האוטומטיים ב-PlayerStateMachine.AutoTransition
+    // מטפלים בכל הבדיקות.
 }

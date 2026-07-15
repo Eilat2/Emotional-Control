@@ -7,25 +7,24 @@ public class EmotionController : MonoBehaviour
     public Emotion current = Emotion.Neutral;
 
     [Header("Neutral scripts")]
-    [SerializeField] MonoBehaviour neutralMovement;
+    [SerializeField] private MonoBehaviour neutralMovement;
 
     [Header("Joy scripts")]
-    [SerializeField] MonoBehaviour joyMovement;
+    [SerializeField] private MonoBehaviour joyMovement;
 
     [Header("Rage scripts")]
-    [SerializeField] MonoBehaviour rageMovement;
-    [SerializeField] MonoBehaviour rageBreak;
+    [SerializeField] private MonoBehaviour rageMovement;
+    [SerializeField] private MonoBehaviour rageBreak;
 
     [Header("Visual")]
-    [SerializeField] SpriteRenderer playerRenderer;
-    [SerializeField] PlayerEmotionContext context;
+    [SerializeField] private SpriteRenderer playerRenderer;
+    [SerializeField] private PlayerEmotionContext context;
 
     public Color neutralColor = Color.white;
     public Color joyColor = Color.yellow;
     public Color rageColor = Color.red;
 
-    // 🔹 מאתחלים רפרנסים אם חסרים
-    void Awake()
+    private void Awake()
     {
         if (!playerRenderer)
             playerRenderer = GetComponent<SpriteRenderer>();
@@ -34,10 +33,10 @@ public class EmotionController : MonoBehaviour
             context = GetComponent<PlayerEmotionContext>();
     }
 
-    void Start()
+    private void Start()
     {
-        // 🔥 בכל סצנה השחקן מתחיל מחדש כ-Normal/Neutral
-        // כי כבר לא משתמשים ב-DontDestroyOnLoad
+        // בכל סצנה השחקן מתחיל מחדש כ-Neutral
+        // כי לא משתמשים ב-DontDestroyOnLoad.
         ApplyInitial(Emotion.Neutral);
     }
 
@@ -45,21 +44,22 @@ public class EmotionController : MonoBehaviour
     public void OnAnger() => Apply(Emotion.Rage);
     public void OnNeutral() => Apply(Emotion.Neutral);
 
-    void Apply(Emotion e)
+    private void Apply(Emotion e)
     {
-        if (current == e) return;
+        if (current == e)
+            return;
 
         current = e;
 
         context?.SetEmotion(e);
         ApplyColor(e);
 
-        // כאן EmotionController רק מודיע שהרגש השתנה.
+        // EmotionController רק מודיע שהרגש השתנה -
         // הוא לא קורא ישירות ל-WorldSwitcher או ל-VisualSwitcher.
         GameEvents.RaiseEmotionChanged(e);
     }
 
-    void ApplyInitial(Emotion e)
+    private void ApplyInitial(Emotion e)
     {
         current = e;
 
@@ -69,15 +69,15 @@ public class EmotionController : MonoBehaviour
         GameEvents.RaiseEmotionChanged(e);
     }
 
-    // 🔹 פונקציה שאפשר לקרוא לה אם רוצים לאפס את השחקן לניטרלי
     public void ResetToNeutral()
     {
         ApplyInitial(Emotion.Neutral);
     }
 
-    void ApplyColor(Emotion e)
+    private void ApplyColor(Emotion e)
     {
-        if (!playerRenderer) return;
+        if (!playerRenderer)
+            return;
 
         if (e == Emotion.Joy)
             playerRenderer.color = joyColor;

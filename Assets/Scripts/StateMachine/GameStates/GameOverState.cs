@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-
-// ============================================================
-//  GameOverState  –  המשחק נגמר (השחקן מת)
+﻿// ============================================================
+//  GameOverState – המשחק נגמר (השחקן מת)
 //
 //  עוטף את PauseMenuInputSystem.GameOver() הקיים.
 //  מגיעים לכאן דרך GameEvents.OnGameOver.
@@ -11,36 +9,28 @@
 //                        → GameStateMachine.HandleRestart()
 //                        → PlayingState
 // ============================================================
-
-public class GameOverState : IGameState
+public class GameOverState : GameStateBase
 {
-    private readonly GameStateMachine _machine;
     private readonly PauseMenuInputSystem _pauseMenu;
 
     public GameOverState(GameStateMachine machine, PauseMenuInputSystem pauseMenu)
+        : base(machine)
     {
-        _machine = machine;
         _pauseMenu = pauseMenu;
     }
 
-    public void Enter()
+    public override void Enter()
     {
-        // PauseMenuInputSystem.GameOver() כבר:
-        //   • מציג GameOverPanel
-        //   • עוצר Time.timeScale = 0
-        //   • מפנה focus לכפתור Restart
-        // אבל — PauseMenuInputSystem מאזין ל-GameEvents.OnGameOver בעצמו,
-        // אז הוא כבר נקרא. אנחנו רק מתעדים את המצב.
-        Debug.Log("[GameState] Game Over");
+        // PauseMenuInputSystem כבר מאזין ל-GameEvents.OnGameOver בעצמו
+        // ומטפל ב-GameOverPanel / timeScale / focus.
+        // אנחנו רק מתעדים את המצב.
+        base.Enter();
     }
 
-    public void Update() { }
-
-    public void Exit()
+    public override void Exit()
     {
-        // ניקוי GameOverPanel אם צריך —
-        // PauseMenuInputSystem.Restart() כבר עושה זאת
-        // ב-OnRestartRequested. לא צריך כאן כפול.
-        Debug.Log("[GameState] Leaving Game Over");
+        // ניקוי GameOverPanel נעשה כבר ב-PauseMenuInputSystem.Restart()
+        // דרך OnRestartRequested – לא צריך כאן כפול.
+        base.Exit();
     }
 }

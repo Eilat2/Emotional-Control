@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerHitFeedback : MonoBehaviour
 {
     [Header("Renderers")]
-    // ה־SpriteRenderers לכל מצב רגש
+    // ה-SpriteRenderers לכל מצב רגש
     [SerializeField] private SpriteRenderer neutralRenderer;
     [SerializeField] private SpriteRenderer joyRenderer;
     [SerializeField] private SpriteRenderer rageRenderer;
@@ -20,36 +20,28 @@ public class PlayerHitFeedback : MonoBehaviour
     // רפרנס לסקריפט שמנהל את הרגש הפעיל
     [SerializeField] private EmotionController emotionController;
 
-    // ה־Transforms של הוויזואלים (לא באמת חייבים עכשיו אבל נשאיר)
-    [SerializeField] private Transform neutralVisual;
-    [SerializeField] private Transform joyVisual;
-    [SerializeField] private Transform rageVisual;
+    // הערה: השדות neutralVisual/joyVisual/rageVisual (Transform) הוסרו –
+    // הם לא היו בשימוש בפועל בקוד (רק הוגדרו ולא נקראו לעולם).
+    // אם בעתיד תרצי לאנימציה/תזוזה על פגיעה, אפשר להוסיף אותם בחזרה.
 
-    // פונקציה חיצונית להפעלת אפקט פגיעה
     public void PlayHitFeedback()
     {
         StopAllCoroutines(); // עוצר אפקט קודם אם היה
         StartCoroutine(HitRoutine());
     }
 
-    // הקורוטינה שמבצעת את ההבהוב
     private IEnumerator HitRoutine()
     {
-        // לוקחים את ה־Renderer של המצב הפעיל
         SpriteRenderer activeRenderer = GetActiveRenderer();
 
-        // אם חסר משהו – יוצאים
         if (activeRenderer == null || emotionController == null)
             yield break;
 
-        // מבצעים הבהוב
         for (int i = 0; i < blinkCount; i++)
         {
-            // מכבים את הספרייט (נראה כמו פגיעה)
             activeRenderer.enabled = false;
             yield return new WaitForSeconds(blinkStepDuration);
 
-            // מדליקים חזרה
             activeRenderer.enabled = true;
             yield return new WaitForSeconds(blinkStepDuration);
         }
@@ -58,7 +50,6 @@ public class PlayerHitFeedback : MonoBehaviour
         activeRenderer.enabled = true;
     }
 
-    // מחזיר את ה־Renderer לפי הרגש הפעיל
     private SpriteRenderer GetActiveRenderer()
     {
         switch (emotionController.current)

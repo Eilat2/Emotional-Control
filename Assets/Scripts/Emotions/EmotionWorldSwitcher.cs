@@ -39,25 +39,15 @@ public class EmotionWorldSwitcher : MonoBehaviour
         }
     }
 
-    public void ShowJoyWorld()
-    {
-        SetObjects(joyObjects, true);
-        SetObjects(rageObjects, false);
-        SetObjects(neutralObjects, false);
-    }
+    public void ShowJoyWorld() => SetActiveGroup(joyObjects);
+    public void ShowRageWorld() => SetActiveGroup(rageObjects);
+    public void ShowNeutralWorld() => SetActiveGroup(neutralObjects);
 
-    public void ShowRageWorld()
+    private void SetActiveGroup(GameObject[] activeGroup)
     {
-        SetObjects(joyObjects, false);
-        SetObjects(rageObjects, true);
-        SetObjects(neutralObjects, false);
-    }
-
-    public void ShowNeutralWorld()
-    {
-        SetObjects(joyObjects, false);
-        SetObjects(rageObjects, false);
-        SetObjects(neutralObjects, true);
+        SetObjects(joyObjects, activeGroup == joyObjects);
+        SetObjects(rageObjects, activeGroup == rageObjects);
+        SetObjects(neutralObjects, activeGroup == neutralObjects);
     }
 
     private void SetObjects(GameObject[] objects, bool active)

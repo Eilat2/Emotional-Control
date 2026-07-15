@@ -1,46 +1,35 @@
-﻿using UnityEngine;
-
-// ============================================================
-//  GamePausedState  –  המשחק מושהה
+﻿// ============================================================
+//  GamePausedState – המשחק מושהה
 //
-//  עוטף את PauseMenuInputSystem הקיים — לא מחליף אותו!
+//  עוטף את PauseMenuInputSystem הקיים – לא מחליף אותו!
 //  PauseMenuInputSystem ממשיך לנהל את ה-UI בפועל.
 //  GamePausedState רק "יודע" שאנחנו ב-Pause.
 //
 //  כניסה:  Playing (ESC)
 //  יציאה:  ESC שוב / כפתור Resume → PlayingState
 // ============================================================
-
-public class GamePausedState : IGameState
+public class GamePausedState : GameStateBase
 {
-    private readonly GameStateMachine _machine;
     private readonly PauseMenuInputSystem _pauseMenu;
 
     public GamePausedState(GameStateMachine machine, PauseMenuInputSystem pauseMenu)
+        : base(machine)
     {
-        _machine = machine;
         _pauseMenu = pauseMenu;
     }
 
-    public void Enter()
+    public override void Enter()
     {
-        // PauseMenuInputSystem.Pause() כבר:
-        //   • מציג PausePanel
-        //   • עוצר Time.timeScale = 0
-        //   • עוצר תנועת שחקן
-        // אנחנו רק קוראים לו — לא כותבים כפול
+        // PauseMenuInputSystem.Pause() כבר: מציג PausePanel,
+        // עוצר Time.timeScale = 0, עוצר תנועת שחקן.
+        // אנחנו רק קוראים לו – לא כותבים כפול.
         _pauseMenu?.Pause();
-        Debug.Log("[GameState] Paused");
+        base.Enter();
     }
 
-    public void Update()
-    {
-        // PauseMenuInputSystem מנהל את ה-ESC בעצמו —
-        // לא צריך לנהל כאן.
-    }
-
-    public void Exit()
+    public override void Exit()
     {
         _pauseMenu?.Resume();
+        base.Exit();
     }
 }
