@@ -8,7 +8,7 @@ public class Level3RevealAfterBreak : MonoBehaviour
     [Header("האובייקט שיופיע אחרי השבירה")]
     [SerializeField] private GameObject objectToReveal;
 
-    private bool revealed = false;
+    private bool _revealed;
 
     private void Start()
     {
@@ -18,24 +18,26 @@ public class Level3RevealAfterBreak : MonoBehaviour
 
     private void Update()
     {
-        if (revealed) return;
+        if (_revealed)
+            return;
 
-        if (objectToWatch == null || !objectToWatch.activeInHierarchy)
-        {
-            revealed = true;
+        if (objectToWatch != null && objectToWatch.activeInHierarchy)
+            return;
 
-            Debug.Log("Level 3: Revealing puzzle piece");
+        Reveal();
+    }
 
-            if (objectToReveal != null)
-            {
-                objectToReveal.SetActive(true);
+    private void Reveal()
+    {
+        _revealed = true;
+        StateLogger.Log(nameof(Level3RevealAfterBreak), "Revealing puzzle piece.");
 
-                Level3PuzzlePiecePickup pickup =
-                    objectToReveal.GetComponent<Level3PuzzlePiecePickup>();
+        if (objectToReveal == null)
+            return;
 
-                if (pickup != null)
-                    pickup.UnlockAfterStoneBroken();
-            }
-        }
+        objectToReveal.SetActive(true);
+
+        Level3PuzzlePiecePickup pickup = objectToReveal.GetComponent<Level3PuzzlePiecePickup>();
+        pickup?.UnlockAfterStoneBroken();
     }
 }

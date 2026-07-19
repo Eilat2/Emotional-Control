@@ -14,13 +14,13 @@ public class MovingElectricTilemapPlatform : MonoBehaviour
     [Header("האם להתחיל לכיוון ימין")]
     [SerializeField] private bool startMovingRight = true;
 
-    private Transform currentTarget;
-    private float startY;
+    private Transform _currentTarget;
+    private float _startY;
 
     private void Start()
     {
-        startY = transform.position.y;
-        currentTarget = startMovingRight ? rightTargetPoint : leftTargetPoint;
+        _startY = transform.position.y;
+        _currentTarget = startMovingRight ? rightTargetPoint : leftTargetPoint;
     }
 
     private void Update()
@@ -29,8 +29,8 @@ public class MovingElectricTilemapPlatform : MonoBehaviour
             return;
 
         Vector3 targetPosition = new Vector3(
-            currentTarget.position.x,
-            startY,
+            _currentTarget.position.x,
+            _startY,
             transform.position.z
         );
 
@@ -40,9 +40,9 @@ public class MovingElectricTilemapPlatform : MonoBehaviour
             moveSpeed * Time.deltaTime
         );
 
-        if (Mathf.Abs(transform.position.x - currentTarget.position.x) < 0.05f)
+        if (Mathf.Abs(transform.position.x - _currentTarget.position.x) < 0.05f)
         {
-            currentTarget = currentTarget == rightTargetPoint
+            _currentTarget = _currentTarget == rightTargetPoint
                 ? leftTargetPoint
                 : rightTargetPoint;
         }

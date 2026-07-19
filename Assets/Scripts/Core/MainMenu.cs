@@ -16,19 +16,30 @@ public class MainMenu : MonoBehaviour
 
     public void OpenOptions()
     {
-        buttonsHolder.SetActive(false);
-        optionsPanel.SetActive(true);
+        SetPanels(buttonsActive: false, optionsActive: true);
     }
 
     public void CloseOptions()
     {
-        optionsPanel.SetActive(false);
-        buttonsHolder.SetActive(true);
+        SetPanels(buttonsActive: true, optionsActive: false);
+    }
+
+    private void SetPanels(bool buttonsActive, bool optionsActive)
+    {
+        if (buttonsHolder != null)
+            buttonsHolder.SetActive(buttonsActive);
+        else
+            Debug.LogWarning("MainMenu: Buttons holder is not assigned.");
+
+        if (optionsPanel != null)
+            optionsPanel.SetActive(optionsActive);
+        else
+            Debug.LogWarning("MainMenu: Options panel is not assigned.");
     }
 
     public void QuitGame()
     {
+        StateLogger.Log(nameof(MainMenu), "Quit Game requested.");
         Application.Quit();
-        Debug.Log("Quit Game");
     }
 }

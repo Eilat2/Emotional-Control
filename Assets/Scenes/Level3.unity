@@ -3881,15 +3881,15 @@ MonoBehaviour:
   triangleOnly: {fileID: 817757385384869760, guid: cc58175f01a105742aa87b0ce3f8505d, type: 3}
   squareOnly: {fileID: -4147020696825799035, guid: 3f6dbf1af3645814ca7d0e68f01291f6, type: 3}
   circleOnly: {fileID: -5259674794213886973, guid: b20d77cc0b7e5744bb70886466a024ea, type: 3}
-  eclipseOnly: {fileID: 288905208536252371, guid: ec6be3a53d741c94db94c84e22463269, type: 3}
+  ellipseOnly: {fileID: 288905208536252371, guid: ec6be3a53d741c94db94c84e22463269, type: 3}
   squareTriangle: {fileID: -6807266315612943125, guid: fbd2e1ad6cc39d246a342f480bcb3dbe, type: 3}
   circleTriangle: {fileID: 7902616024334313203, guid: 98c6c67eadb025c468ad434d4321f6d5, type: 3}
-  eclipseTriangle: {fileID: -4655600256378283646, guid: b3586e93d3f9cfa41858e0cd6d918416, type: 3}
+  ellipseTriangle: {fileID: -4655600256378283646, guid: b3586e93d3f9cfa41858e0cd6d918416, type: 3}
   squareCircle: {fileID: 1808449887729193802, guid: 35e5b0f6d8fd9e746bb38718f50e453b, type: 3}
-  eclipseSquare: {fileID: 297891231327587309, guid: fd056dbb06a6cb04bb63c5a5f2ddb5b6, type: 3}
-  eclipseCircle: {fileID: 7397451352616745920, guid: 2e2ed7ec3c768704084a175beba2520f, type: 3}
+  ellipseSquare: {fileID: 297891231327587309, guid: fd056dbb06a6cb04bb63c5a5f2ddb5b6, type: 3}
+  ellipseCircle: {fileID: 7397451352616745920, guid: 2e2ed7ec3c768704084a175beba2520f, type: 3}
   squareCircleTriangle: {fileID: -2127156760497558252, guid: 2dcb989fa4eb1194d91cdfe049f588d8, type: 3}
-  circleTriangleEclipse: {fileID: -4908492196139457366, guid: 274e593d3a1809647b5e6820bdbfb4f9, type: 3}
+  circleTriangleEllipse: {fileID: -4908492196139457366, guid: 274e593d3a1809647b5e6820bdbfb4f9, type: 3}
   allTogether: {fileID: 5819073348632148331, guid: 92228441b2ae4014db0dae5faded03fa, type: 3}
   allTogetherArrow: {fileID: 1337459778923842268, guid: 6efe92829710da844b32f3e01f93e351, type: 3}
   secretElevator: {fileID: 944954014}

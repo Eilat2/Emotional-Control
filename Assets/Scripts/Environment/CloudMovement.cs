@@ -6,16 +6,16 @@ public class CloudMovement : MonoBehaviour
     [SerializeField] private float speed = 0.5f;   // מהירות התנועה
     [SerializeField] private float distance = 2f;  // כמה רחוק לזוז
 
-    private Vector3 startPos;
+    private Vector3 _startPosition;
 
-    void Start()
+    private void Start()
     {
-        startPos = transform.position;
+        _startPosition = transform.position;
     }
 
-    void Update()
+    private void Update()
     {
         float offset = Mathf.Sin(Time.time * speed) * distance;
-        transform.position = startPos + new Vector3(offset, 0f, 0f);
+        transform.position = _startPosition + new Vector3(offset, 0f, 0f);
     }
 }

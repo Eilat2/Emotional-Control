@@ -9,15 +9,13 @@ public class DoorController : MonoBehaviour
 
     public void OpenDoor()
     {
-        Debug.Log("הדלת נפתחה!");
+        StateLogger.Log(nameof(DoorController), "Door opened.");
 
         if (blockingCollider != null)
             blockingCollider.enabled = false;
 
         // רק אם רוצים שהיא תיעלם
         if (disableOnOpen)
-        {
             gameObject.SetActive(false);
-        }
     }
 }

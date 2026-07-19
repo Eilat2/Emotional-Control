@@ -18,101 +18,88 @@ public class Level3SecretElevator : MonoBehaviour
     [SerializeField] private float cameraMaxYWhenElevatorMoves = 120f;
 
     // האם אפשר להפעיל את המעלית לעלייה
-    private bool canActivate = false;
+    private bool _canActivate;
 
     // האם אפשר להפעיל את המעלית לירידה
-    private bool canReturnDown = false;
+    private bool _canReturnDown;
 
     // האם המעלית זזה כרגע
-    private bool isMoving = false;
+    private bool _isMoving;
 
     // היעד הנוכחי שאליו המעלית זזה
-    private Transform currentTarget;
+    private Transform _currentTarget;
 
     private void Start()
     {
         // אם לא חיברנו מצלמה ידנית, נחפש אותה בסצנה
         if (cameraFollow == null)
-        {
             cameraFollow = FindFirstObjectByType<CameraFollow2D>();
-        }
     }
 
     private void Update()
     {
-        // אם המעלית לא זזה, אין מה לעדכן
-        if (!isMoving) return;
+        if (!_isMoving || _currentTarget == null)
+            return;
 
-        // אם אין יעד, אי אפשר להזיז את המעלית
-        if (currentTarget == null) return;
-
-        // מזיזים את המעלית לכיוון היעד הנוכחי
         transform.position = Vector3.MoveTowards(
             transform.position,
-            currentTarget.position,
+            _currentTarget.position,
             moveSpeed * Time.deltaTime
         );
 
-        // בודקים אם המעלית הגיעה ליעד
-        if (Vector3.Distance(transform.position, currentTarget.position) < 0.01f)
+        if (Vector3.Distance(transform.position, _currentTarget.position) < 0.01f)
+            HandleTargetReached();
+    }
+
+    private void HandleTargetReached()
+    {
+        _isMoving = false;
+        StateLogger.Log(nameof(Level3SecretElevator), "Elevator reached target");
+
+        // אם הגענו חזרה לנקודה התחתונה, מחזירים את המצלמה למעקב רגיל אחרי השחקן
+        if (_currentTarget == bottomTargetPoint && cameraFollow != null)
         {
-            isMoving = false;
-
-            Debug.Log("Elevator reached target");
-
-            // אם הגענו חזרה לנקודה התחתונה,
-            // מחזירים את המצלמה למעקב רגיל אחרי השחקן
-            if (currentTarget == bottomTargetPoint && cameraFollow != null)
-            {
-                cameraFollow.ReturnToPlayer();
-                cameraFollow.DisableFollowY();
-
-                Debug.Log("Camera returned to player after elevator went down");
-            }
+            cameraFollow.ReturnToPlayer();
+            cameraFollow.DisableFollowY();
+            StateLogger.Log(nameof(Level3SecretElevator), "Camera returned to player after elevator went down");
         }
     }
 
     // נקרא אחרי שהפאזל הושלם
     public void UnlockElevator()
     {
-        canActivate = true;
-
-        Debug.Log("Elevator unlocked");
+        _canActivate = true;
+        StateLogger.Log(nameof(Level3SecretElevator), "Elevator unlocked");
     }
 
     // נקרא אחרי שהמיני בוס מת
     public void UnlockReturnDown()
     {
-        canReturnDown = true;
-
-        Debug.Log("Elevator can now return down");
+        _canReturnDown = true;
+        StateLogger.Log(nameof(Level3SecretElevator), "Elevator can now return down");
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // רק השחקן יכול להפעיל את המעלית
-        if (!collision.gameObject.CompareTag("Player")) return;
+        if (!collision.gameObject.CompareTag("Player"))
+            return;
 
         // אם המעלית כבר זזה, לא מפעילים שוב
-        if (isMoving) return;
+        if (_isMoving)
+            return;
 
-        // אם אפשר לרדת, המעלית תרד
-        if (canReturnDown)
-        {
+        if (_canReturnDown)
             StartMovingDown();
-        }
-        // אחרת, אם הפאזל הושלם, המעלית תעלה
-        else if (canActivate)
-        {
+        else if (_canActivate)
             StartMovingUp();
-        }
     }
 
     // התחלת עלייה לחדר הסודי
     private void StartMovingUp()
     {
-        currentTarget = topTargetPoint;
-        isMoving = true;
+        _currentTarget = topTargetPoint;
+        _isMoving = true;
 
         // בזמן העלייה, המצלמה עוברת לעקוב אחרי המעלית
         if (cameraFollow != null)
@@ -122,14 +109,14 @@ public class Level3SecretElevator : MonoBehaviour
             cameraFollow.EnableFollowY();
         }
 
-        Debug.Log("Elevator moving up");
+        StateLogger.Log(nameof(Level3SecretElevator), "Elevator moving up");
     }
 
     // התחלת ירידה חזרה למטה
     private void StartMovingDown()
     {
-        currentTarget = bottomTargetPoint;
-        isMoving = true;
+        _currentTarget = bottomTargetPoint;
+        _isMoving = true;
 
         // בזמן הירידה, המצלמה עדיין עוקבת אחרי המעלית
         if (cameraFollow != null)
@@ -138,6 +125,6 @@ public class Level3SecretElevator : MonoBehaviour
             cameraFollow.EnableFollowY();
         }
 
-        Debug.Log("Elevator moving down");
+        StateLogger.Log(nameof(Level3SecretElevator), "Elevator moving down");
     }
 }

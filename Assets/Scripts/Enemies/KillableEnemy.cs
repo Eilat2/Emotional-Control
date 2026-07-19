@@ -8,59 +8,60 @@ public class KillableEnemy : MonoBehaviour, IBreakable
     [SerializeField] private float force = 4f;
     [SerializeField] private float torque = 4f;
 
-    private EnemyHealthSystem healthSystem;
-    private bool isDead = false;
+    private EnemyHealthSystem _healthSystem;
+    private bool _isDead;
 
     private void Awake()
     {
-        healthSystem = GetComponent<EnemyHealthSystem>();
+        _healthSystem = GetComponent<EnemyHealthSystem>();
 
-        if (healthSystem == null)
+        if (_healthSystem == null)
             Debug.LogError($"{gameObject.name}: EnemyHealthSystem not found on KillableEnemy!");
     }
 
     public void OnBreak()
     {
-        if (healthSystem != null)
-            healthSystem.OnBreak();
+        if (_healthSystem != null)
+            _healthSystem.OnBreak();
         else
             Die();
     }
 
     public void Die()
     {
-        if (isDead) return;
-        isDead = true;
+        if (_isDead)
+            return;
+
+        _isDead = true;
 
         SpawnDebris();
 
         EnemyLevelCounter counter = FindFirstObjectByType<EnemyLevelCounter>();
-        if (counter != null)
-            counter.EnemyDied();
+        counter?.EnemyDied();
 
         Destroy(gameObject);
     }
 
     private void SpawnDebris()
     {
-        if (debrisPrefab == null) return;
+        if (debrisPrefab == null)
+            return;
 
         for (int i = 0; i < debrisCount; i++)
         {
             GameObject piece = Instantiate(debrisPrefab, transform.position, Quaternion.identity);
 
             Rigidbody2D rb = piece.GetComponent<Rigidbody2D>();
+            if (rb == null)
+                continue;
 
-            if (rb != null)
-            {
-                Vector2 dir = new Vector2(
-                    Random.Range(-1f, 1f),
-                    Random.Range(0.5f, 1f)
-                ).normalized;
+            Vector2 dir = new Vector2(
+                Random.Range(-1f, 1f),
+                Random.Range(0.5f, 1f)
+            ).normalized;
 
-                rb.AddForce(dir * force, ForceMode2D.Impulse);
-                rb.AddTorque(Random.Range(-torque, torque), ForceMode2D.Impulse);
-            }
+            rb.AddForce(dir * force, ForceMode2D.Impulse);
+            rb.AddTorque(Random.Range(-torque, torque), ForceMode2D.Impulse);
         }
     }
 }

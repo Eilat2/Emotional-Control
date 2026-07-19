@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-// מנהל פאוז + ריסטארט + GAME OVER
+// מנהל Pause, Restart ו-Game Over
 public class PauseMenuInputSystem : MonoBehaviour
 {
     [Header("Pause UI")]
@@ -18,16 +18,13 @@ public class PauseMenuInputSystem : MonoBehaviour
     [Header("Game Over Button")]
     [SerializeField] private Button gameOverRestartButton;
 
-    private bool isPaused = false;
-    private bool isGameOver = false; // ✅ לא תלוי ב-GameStateMachine.Instance
+    private bool _isPaused;
+    private bool _isGameOver;
 
     private void Awake()
     {
-        if (pausePanel == null)
-            pausePanel = FindInactiveObjectByName("PausePanel");
-
-        if (gameOverPanel == null)
-            gameOverPanel = FindInactiveObjectByName("GameOverPanel");
+        EnsurePausePanel();
+        EnsureGameOverPanel();
     }
 
     private void OnEnable()
@@ -44,8 +41,6 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("PauseMenuInputSystem STARTED");
-
         if (pausePanel != null)
             pausePanel.SetActive(false);
         else
@@ -54,8 +49,8 @@ public class PauseMenuInputSystem : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        isPaused = false;
-        isGameOver = false;
+        _isPaused = false;
+        _isGameOver = false;
         Time.timeScale = 1f;
 
         SetupRestartButton();
@@ -63,111 +58,98 @@ public class PauseMenuInputSystem : MonoBehaviour
 
     private void Update()
     {
-        // ✅ תיקון: ESC חסום לגמרי כשב-GameOver
-        // לא תלוי ב-GameStateMachine.Instance שיכול להיות null
-        if (isGameOver) return;
+        if (_isGameOver)
+            return;
 
-        bool escapePressed = Keyboard.current != null &&
-                             Keyboard.current.escapeKey.wasPressedThisFrame;
+        bool escapePressed =
+            Keyboard.current != null &&
+            Keyboard.current.escapeKey.wasPressedThisFrame;
 
-        bool pPressed = Keyboard.current != null &&
-                        Keyboard.current.pKey.wasPressedThisFrame;
+        bool pPressed =
+            Keyboard.current != null &&
+            Keyboard.current.pKey.wasPressedThisFrame;
 
         if (escapePressed || pPressed)
-        {
-            Debug.Log("PauseMenuInputSystem: Pause key pressed");
             TogglePause();
-        }
     }
 
     private void TogglePause()
     {
-        if (isPaused) Resume();
-        else Pause();
+        if (_isPaused)
+            Resume();
+        else
+            Pause();
     }
 
-    // =======================
-    // 🔥 חיבור כפתור ריסטארט
-    // =======================
     private void SetupRestartButton()
     {
         if (gameOverRestartButton == null && gameOverFirstSelectedButton != null)
-            gameOverRestartButton = gameOverFirstSelectedButton.GetComponent<Button>();
-
-        if (gameOverRestartButton != null)
         {
-            gameOverRestartButton.onClick.RemoveAllListeners();
-            gameOverRestartButton.onClick.AddListener(() =>
-            {
-                GameEvents.RaiseRestartRequested();
-            });
+            gameOverRestartButton =
+                gameOverFirstSelectedButton.GetComponent<Button>();
         }
+
+        if (gameOverRestartButton == null)
+            return;
+
+        gameOverRestartButton.onClick.RemoveAllListeners();
+        gameOverRestartButton.onClick.AddListener(
+            GameEvents.RaiseRestartRequested
+        );
     }
 
-    // =======================
-    // ⏸️ PAUSE
-    // =======================
     public void Pause()
     {
-        if (pausePanel == null)
-            pausePanel = FindInactiveObjectByName("PausePanel");
-
-        if (pausePanel == null)
+        if (!EnsurePausePanel())
         {
-            Debug.LogWarning("PauseMenuInputSystem: אי אפשר לפתוח Pause כי PausePanel לא מחובר.");
+            Debug.LogWarning(
+                "PauseMenuInputSystem: אי אפשר לפתוח Pause כי PausePanel לא מחובר."
+            );
             return;
         }
 
-        isPaused = true;
+        _isPaused = true;
         pausePanel.SetActive(true);
         Time.timeScale = 0f;
+
         StopPlayerMovement();
+        SelectUiButton(firstSelectedButton);
 
-        if (EventSystem.current != null && firstSelectedButton != null)
-        {
-            EventSystem.current.SetSelectedGameObject(null);
-            EventSystem.current.SetSelectedGameObject(firstSelectedButton);
-        }
-
-        Debug.Log("PauseMenuInputSystem: Pause opened");
+        StateLogger.Log(
+            nameof(PauseMenuInputSystem),
+            "Pause opened"
+        );
     }
 
-    // ▶️ RESUME
     public void Resume()
     {
-        if (pausePanel == null)
-            pausePanel = FindInactiveObjectByName("PausePanel");
-
-        if (pausePanel == null)
+        if (!EnsurePausePanel())
         {
-            Debug.LogWarning("PauseMenuInputSystem: אי אפשר לסגור Pause כי PausePanel לא מחובר.");
+            Debug.LogWarning(
+                "PauseMenuInputSystem: אי אפשר לסגור Pause כי PausePanel לא מחובר."
+            );
             return;
         }
 
-        isPaused = false;
+        _isPaused = false;
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
 
-        if (EventSystem.current != null)
-            EventSystem.current.SetSelectedGameObject(null);
+        SelectUiButton(null);
 
-        Debug.Log("PauseMenuInputSystem: Pause closed");
+        StateLogger.Log(
+            nameof(PauseMenuInputSystem),
+            "Pause closed"
+        );
     }
 
-    // =======================
-    // 🔄 RESTART
-    // =======================
     public void Restart()
     {
-        Debug.Log("GAME OVER RESTART CLICKED");
-
-        // ✅ מאפסים isGameOver כדי שה-ESC יחזור לעבוד אחרי ריסטארט
-        isGameOver = false;
-        isPaused = false;
+        _isGameOver = false;
+        _isPaused = false;
         Time.timeScale = 1f;
 
-        if (EventSystem.current != null)
-            EventSystem.current.SetSelectedGameObject(null);
+        SelectUiButton(null);
 
         if (pausePanel != null)
             pausePanel.SetActive(false);
@@ -175,72 +157,98 @@ public class PauseMenuInputSystem : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        StateLogger.Log(
+            nameof(PauseMenuInputSystem),
+            "Restart requested - reloading scene"
+        );
+
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().name
+        );
     }
 
-    // =======================
-    // 💀 GAME OVER
-    // =======================
     public void GameOver()
     {
-        if (gameOverPanel == null)
-            gameOverPanel = FindInactiveObjectByName("GameOverPanel");
-
-        if (gameOverPanel == null)
+        if (!EnsureGameOverPanel())
         {
-            Debug.LogWarning("Game Over panel is not assigned.");
+            Debug.LogWarning(
+                "PauseMenuInputSystem: Game Over panel is not assigned."
+            );
             return;
         }
 
-        // ✅ מסמנים isGameOver=true → חוסם ESC מיידית
-        isGameOver = true;
-        isPaused = false;
+        _isGameOver = true;
+        _isPaused = false;
 
-        // סוגרים Pause Panel אם היה פתוח
         if (pausePanel != null)
             pausePanel.SetActive(false);
 
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
+
         StopPlayerMovement();
+        SelectUiButton(gameOverFirstSelectedButton);
 
-        if (EventSystem.current != null)
-        {
-            EventSystem.current.SetSelectedGameObject(null);
-            if (gameOverFirstSelectedButton != null)
-                EventSystem.current.SetSelectedGameObject(gameOverFirstSelectedButton);
-        }
-
-        Debug.Log("Game Over menu opened.");
+        StateLogger.Log(
+            nameof(PauseMenuInputSystem),
+            "Game Over menu opened."
+        );
     }
 
-    // =======================
-    // 🧠 עצירת שחקן
-    // =======================
     private void StopPlayerMovement()
     {
         GameObject player = GameObject.FindWithTag("Player");
-        if (player == null) return;
+
+        if (player == null)
+            return;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-        }
+
+        if (rb == null)
+            return;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
 
-    // =======================
-    // 🔍 חיפוש אובייקט גם אם כבוי
-    // =======================
+    private void SelectUiButton(GameObject buttonToSelect)
+    {
+        if (EventSystem.current == null)
+            return;
+
+        EventSystem.current.SetSelectedGameObject(null);
+
+        if (buttonToSelect != null)
+            EventSystem.current.SetSelectedGameObject(buttonToSelect);
+    }
+
+    private bool EnsurePausePanel()
+    {
+        if (pausePanel == null)
+            pausePanel = FindInactiveObjectByName("PausePanel");
+
+        return pausePanel != null;
+    }
+
+    private bool EnsureGameOverPanel()
+    {
+        if (gameOverPanel == null)
+            gameOverPanel = FindInactiveObjectByName("GameOverPanel");
+
+        return gameOverPanel != null;
+    }
+
     private GameObject FindInactiveObjectByName(string objectName)
     {
-        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+        GameObject[] allObjects =
+            Resources.FindObjectsOfTypeAll<GameObject>();
+
         foreach (GameObject obj in allObjects)
         {
             if (obj.name == objectName && obj.scene.IsValid())
                 return obj;
         }
+
         return null;
     }
 }

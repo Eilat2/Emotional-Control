@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class FlyingEnemyStomp : MonoBehaviour
@@ -11,23 +12,28 @@ public class FlyingEnemyStomp : MonoBehaviour
     [Header("Stomp Check")]
     [SerializeField] private float stompHeightOffset = 0.25f;
 
-    private Collider2D enemyCol;
-    private EnemyTouchDamage enemyDamage;
-    private EnemyHealthSystem enemyHealth;
+    [Header("Touch Damage Cooldown After Stomp")]
+    // כמה זמן EnemyTouchDamage נשאר כבוי אחרי דריכה, כדי שלא ייספר
+    // גם כפגיעת מגע וגם כדריכה באותו רגע. בעבר זה כובה לצמיתות בטעות
+    // ולא הודלק בחזרה - עכשיו זה חוזר לפעול אחרי הזמן הזה.
+    [SerializeField] private float touchDamageDisableDuration = 0.3f;
+
+    private Collider2D _enemyCollider;
+    private EnemyTouchDamage _enemyDamage;
+    private EnemyHealthSystem _enemyHealth;
+
+    private Coroutine _reEnableRoutine;
 
     private void Awake()
     {
-        enemyCol = GetComponent<Collider2D>();
-        enemyDamage = GetComponent<EnemyTouchDamage>();
-        enemyHealth = GetComponentInParent<EnemyHealthSystem>();
+        _enemyCollider = GetComponent<Collider2D>();
+        _enemyDamage = GetComponent<EnemyTouchDamage>();
+        _enemyHealth = GetComponentInParent<EnemyHealthSystem>();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (enemyStats == null)
-            return;
-
-        if (!enemyStats.canBeStompedByJoy)
+        if (enemyStats == null || !enemyStats.canBeStompedByJoy)
             return;
 
         if (!collision.gameObject.CompareTag("Player"))
@@ -38,35 +44,48 @@ public class FlyingEnemyStomp : MonoBehaviour
             return;
 
         Rigidbody2D playerRb = collision.gameObject.GetComponent<Rigidbody2D>();
-        if (playerRb == null)
-            return;
-
-        if (enemyCol == null)
+        if (playerRb == null || _enemyCollider == null)
             return;
 
         if (!IsPlayerStompingFromAbove(collision, playerRb))
             return;
 
-        if (enemyDamage != null)
-            enemyDamage.enabled = false;
+        TemporarilyDisableTouchDamage();
 
         PlayerHurtLock hurt = collision.gameObject.GetComponent<PlayerHurtLock>();
-        if (hurt != null)
-            hurt.TriggerHit(0f, 0.2f);
+        hurt?.TriggerHit(0f, 0.2f);
 
-        playerRb.linearVelocity = new Vector2(
-            playerRb.linearVelocity.x,
-            stompBounceForce
-        );
+        playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, stompBounceForce);
 
-        if (enemyHealth != null)
-        {
-            enemyHealth.TakeDamage(enemyStats.stompDamage);
-        }
+        if (_enemyHealth != null)
+            _enemyHealth.TakeDamage(enemyStats.stompDamage);
         else
-        {
             Debug.LogError($"{gameObject.name}: EnemyHealthSystem not found!");
-        }
+    }
+
+    private void TemporarilyDisableTouchDamage()
+    {
+        if (_enemyDamage == null)
+            return;
+
+        _enemyDamage.enabled = false;
+
+        // אם דרכו עליו שוב לפני שהקווייה הקודמת סיימה (אויב עם כמה חיים) -
+        // מפעילים מחדש את הטיימר, לא צוברים כמה קורוטינות במקביל.
+        if (_reEnableRoutine != null)
+            StopCoroutine(_reEnableRoutine);
+
+        _reEnableRoutine = StartCoroutine(ReEnableTouchDamageAfterDelay());
+    }
+
+    private IEnumerator ReEnableTouchDamageAfterDelay()
+    {
+        yield return new WaitForSeconds(touchDamageDisableDuration);
+
+        if (_enemyDamage != null)
+            _enemyDamage.enabled = true;
+
+        _reEnableRoutine = null;
     }
 
     private bool IsPlayerStompingFromAbove(Collision2D collision, Rigidbody2D playerRb)
@@ -79,7 +98,7 @@ public class FlyingEnemyStomp : MonoBehaviour
             return false;
 
         float playerBottomY = playerCol.bounds.min.y;
-        float enemyTopY = enemyCol.bounds.max.y;
+        float enemyTopY = _enemyCollider.bounds.max.y;
 
         return playerBottomY >= enemyTopY - stompHeightOffset;
     }

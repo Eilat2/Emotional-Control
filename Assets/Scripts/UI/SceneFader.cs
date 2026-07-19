@@ -8,18 +8,12 @@ public class SceneFader : MonoBehaviour
     [SerializeField] private Image fadeImage;
     [SerializeField] private float fadeDuration = 1f;
 
-    private bool isFading = false;
+    private bool _isFading;
 
     private void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
-
-        if (fadeImage != null)
-        {
-            Color c = fadeImage.color;
-            c.a = 0f;
-            fadeImage.color = c;
-        }
+        SetAlpha(0f);
     }
 
     private void OnDestroy()
@@ -29,10 +23,8 @@ public class SceneFader : MonoBehaviour
 
     public void FadeToScene(string sceneName)
     {
-        if (!isFading)
-        {
+        if (!_isFading)
             StartCoroutine(FadeAndLoad(sceneName));
-        }
     }
 
     private IEnumerator FadeAndLoad(string sceneName)
@@ -43,21 +35,9 @@ public class SceneFader : MonoBehaviour
             yield break;
         }
 
-        isFading = true;
+        _isFading = true;
 
-        float time = 0f;
-        Color c = fadeImage.color;
-
-        while (time < fadeDuration)
-        {
-            time += Time.deltaTime;
-            c.a = Mathf.Lerp(0f, 1f, time / fadeDuration);
-            fadeImage.color = c;
-            yield return null;
-        }
-
-        c.a = 1f;
-        fadeImage.color = c;
+        yield return Fade(0f, 1f);
 
         SceneManager.LoadScene(sceneName);
     }
@@ -65,33 +45,46 @@ public class SceneFader : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (fadeImage != null)
-        {
             StartCoroutine(FadeOut());
-        }
     }
 
     private IEnumerator FadeOut()
     {
         if (fadeImage == null)
         {
-            isFading = false;
+            _isFading = false;
             yield break;
         }
 
+        yield return Fade(1f, 0f);
+
+        _isFading = false;
+    }
+
+    /// <summary>
+    /// עוטף את לוגיקת ה-fade המשותפת (הלוך וחזור היו קוד כמעט זהה בעבר).
+    /// </summary>
+    private IEnumerator Fade(float from, float to)
+    {
         float time = 0f;
-        Color c = fadeImage.color;
 
         while (time < fadeDuration)
         {
             time += Time.deltaTime;
-            c.a = Mathf.Lerp(1f, 0f, time / fadeDuration);
-            fadeImage.color = c;
+            SetAlpha(Mathf.Lerp(from, to, time / fadeDuration));
             yield return null;
         }
 
-        c.a = 0f;
-        fadeImage.color = c;
+        SetAlpha(to);
+    }
 
-        isFading = false;
+    private void SetAlpha(float alpha)
+    {
+        if (fadeImage == null)
+            return;
+
+        Color c = fadeImage.color;
+        c.a = alpha;
+        fadeImage.color = c;
     }
 }

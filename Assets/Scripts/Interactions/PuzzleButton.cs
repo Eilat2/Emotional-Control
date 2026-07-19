@@ -23,109 +23,73 @@ public class PuzzleButton : MonoBehaviour
     [Header("Interaction Popup")]
     [SerializeField] private GameObject interactionPopup; // הפופאפ "Press F"
 
-    private bool playerInside = false;        // האם השחקן בתוך הטריגר
-    private EmotionController playerEmotion;  // הרגש הנוכחי של השחקן
+    private bool _playerInside;
+    private EmotionController _playerEmotion;
 
-    private bool wasPressed = false;          // האם הכפתור כבר נלחץ
-    private bool pressedCorrectly = false;    // האם הכפתור נלחץ עם הרגש הנכון
+    private bool _wasPressed;
+    private bool _pressedCorrectly;
 
-    private SpriteRenderer sr;
-    private Vector3 originalScale;
+    private SpriteRenderer _sr;
+    private Vector3 _originalScale;
 
-    public bool WasPressed => wasPressed;
-    public bool PressedCorrectly => pressedCorrectly;
+    public bool WasPressed => _wasPressed;
+    public bool PressedCorrectly => _pressedCorrectly;
 
     private void Start()
     {
-        sr = GetComponent<SpriteRenderer>();
-        originalScale = transform.localScale;
+        _sr = GetComponent<SpriteRenderer>();
+        _originalScale = transform.localScale;
 
-        // מגדירים ספרייט רגיל בהתחלה
-        if (sr != null && normalSprite != null)
-        {
-            sr.sprite = normalSprite;
-        }
+        if (_sr != null && normalSprite != null)
+            _sr.sprite = normalSprite;
 
-        // מכבים את ההילה בהתחלה
         if (glowRenderer != null)
-        {
             glowRenderer.gameObject.SetActive(false);
-        }
 
-        // מכבים את הפופאפ בהתחלה
         if (interactionPopup != null)
-        {
             interactionPopup.SetActive(false);
-        }
     }
 
     private void Update()
     {
-        // אם השחקן לא ליד הכפתור — לא עושים כלום
-        if (!playerInside || playerEmotion == null)
+        if (!_playerInside || _playerEmotion == null)
             return;
 
-        // בדיקה ללחיצה על F
         if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
-        {
             PressButton();
-        }
     }
 
     private void PressButton()
     {
         // לא מאפשרים ללחוץ על אותו כפתור פעמיים
-        if (wasPressed)
+        if (_wasPressed)
             return;
 
         // אם הפאזל כבר נפתר, לא מאפשרים עוד לחיצות
         if (levelManager != null && levelManager.PuzzleSolved)
             return;
 
-        // שומרים את הרגש הנוכחי של השחקן בזמן הלחיצה
-        EmotionType currentEmotion = playerEmotion.GetCurrentEmotion();
+        EmotionType currentEmotion = _playerEmotion.GetCurrentEmotion();
+        _wasPressed = true;
+        _pressedCorrectly = currentEmotion == requiredEmotion;
 
-        wasPressed = true;
+        StateLogger.Log(nameof(PuzzleButton), _pressedCorrectly ? "Correct button press." : "Wrong button press.");
 
-        // בודקים אם הרגש של השחקן תואם לרגש שהכפתור דורש
-        if (currentEmotion == requiredEmotion)
-        {
-            pressedCorrectly = true;
-            Debug.Log("Correct button press.");
-        }
-        else
-        {
-            pressedCorrectly = false;
-            Debug.Log("Wrong button press.");
-        }
-
-        // מחליפים לספרייט של כפתור לחוץ
-        if (sr != null && pressedSprite != null)
-        {
-            sr.sprite = pressedSprite;
-        }
+        if (_sr != null && pressedSprite != null)
+            _sr.sprite = pressedSprite;
 
         // מקטינים קצת את הכפתור כדי לתת תחושת לחיצה
-        transform.localScale = originalScale * pressScale;
+        transform.localScale = _originalScale * pressScale;
 
-        // מפעילים הילה בצבע של הרגש שלחץ על הכפתור
         ActivateGlow(currentEmotion);
 
-        // מכבים את הפופאפ אחרי הלחיצה
         if (interactionPopup != null)
-        {
             interactionPopup.SetActive(false);
-        }
 
-        // מעדכנים את מנהל הפאזל כדי שיבדוק אם הלחיצה נכונה לפי הסדר
         if (levelManager != null)
-        {
-            levelManager.RegisterButtonPress(this, currentEmotion, pressedCorrectly);
-        }
+            levelManager.RegisterButtonPress(this, currentEmotion, _pressedCorrectly);
         else
-        {
-            Debug.LogWarning("Puzzle manager is not assigned.");
-        }
+            Debug.LogWarning("PuzzleButton: Puzzle manager is not assigned.");
     }
 
     private void ActivateGlow(EmotionType emotion)
@@ -160,16 +124,14 @@ public class PuzzleButton : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        playerInside = true;
-        playerEmotion = other.GetComponentInParent<EmotionController>();
+        _playerInside = true;
+        _playerEmotion = other.GetComponentInParent<EmotionController>();
 
-        Debug.Log("Player entered button area.");
+        StateLogger.Log(nameof(PuzzleButton), "Player entered button area.");
 
         // מציגים פופאפ רק אם הכפתור עדיין לא נלחץ
-        if (interactionPopup != null && !wasPressed)
-        {
+        if (interactionPopup != null && !_wasPressed)
             interactionPopup.SetActive(true);
-        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -177,15 +139,12 @@ public class PuzzleButton : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        playerInside = false;
-        playerEmotion = null;
+        _playerInside = false;
+        _playerEmotion = null;
 
-        Debug.Log("Player left button area.");
+        StateLogger.Log(nameof(PuzzleButton), "Player left button area.");
 
-        // מסתירים את הפופאפ כשהשחקן מתרחק
         if (interactionPopup != null)
-        {
             interactionPopup.SetActive(false);
-        }
     }
 }

@@ -3,78 +3,59 @@ using UnityEngine;
 public class BreakableWall : MonoBehaviour, IBreakable
 {
     [Header("Debris Settings")]
-    [SerializeField] GameObject debrisPiecePrefab;
-    [SerializeField] int debrisCount = 12;
-    [SerializeField] float debrisForce = 4f;
-    [SerializeField] float debrisTorque = 200f;
-    [SerializeField] float debrisLifeTime = 1.5f;
+    [SerializeField] private GameObject debrisPiecePrefab;
+    [SerializeField] private int debrisCount = 12;
+    [SerializeField] private float debrisForce = 4f;
+    [SerializeField] private float debrisTorque = 200f;
+    [SerializeField] private float debrisLifeTime = 1.5f;
+    [SerializeField] private float debrisPositionJitter = 0.15f;
 
     [Header("Reveal")]
-    [SerializeField] GameObject hiddenButton;
+    [SerializeField] private GameObject hiddenButton;
 
     [Header("Tutorial")]
-    [SerializeField] GameObject tutorialPopup;
+    [SerializeField] private GameObject tutorialPopup;
 
     [Header("Puzzle Piece Unlock")]
     [SerializeField] private Level3PuzzlePiecePickup puzzlePieceToUnlock;
 
-    private bool isBroken = false;
+    private bool _isBroken;
 
     public void OnBreak()
     {
-        if (isBroken) return;
+        if (_isBroken)
+            return;
 
-        isBroken = true;
+        _isBroken = true;
 
-        SpawnDebris();
+        DebrisSpawner.SpawnRandomDebris(
+            debrisPiecePrefab,
+            transform.position,
+            debrisCount,
+            debrisForce,
+            debrisTorque,
+            positionJitter: debrisPositionJitter,
+            lifeTime: debrisLifeTime
+        );
 
-        TutorialPopupTrigger tutorial = GetComponent<TutorialPopupTrigger>();
-
-        if (tutorial != null)
-        {
-            tutorial.HidePopupForever();
-        }
-        else if (tutorialPopup != null)
-        {
-            tutorialPopup.SetActive(false);
-        }
+        HideTutorialPopup();
 
         if (hiddenButton != null)
-        {
             hiddenButton.SetActive(true);
-        }
 
         if (puzzlePieceToUnlock != null)
-        {
             puzzlePieceToUnlock.UnlockAfterStoneBroken();
-        }
 
         Destroy(gameObject);
     }
 
-    private void SpawnDebris()
+    private void HideTutorialPopup()
     {
-        if (debrisPiecePrefab == null) return;
+        TutorialPopupTrigger tutorial = GetComponent<TutorialPopupTrigger>();
 
-        for (int i = 0; i < debrisCount; i++)
-        {
-            Vector3 offset = Random.insideUnitCircle * 0.15f;
-
-            GameObject piece = Instantiate(
-                debrisPiecePrefab,
-                transform.position + offset,
-                Quaternion.identity
-            );
-
-            Destroy(piece, debrisLifeTime);
-
-            Rigidbody2D rb = piece.GetComponent<Rigidbody2D>();
-
-            if (rb != null)
-            {
-                rb.AddForce(Random.insideUnitCircle.normalized * debrisForce, ForceMode2D.Impulse);
-                rb.AddTorque(Random.Range(-debrisTorque, debrisTorque));
-            }
-        }
+        if (tutorial != null)
+            tutorial.HidePopupForever();
+        else if (tutorialPopup != null)
+            tutorialPopup.SetActive(false);
     }
 }

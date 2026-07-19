@@ -6,25 +6,27 @@ public class LightningVFX : MonoBehaviour
     [SerializeField] private float duration = 0.1f;
     [SerializeField] private float length = 1f;
 
-    private float timer;
-    private bool isPlaying;
+    private float _timer;
+    private bool _isPlaying;
 
-    void Update()
+    private void Update()
     {
-        if (!isPlaying) return;
+        if (!_isPlaying)
+            return;
 
-        timer -= Time.deltaTime;
+        _timer -= Time.deltaTime;
 
-        if (timer <= 0f)
+        if (_timer <= 0f)
         {
             line.enabled = false;
-            isPlaying = false;
+            _isPlaying = false;
         }
     }
 
     public void PlayLightning()
     {
-        if (line == null) return;
+        if (line == null)
+            return;
 
         // נקודת התחלה = הדמות
         Vector3 start = transform.position;
@@ -41,7 +43,7 @@ public class LightningVFX : MonoBehaviour
 
         line.enabled = true;
 
-        timer = duration;
-        isPlaying = true;
+        _timer = duration;
+        _isPlaying = true;
     }
 }

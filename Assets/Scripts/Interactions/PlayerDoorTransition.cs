@@ -6,15 +6,15 @@ public class PlayerDoorTransition : MonoBehaviour
 {
     [SerializeField] private bool fadePlayer = true;
 
-    private Rigidbody2D rb;
-    private Collider2D[] colliders;
-    private MonoBehaviour[] scripts;
+    private Rigidbody2D _rb;
+    private Collider2D[] _colliders;
+    private MonoBehaviour[] _scripts;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        colliders = GetComponentsInChildren<Collider2D>(true);
-        scripts = GetComponents<MonoBehaviour>();
+        _rb = GetComponent<Rigidbody2D>();
+        _colliders = GetComponentsInChildren<Collider2D>(true);
+        _scripts = GetComponents<MonoBehaviour>();
     }
 
     public IEnumerator EnterDoor(Vector3 targetPosition, Vector3 targetScale, float duration)
@@ -28,9 +28,7 @@ public class PlayerDoorTransition : MonoBehaviour
         Color[] startColors = new Color[renderers.Length];
 
         for (int i = 0; i < renderers.Length; i++)
-        {
             startColors[i] = renderers[i].color;
-        }
 
         float time = 0f;
 
@@ -50,7 +48,8 @@ public class PlayerDoorTransition : MonoBehaviour
             {
                 for (int i = 0; i < renderers.Length; i++)
                 {
-                    if (renderers[i] == null) continue;
+                    if (renderers[i] == null)
+                        continue;
 
                     Color c = startColors[i];
                     c.a = Mathf.Lerp(startColors[i].a, 0f, t);
@@ -67,26 +66,27 @@ public class PlayerDoorTransition : MonoBehaviour
 
     private void FreezePlayer()
     {
-        if (rb != null)
+        if (_rb != null)
         {
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-            rb.gravityScale = 0f;
-            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+            _rb.linearVelocity = Vector2.zero;
+            _rb.angularVelocity = 0f;
+            _rb.gravityScale = 0f;
+            _rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
 
-        // מכבים קוליידרים כדי שלא ייתקע ברצפה או בקירות
-        foreach (Collider2D col in colliders)
+        // מכבים קוליידרים כדי שלא ייתקע ברצפה או בקירות.
+        // (מודלקים בחזרה ע"י PlayerSceneReset.ReEnableAllScripts כשנטענת הסצנה הבאה)
+        foreach (Collider2D col in _colliders)
         {
             if (col != null)
                 col.enabled = false;
         }
 
         // מכבים סקריפטים של השחקן כדי שלא ימשיכו להזיז אותו
-        foreach (MonoBehaviour script in scripts)
+        foreach (MonoBehaviour script in _scripts)
         {
-            if (script == null) continue;
-            if (script == this) continue;
+            if (script == null || script == this)
+                continue;
 
             script.enabled = false;
         }

@@ -5,41 +5,33 @@ public class EnemyLevelCounter : MonoBehaviour
     [Header("Door")]
     [SerializeField] private GameObject door;
 
-    private int enemiesAlive;
+    private int _enemiesAlive;
 
     private void Start()
     {
-        enemiesAlive = FindObjectsByType<KillableEnemy>(
-            FindObjectsSortMode.None
-        ).Length;
+        _enemiesAlive = FindObjectsByType<KillableEnemy>(FindObjectsSortMode.None).Length;
 
-        Debug.Log("Enemies alive: " + enemiesAlive);
+        StateLogger.Log(nameof(EnemyLevelCounter), $"Enemies alive: {_enemiesAlive}");
 
         if (door != null)
-        {
             door.SetActive(false);
-        }
     }
 
     public void EnemyDied()
     {
-        enemiesAlive--;
+        _enemiesAlive--;
 
-        Debug.Log("Enemy killed. Remaining: " + enemiesAlive);
+        StateLogger.Log(nameof(EnemyLevelCounter), $"Enemy killed. Remaining: {_enemiesAlive}");
 
-        if (enemiesAlive <= 0)
-        {
+        if (_enemiesAlive <= 0)
             OpenDoor();
-        }
     }
 
     private void OpenDoor()
     {
-        Debug.Log("All enemies defeated. Door opened!");
+        StateLogger.Log(nameof(EnemyLevelCounter), "All enemies defeated. Door opened!");
 
         if (door != null)
-        {
             door.SetActive(true);
-        }
     }
 }

@@ -6,7 +6,8 @@ public class ElectricVFX : MonoBehaviour
 
     public void PlaySparks()
     {
-        if (sparks == null) return;
+        if (sparks == null)
+            return;
 
         sparks.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         sparks.Play();

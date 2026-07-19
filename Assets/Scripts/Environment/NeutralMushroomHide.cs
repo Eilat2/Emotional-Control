@@ -2,31 +2,23 @@ using UnityEngine;
 
 public class NeutralMushroomHide : MonoBehaviour
 {
-    [SerializeField] GameObject hiddenButton;
+    [SerializeField] private GameObject hiddenButton;
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        CheckReveal(other);
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        CheckReveal(other);
-    }
+    private void OnTriggerEnter2D(Collider2D other) => CheckReveal(other);
+    private void OnTriggerStay2D(Collider2D other) => CheckReveal(other);
 
     private void CheckReveal(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
-        EmotionController ec = other.GetComponent<EmotionController>();
-        if (ec == null) return;
+        EmotionController emotion = other.GetComponent<EmotionController>();
+        if (emotion == null || emotion.current != EmotionController.Emotion.Neutral)
+            return;
 
-        if (ec.current == EmotionController.Emotion.Neutral)
-        {
-            if (hiddenButton != null)
-                hiddenButton.SetActive(true);
+        if (hiddenButton != null)
+            hiddenButton.SetActive(true);
 
-            gameObject.SetActive(false);
-        }
+        gameObject.SetActive(false);
     }
 }

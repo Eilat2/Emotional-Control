@@ -3,17 +3,14 @@ using UnityEngine;
 
 public class CameraShake : MonoBehaviour
 {
-    // עוצמת הרעידה
     [SerializeField] private float shakeMagnitude = 0.15f;
-
-    // משך הרעידה
     [SerializeField] private float shakeDuration = 0.2f;
 
-    private Vector3 originalPosition;
+    private Vector3 _originalPosition;
 
-    void Awake()
+    private void Awake()
     {
-        originalPosition = transform.localPosition;
+        _originalPosition = transform.localPosition;
     }
 
     public void Shake()
@@ -31,12 +28,12 @@ public class CameraShake : MonoBehaviour
             float x = Random.Range(-1f, 1f) * shakeMagnitude;
             float y = Random.Range(-1f, 1f) * shakeMagnitude;
 
-            transform.localPosition = originalPosition + new Vector3(x, y, 0f);
+            transform.localPosition = _originalPosition + new Vector3(x, y, 0f);
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        transform.localPosition = originalPosition;
+        transform.localPosition = _originalPosition;
     }
 }

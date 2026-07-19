@@ -41,12 +41,12 @@ public class EnemyTouchDamage : MonoBehaviour
     [SerializeField] private bool ignoreIfPlayerStompsFromAbove = false;
     [SerializeField] private float stompTolerance = 0.5f;
 
-    private float nextHitTime = 0f;
-    private Collider2D myCol;
+    private float _nextHitTime;
+    private Collider2D _myCollider;
 
     private void Awake()
     {
-        myCol = GetComponent<Collider2D>();
+        _myCollider = GetComponent<Collider2D>();
 
         if (enemyStats == null)
             Debug.LogError($"{gameObject.name}: EnemyStats is not assigned on EnemyTouchDamage!");
@@ -57,9 +57,9 @@ public class EnemyTouchDamage : MonoBehaviour
 
     private void TryHit(Collision2D collision)
     {
-        if (Time.time < nextHitTime) return;
+        if (Time.time < _nextHitTime) return;
         if (!collision.gameObject.CompareTag("Player")) return;
-        if (myCol == null) return;
+        if (_myCollider == null) return;
 
         Rigidbody2D rb = collision.rigidbody;
         if (rb == null) return;
@@ -70,25 +70,17 @@ public class EnemyTouchDamage : MonoBehaviour
         PlayerHurtLock hurt = collision.gameObject.GetComponent<PlayerHurtLock>();
         if (hurt != null && hurt.IsInvincible) return;
 
-        if (ignoreIfPlayerStompsFromAbove)
-        {
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                if (contact.normal.y < -stompTolerance && rb.linearVelocity.y <= 0f)
-                    return;
-            }
-        }
+        if (ignoreIfPlayerStompsFromAbove && IsBeingStompedFromAbove(collision, rb))
+            return;
 
-        nextHitTime = Time.time + hitCooldown;
+        _nextHitTime = Time.time + hitCooldown;
 
         PlayerHitFeedback feedback = collision.gameObject.GetComponent<PlayerHitFeedback>();
 
         if (emotion.current == EmotionController.Emotion.Neutral)
         {
-            if (hurt != null)
-                hurt.TriggerHit(hurtLockTime, invincibleTime);
-            if (feedback != null)
-                feedback.PlayHitFeedback();
+            hurt?.TriggerHit(hurtLockTime, invincibleTime);
+            feedback?.PlayHitFeedback();
             ApplyKnockback(rb, collision.transform, 8f, 4f);
             StartCoroutine(NeutralGameOverAfterDelay(collision.gameObject));
             return;
@@ -96,10 +88,8 @@ public class EnemyTouchDamage : MonoBehaviour
 
         DrainStaminaByCurrentEmotion(collision.collider, emotion);
 
-        if (hurt != null)
-            hurt.TriggerHit(hurtLockTime, invincibleTime);
-        if (feedback != null)
-            feedback.PlayHitFeedback();
+        hurt?.TriggerHit(hurtLockTime, invincibleTime);
+        feedback?.PlayHitFeedback();
 
         if (emotion.current == EmotionController.Emotion.Rage)
         {
@@ -114,23 +104,33 @@ public class EnemyTouchDamage : MonoBehaviour
         }
     }
 
+    private bool IsBeingStompedFromAbove(Collision2D collision, Rigidbody2D playerRb)
+    {
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            if (contact.normal.y < -stompTolerance && playerRb.linearVelocity.y <= 0f)
+                return true;
+        }
+
+        return false;
+    }
+
     private IEnumerator NeutralGameOverAfterDelay(GameObject player)
     {
         yield return new WaitForSeconds(neutralGameOverDelay);
+
         PlayerEmotionContext context = player.GetComponent<PlayerEmotionContext>();
-        if (context != null)
-            context.OnStaminaDepleted();
+        context?.OnStaminaDepleted();
     }
 
     private void DrainStaminaByCurrentEmotion(Collider2D playerCol, EmotionController emotion)
     {
-        // קורא staminaDrain ישירות מה-Stats — אין שדה כפול
         float drainAmount = enemyStats != null ? enemyStats.staminaDrain : 0f;
 
         Stamina.StaminaType typeToDrain =
-            (emotion.current == EmotionController.Emotion.Joy)
-            ? Stamina.StaminaType.Joy
-            : Stamina.StaminaType.Rage;
+            emotion.current == EmotionController.Emotion.Joy
+                ? Stamina.StaminaType.Joy
+                : Stamina.StaminaType.Rage;
 
         Stamina[] staminas = playerCol.GetComponents<Stamina>();
         foreach (Stamina s in staminas)
@@ -145,13 +145,13 @@ public class EnemyTouchDamage : MonoBehaviour
 
     private void ApplyKnockback(Rigidbody2D rb, Transform playerTf, float x, float y)
     {
-        float dir = (playerTf.position.x < transform.position.x) ? -1f : 1f;
+        float dir = playerTf.position.x < transform.position.x ? -1f : 1f;
         rb.linearVelocity = new Vector2(dir * x, y);
     }
 
     private void ApplyJoySlamDown(Rigidbody2D rb, Transform playerTf)
     {
-        float dir = (playerTf.position.x < transform.position.x) ? -1f : 1f;
+        float dir = playerTf.position.x < transform.position.x ? -1f : 1f;
         rb.linearVelocity = new Vector2(dir * joyPushBackX, -joySlamDownY);
     }
 }

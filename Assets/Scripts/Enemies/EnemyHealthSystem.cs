@@ -7,7 +7,7 @@ public class EnemyHealthSystem : MonoBehaviour, IBreakable
     [Header("HP Visuals")]
     [SerializeField] private GameObject[] heartVisuals;
 
-    private int currentHealth;
+    private int _currentHealth;
 
     private void Awake()
     {
@@ -17,27 +17,30 @@ public class EnemyHealthSystem : MonoBehaviour, IBreakable
             return;
         }
 
-        currentHealth = enemyStats.maxHealth;
+        _currentHealth = enemyStats.maxHealth;
         UpdateHeartVisuals();
     }
 
     public void TakeDamage(int damageAmount)
     {
-        currentHealth -= damageAmount;
-        currentHealth = Mathf.Max(currentHealth, 0);
+        _currentHealth -= damageAmount;
+        _currentHealth = Mathf.Max(_currentHealth, 0);
 
-        Debug.Log($"{gameObject.name} took {damageAmount} damage. HP: {currentHealth}/{enemyStats.maxHealth}");
+        StateLogger.Log(nameof(EnemyHealthSystem),
+            $"{gameObject.name} took {damageAmount} damage. HP: {_currentHealth}/{enemyStats.maxHealth}");
 
         UpdateHeartVisuals();
 
-        if (currentHealth <= 0)
+        if (_currentHealth <= 0)
             Die();
     }
 
     // נקרא מ-KillableEnemy.OnBreak() דרך IBreakable — מטפל בנזק Rage
     public void OnBreak()
     {
-        if (enemyStats == null || !enemyStats.canBeDamagedByRage) return;
+        if (enemyStats == null || !enemyStats.canBeDamagedByRage)
+            return;
+
         TakeDamage(enemyStats.rageDamage);
     }
 
@@ -45,8 +48,10 @@ public class EnemyHealthSystem : MonoBehaviour, IBreakable
     {
         for (int i = 0; i < heartVisuals.Length; i++)
         {
-            if (heartVisuals[i] == null) continue;
-            heartVisuals[i].SetActive(i < currentHealth);
+            if (heartVisuals[i] == null)
+                continue;
+
+            heartVisuals[i].SetActive(i < _currentHealth);
         }
     }
 

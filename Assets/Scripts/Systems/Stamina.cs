@@ -20,35 +20,35 @@ public class Stamina : MonoBehaviour
     [Header("זיהוי חוסר תזוזה")]
     public float idleSpeedThreshold = 0.05f;
 
-    private Rigidbody2D rb;
-    private float lastUseTime;
-    private PlayerEmotionContext emotionContext;
+    private Rigidbody2D _rb;
+    private float _lastUseTime;
+    private PlayerEmotionContext _emotionContext;
 
-    private bool depletedTriggered = false;
+    private bool _depletedTriggered;
 
-    void Awake()
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        emotionContext = GetComponent<PlayerEmotionContext>();
+        _rb = GetComponent<Rigidbody2D>();
+        _emotionContext = GetComponent<PlayerEmotionContext>();
     }
 
-    void Start()
+    private void Start()
     {
         // בכל סצנה חדשה הסטאמינה מתחילה מלאה
         ResetForNewScene();
     }
 
-    void Update()
+    private void Update()
     {
         RegenerateWhenIdle();
     }
 
-    void RegenerateWhenIdle()
+    private void RegenerateWhenIdle()
     {
         if (currentStamina >= maxStamina)
             return;
 
-        if (Time.time < lastUseTime + regenDelay)
+        if (Time.time < _lastUseTime + regenDelay)
             return;
 
         if (!IsIdle())
@@ -60,11 +60,12 @@ public class Stamina : MonoBehaviour
         GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
     }
 
-    bool IsIdle()
+    private bool IsIdle()
     {
-        if (rb == null) return true;
+        if (_rb == null)
+            return true;
 
-        return rb.linearVelocity.magnitude <= idleSpeedThreshold;
+        return _rb.linearVelocity.magnitude <= idleSpeedThreshold;
     }
 
     public bool Use(float amount)
@@ -78,7 +79,7 @@ public class Stamina : MonoBehaviour
         currentStamina -= amount;
         currentStamina = Mathf.Max(currentStamina, 0f);
 
-        lastUseTime = Time.time;
+        _lastUseTime = Time.time;
 
         GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
 
@@ -93,41 +94,36 @@ public class Stamina : MonoBehaviour
 
     private void TriggerDepleted()
     {
-        if (depletedTriggered)
+        if (_depletedTriggered)
             return;
 
-        depletedTriggered = true;
-
-        if (emotionContext != null)
-        {
-            emotionContext.OnStaminaDepleted();
-        }
+        _depletedTriggered = true;
+        _emotionContext?.OnStaminaDepleted();
     }
 
     public void Refill()
     {
-        currentStamina = maxStamina;
-        depletedTriggered = false;
-
-        GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
+        SetStamina(maxStamina);
     }
 
     public void ResetForNewScene()
     {
         // איפוס מלא להתחלה נקייה של כל סצנה
-        currentStamina = maxStamina;
-        lastUseTime = 0f;
-        depletedTriggered = false;
-
-        GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
+        _lastUseTime = 0f;
+        SetStamina(maxStamina);
     }
+
     public void ForceDeplete()
     {
-        currentStamina = 0f;
-        depletedTriggered = false;
+        SetStamina(0f);
+        TriggerDepleted();
+    }
+
+    private void SetStamina(float value)
+    {
+        currentStamina = value;
+        _depletedTriggered = false;
 
         GameEvents.RaiseStaminaChanged(type, currentStamina, maxStamina);
-
-        TriggerDepleted();
     }
 }

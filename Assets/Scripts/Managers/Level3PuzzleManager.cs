@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Level3PuzzleManager : MonoBehaviour
 {
@@ -11,18 +12,23 @@ public class Level3PuzzleManager : MonoBehaviour
     [SerializeField] private Sprite triangleOnly;
     [SerializeField] private Sprite squareOnly;
     [SerializeField] private Sprite circleOnly;
-    [SerializeField] private Sprite eclipseOnly;
+    [FormerlySerializedAs("eclipseOnly")]
+    [SerializeField] private Sprite ellipseOnly;
 
     [SerializeField] private Sprite squareTriangle;
     [SerializeField] private Sprite circleTriangle;
-    [SerializeField] private Sprite eclipseTriangle;
+    [FormerlySerializedAs("eclipseTriangle")]
+    [SerializeField] private Sprite ellipseTriangle;
 
     [SerializeField] private Sprite squareCircle;
-    [SerializeField] private Sprite eclipseSquare;
-    [SerializeField] private Sprite eclipseCircle;
+    [FormerlySerializedAs("eclipseSquare")]
+    [SerializeField] private Sprite ellipseSquare;
+    [FormerlySerializedAs("eclipseCircle")]
+    [SerializeField] private Sprite ellipseCircle;
 
     [SerializeField] private Sprite squareCircleTriangle;
-    [SerializeField] private Sprite circleTriangleEclipse;
+    [FormerlySerializedAs("circleTriangleEclipse")]
+    [SerializeField] private Sprite circleTriangleEllipse;
 
     [SerializeField] private Sprite allTogether;
     [SerializeField] private Sprite allTogetherArrow;
@@ -33,12 +39,12 @@ public class Level3PuzzleManager : MonoBehaviour
     [Header("Glow שיופיע כשהפאזל הושלם")]
     [SerializeField] private GameObject puzzleGlow;
 
-    private bool hasTriangle;
-    private bool hasSquare;
-    private bool hasCircle;
-    private bool hasEclipse;
+    private bool _hasTriangle;
+    private bool _hasSquare;
+    private bool _hasCircle;
+    private bool _hasEllipse;
 
-    private bool puzzleCompleted = false;
+    private bool _puzzleCompleted;
 
     private void Start()
     {
@@ -51,37 +57,33 @@ public class Level3PuzzleManager : MonoBehaviour
 
     public void AddPiece(PuzzlePieceType pieceType)
     {
-        Debug.Log("Manager received piece: " + pieceType);
-
-        if (puzzleCompleted)
+        if (_puzzleCompleted)
             return;
 
         switch (pieceType)
         {
             case PuzzlePieceType.Triangle:
-                hasTriangle = true;
-                Debug.Log("Triangle added");
+                _hasTriangle = true;
                 break;
 
             case PuzzlePieceType.Square:
-                hasSquare = true;
-                Debug.Log("Square added");
+                _hasSquare = true;
                 break;
 
             case PuzzlePieceType.Circle:
-                hasCircle = true;
-                Debug.Log("Circle added");
+                _hasCircle = true;
                 break;
 
-            case PuzzlePieceType.Eclipse:
-                hasEclipse = true;
-                Debug.Log("Eclipse added");
+            case PuzzlePieceType.Ellipse:
+                _hasEllipse = true;
                 break;
         }
 
+        StateLogger.Log(nameof(Level3PuzzleManager), $"Piece added: {pieceType}");
+
         UpdatePuzzleSprite();
 
-        if (hasTriangle && hasSquare && hasCircle && hasEclipse)
+        if (_hasTriangle && _hasSquare && _hasCircle && _hasEllipse)
             PuzzleComplete();
     }
 
@@ -89,94 +91,37 @@ public class Level3PuzzleManager : MonoBehaviour
     {
         if (puzzleRenderer == null)
         {
-            Debug.LogError("Puzzle Renderer is NULL!");
+            Debug.LogError("Level3PuzzleManager: Puzzle Renderer is not assigned.");
             return;
         }
 
-        Debug.Log(
-            "UpdatePuzzleSprite -> " +
-            "Triangle=" + hasTriangle +
-            " Square=" + hasSquare +
-            " Circle=" + hasCircle +
-            " Eclipse=" + hasEclipse);
+        puzzleRenderer.sprite = ResolveSprite();
+    }
 
-        if (hasTriangle && hasSquare && hasCircle && hasEclipse)
-        {
-            Debug.Log("Setting sprite: allTogetherArrow");
-            puzzleRenderer.sprite = allTogetherArrow;
-        }
-        else if (hasTriangle && hasSquare && hasCircle)
-        {
-            Debug.Log("Setting sprite: squareCircleTriangle");
-            puzzleRenderer.sprite = squareCircleTriangle;
-        }
-        else if (hasTriangle && hasCircle && hasEclipse)
-        {
-            Debug.Log("Setting sprite: circleTriangleEclipse");
-            puzzleRenderer.sprite = circleTriangleEclipse;
-        }
-        else if (hasTriangle && hasSquare)
-        {
-            Debug.Log("Setting sprite: squareTriangle");
-            puzzleRenderer.sprite = squareTriangle;
-        }
-        else if (hasTriangle && hasCircle)
-        {
-            Debug.Log("Setting sprite: circleTriangle");
-            puzzleRenderer.sprite = circleTriangle;
-        }
-        else if (hasTriangle && hasEclipse)
-        {
-            Debug.Log("Setting sprite: eclipseTriangle");
-            puzzleRenderer.sprite = eclipseTriangle;
-        }
-        else if (hasSquare && hasCircle)
-        {
-            Debug.Log("Setting sprite: squareCircle");
-            puzzleRenderer.sprite = squareCircle;
-        }
-        else if (hasSquare && hasEclipse)
-        {
-            Debug.Log("Setting sprite: eclipseSquare");
-            puzzleRenderer.sprite = eclipseSquare;
-        }
-        else if (hasCircle && hasEclipse)
-        {
-            Debug.Log("Setting sprite: eclipseCircle");
-            puzzleRenderer.sprite = eclipseCircle;
-        }
-        else if (hasTriangle)
-        {
-            Debug.Log("Setting sprite: triangleOnly");
-            puzzleRenderer.sprite = triangleOnly;
-        }
-        else if (hasSquare)
-        {
-            Debug.Log("Setting sprite: squareOnly");
-            puzzleRenderer.sprite = squareOnly;
-        }
-        else if (hasCircle)
-        {
-            Debug.Log("Setting sprite: circleOnly");
-            puzzleRenderer.sprite = circleOnly;
-        }
-        else if (hasEclipse)
-        {
-            Debug.Log("Setting sprite: eclipseOnly");
-            puzzleRenderer.sprite = eclipseOnly;
-        }
-        else
-        {
-            Debug.Log("Setting sprite: emptyPuzzle");
-            puzzleRenderer.sprite = emptyPuzzle;
-        }
+    private Sprite ResolveSprite()
+    {
+        if (_hasTriangle && _hasSquare && _hasCircle && _hasEllipse) return allTogetherArrow;
+        if (_hasTriangle && _hasSquare && _hasCircle) return squareCircleTriangle;
+        if (_hasTriangle && _hasCircle && _hasEllipse) return circleTriangleEllipse;
+        if (_hasTriangle && _hasSquare) return squareTriangle;
+        if (_hasTriangle && _hasCircle) return circleTriangle;
+        if (_hasTriangle && _hasEllipse) return ellipseTriangle;
+        if (_hasSquare && _hasCircle) return squareCircle;
+        if (_hasSquare && _hasEllipse) return ellipseSquare;
+        if (_hasCircle && _hasEllipse) return ellipseCircle;
+        if (_hasTriangle) return triangleOnly;
+        if (_hasSquare) return squareOnly;
+        if (_hasCircle) return circleOnly;
+        if (_hasEllipse) return ellipseOnly;
+
+        return emptyPuzzle;
     }
 
     private void PuzzleComplete()
     {
-        puzzleCompleted = true;
+        _puzzleCompleted = true;
 
-        Debug.Log("Level 3 Puzzle Complete! Elevator can now activate.");
+        StateLogger.Log(nameof(Level3PuzzleManager), "Puzzle complete - elevator can now activate.");
 
         if (puzzleGlow != null)
             puzzleGlow.SetActive(true);
@@ -184,6 +129,6 @@ public class Level3PuzzleManager : MonoBehaviour
         if (secretElevator != null)
             secretElevator.UnlockElevator();
         else
-            Debug.LogWarning("Secret Elevator is not connected to Level3PuzzleManager");
+            Debug.LogWarning("Level3PuzzleManager: Secret Elevator is not connected.");
     }
 }

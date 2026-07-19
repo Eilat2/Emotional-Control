@@ -9,37 +9,32 @@ public class FireDamageZone : MonoBehaviour
     [Header("Hit Feedback")]
     [SerializeField] private float feedbackInterval = 0.2f;
 
-    private bool playerInside = false;
+    private bool _playerInside;
 
-    private Stamina joyStamina;
-    private Stamina rageStamina;
-    private EmotionController emotionController;
-    private PlayerHitFeedback playerHitFeedback;
+    private Stamina _joyStamina;
+    private Stamina _rageStamina;
+    private EmotionController _emotionController;
+    private PlayerHitFeedback _playerHitFeedback;
 
-    private float nextFeedbackTime = 0f;
+    private float _nextFeedbackTime;
 
-    void Update()
+    private void Update()
     {
-        if (!playerInside || emotionController == null)
+        if (!_playerInside || _emotionController == null)
             return;
 
         float drainAmount = drainPerSecond * Time.deltaTime;
+        EmotionType currentEmotion = _emotionController.GetCurrentEmotion();
 
-        EmotionType currentEmotion = emotionController.GetCurrentEmotion();
+        if (currentEmotion == EmotionType.Joy && _joyStamina != null)
+            _joyStamina.Use(drainAmount);
+        else if (currentEmotion == EmotionType.Rage && _rageStamina != null)
+            _rageStamina.Use(drainAmount);
 
-        if (currentEmotion == EmotionType.Joy && joyStamina != null)
+        if (_playerHitFeedback != null && Time.time >= _nextFeedbackTime)
         {
-            joyStamina.Use(drainAmount);
-        }
-        else if (currentEmotion == EmotionType.Rage && rageStamina != null)
-        {
-            rageStamina.Use(drainAmount);
-        }
-
-        if (playerHitFeedback != null && Time.time >= nextFeedbackTime)
-        {
-            playerHitFeedback.PlayHitFeedback();
-            nextFeedbackTime = Time.time + feedbackInterval;
+            _playerHitFeedback.PlayHitFeedback();
+            _nextFeedbackTime = Time.time + feedbackInterval;
         }
     }
 
@@ -48,26 +43,26 @@ public class FireDamageZone : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        playerInside = true;
+        _playerInside = true;
 
-        joyStamina = null;
-        rageStamina = null;
-        emotionController = other.GetComponentInParent<EmotionController>();
-        playerHitFeedback = other.GetComponentInChildren<PlayerHitFeedback>();
+        _emotionController = other.GetComponentInParent<EmotionController>();
+        _playerHitFeedback = other.GetComponentInChildren<PlayerHitFeedback>();
+
+        _joyStamina = null;
+        _rageStamina = null;
 
         Stamina[] staminas = other.GetComponentsInChildren<Stamina>();
-
         foreach (Stamina stamina in staminas)
         {
             if (stamina.type == Stamina.StaminaType.Joy)
-                joyStamina = stamina;
+                _joyStamina = stamina;
             else if (stamina.type == Stamina.StaminaType.Rage)
-                rageStamina = stamina;
+                _rageStamina = stamina;
         }
 
-        nextFeedbackTime = 0f;
+        _nextFeedbackTime = 0f;
 
-        Debug.Log("Player entered fire zone.");
+        StateLogger.Log(nameof(FireDamageZone), "Player entered fire zone.");
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -75,13 +70,13 @@ public class FireDamageZone : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        playerInside = false;
+        _playerInside = false;
 
-        joyStamina = null;
-        rageStamina = null;
-        emotionController = null;
-        playerHitFeedback = null;
+        _joyStamina = null;
+        _rageStamina = null;
+        _emotionController = null;
+        _playerHitFeedback = null;
 
-        Debug.Log("Player left fire zone.");
+        StateLogger.Log(nameof(FireDamageZone), "Player left fire zone.");
     }
 }

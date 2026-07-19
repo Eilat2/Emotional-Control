@@ -11,12 +11,6 @@ public class CameraFocusArea : MonoBehaviour
     public Vector3 GetCenter()
     {
         BoxCollider2D box = GetComponent<BoxCollider2D>();
-
-        if (box != null)
-        {
-            return box.bounds.center;
-        }
-
-        return transform.position;
+        return box != null ? box.bounds.center : transform.position;
     }
 }

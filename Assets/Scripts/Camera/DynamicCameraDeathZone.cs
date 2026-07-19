@@ -12,21 +12,22 @@ public class DynamicCameraDeathZone : MonoBehaviour
     [SerializeField] private float zoneHeight = 1f;
     [SerializeField] private float zoneWidthExtra = 5f;
 
-    private BoxCollider2D boxCollider;
+    private BoxCollider2D _boxCollider;
 
     private void Awake()
     {
-        boxCollider = GetComponent<BoxCollider2D>();
+        _boxCollider = GetComponent<BoxCollider2D>();
 
         if (targetCamera == null)
             targetCamera = Camera.main;
 
-        boxCollider.isTrigger = true;
+        _boxCollider.isTrigger = true;
     }
 
     private void LateUpdate()
     {
-        if (targetCamera == null) return;
+        if (targetCamera == null)
+            return;
 
         float cameraHeight = targetCamera.orthographicSize * 2f;
         float cameraWidth = cameraHeight * targetCamera.aspect;
@@ -38,16 +39,16 @@ public class DynamicCameraDeathZone : MonoBehaviour
             0f
         );
 
-        boxCollider.size = new Vector2(cameraWidth + zoneWidthExtra, zoneHeight);
+        _boxCollider.size = new Vector2(cameraWidth + zoneWidthExtra, zoneHeight);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
-        Debug.Log("Player fell below camera death zone");
-
-        // ✅ במקום FindObjectOfType (נפים) — GameEvents שכבר קיים בפרויקט
+        // משתמשים ב-GameEvents הקיים (במקום FindObjectOfType יקר)
+        StateLogger.Log(nameof(DynamicCameraDeathZone), "Player fell below camera death zone.");
         GameEvents.RaiseGameOver();
     }
 }

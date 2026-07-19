@@ -30,61 +30,44 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField] private CameraFocusSequence cameraSequence;
     [SerializeField] private Transform focusPoint;
 
-    private bool puzzleSolved = false;
-    private bool fireExtinguished = false;
+    private bool _puzzleSolved;
+    private bool _fireExtinguished;
 
     // רק אם הפאזל נפתר חוסמים לחיצות
-    public bool PuzzleSolved => puzzleSolved;
+    public bool PuzzleSolved => _puzzleSolved;
 
     private void Start()
     {
-        if (doorObject != null)
-            doorObject.SetActive(false);
-        else
-            Debug.LogWarning("Door object is not assigned.");
-
+        SetActiveOrWarn(doorObject, false, "Door object");
         if (waterSpray != null)
             waterSpray.SetActive(false);
 
-        if (unbreakableStone != null)
-            unbreakableStone.SetActive(true);
-
+        SetActiveOrWarn(unbreakableStone, true, "Unbreakable stone");
         if (breakableStone != null)
             breakableStone.SetActive(false);
     }
 
     public void RegisterButtonPress(PuzzleButton button, EmotionType pressedEmotion, bool pressedCorrectly)
     {
-        if (puzzleSolved)
+        if (_puzzleSolved)
             return;
 
-        // אין יותר בדיקת סדר.
-        // כל כפתור בודק רק אם לחצו עליו עם הרגש הנכון שלו.
-        if (pressedCorrectly)
-        {
-            Debug.Log("Button pressed correctly: " + button.name);
-        }
-        else
-        {
-            Debug.Log("Button pressed with wrong emotion, but no Game Over.");
-        }
+        // אין בדיקת סדר - כל כפתור בודק רק אם לחצו עליו עם הרגש הנכון שלו.
+        StateLogger.Log(nameof(PuzzleManager),
+            pressedCorrectly
+                ? $"Button pressed correctly: {button.name}"
+                : "Button pressed with wrong emotion, but no Game Over.");
 
         CheckPuzzleState();
     }
 
     public void CheckPuzzleState()
     {
-        Debug.Log("Checking puzzle state...");
-
         if (neutralButton == null || joyButton == null || rageButton == null)
         {
-            Debug.LogWarning("One or more buttons are not assigned.");
+            Debug.LogWarning("PuzzleManager: One or more buttons are not assigned.");
             return;
         }
-
-        Debug.Log("Neutral pressed: " + neutralButton.WasPressed + ", correct: " + neutralButton.PressedCorrectly);
-        Debug.Log("Joy pressed: " + joyButton.WasPressed + ", correct: " + joyButton.PressedCorrectly);
-        Debug.Log("Rage pressed: " + rageButton.WasPressed + ", correct: " + rageButton.PressedCorrectly);
 
         bool allPressed =
             neutralButton.WasPressed &&
@@ -92,58 +75,55 @@ public class PuzzleManager : MonoBehaviour
             rageButton.WasPressed;
 
         if (!allPressed)
-        {
-            Debug.Log("Not all buttons were pressed yet.");
             return;
-        }
 
         bool allCorrect =
             neutralButton.PressedCorrectly &&
             joyButton.PressedCorrectly &&
             rageButton.PressedCorrectly;
 
-        // הצלחה רק אם כל הכפתורים נלחצו עם הרגש הנכון שלהם
-        if (allCorrect && !puzzleSolved)
+        // הצלחה רק אם כל הכפתורים נלחצו עם הרגש הנכון שלהם.
+        // אם לא - כל הכפתורים נלחצו אבל לפחות אחד לא נכון: פשוט לא פותרים
+        // את הפאזל (אין Game Over).
+        if (allCorrect && !_puzzleSolved)
+            SolvePuzzle();
+    }
+
+    private void SolvePuzzle()
+    {
+        _puzzleSolved = true;
+        StateLogger.Log(nameof(PuzzleManager), "Puzzle solved - all buttons pressed correctly.");
+
+        ActivateWaterSpray();
+
+        if (cameraSequence != null && focusPoint != null)
+            cameraSequence.PlayFocusSequence(focusPoint);
+        else
+            Debug.LogWarning("PuzzleManager: Camera sequence or focus point is not assigned.");
+    }
+
+    private void ActivateWaterSpray()
+    {
+        if (waterSpray == null)
         {
-            puzzleSolved = true;
-            Debug.Log("Puzzle solved! All buttons were pressed correctly, no order required.");
+            Debug.LogWarning("PuzzleManager: Water spray is not assigned.");
+            return;
+        }
 
-            if (waterSpray != null)
-            {
-                waterSpray.SetActive(true);
+        waterSpray.SetActive(true);
 
-                ParticleSystem ps = waterSpray.GetComponentInChildren<ParticleSystem>();
-
-                if (ps != null)
-                {
-                    ps.Clear();
-                    ps.Play();
-                    Debug.Log("Particle system started.");
-                }
-                else
-                {
-                    Debug.LogWarning("No Particle System found on WaterSpray or its children.");
-                }
-
-                StartCoroutine(StopWaterAfterTime());
-                Debug.Log("Water spray activated.");
-            }
-            else
-            {
-                Debug.LogWarning("Water spray is not assigned.");
-            }
-
-            if (cameraSequence != null && focusPoint != null)
-                cameraSequence.PlayFocusSequence(focusPoint);
-            else
-                Debug.LogWarning("Camera sequence or focus point is not assigned.");
+        ParticleSystem ps = waterSpray.GetComponentInChildren<ParticleSystem>();
+        if (ps != null)
+        {
+            ps.Clear();
+            ps.Play();
         }
         else
         {
-            // אין Game Over יותר.
-            // אם כל הכפתורים נלחצו אבל אחד מהם לא נכון — פשוט לא פותרים את הפאזל.
-            Debug.Log("All buttons were pressed, but at least one was pressed with the wrong emotion. No Game Over.");
+            Debug.LogWarning("PuzzleManager: No ParticleSystem found on WaterSpray or its children.");
         }
+
+        StartCoroutine(StopWaterAfterTime());
     }
 
     private IEnumerator StopWaterAfterTime()
@@ -151,66 +131,39 @@ public class PuzzleManager : MonoBehaviour
         yield return new WaitForSeconds(waterDuration);
 
         if (waterSpray != null)
-        {
             waterSpray.SetActive(false);
-            Debug.Log("Water spray stopped.");
-        }
     }
 
     public void ExtinguishFireAndRevealDoor()
     {
-        if (fireExtinguished) return;
+        if (_fireExtinguished)
+            return;
 
-        fireExtinguished = true;
+        _fireExtinguished = true;
 
-        if (fireObject != null)
-        {
-            fireObject.SetActive(false);
-            Debug.Log("Fire object deactivated by water.");
-        }
-        else
-        {
-            Debug.LogWarning("Fire object is not assigned.");
-        }
-
-        if (unbreakableStone != null)
-        {
-            unbreakableStone.SetActive(false);
-            Debug.Log("Unbreakable stone deactivated.");
-        }
-        else
-        {
-            Debug.LogWarning("Unbreakable stone is not assigned.");
-        }
-
-        if (breakableStone != null)
-        {
-            breakableStone.SetActive(true);
-            Debug.Log("Breakable stone activated.");
-        }
-        else
-        {
-            Debug.LogWarning("Breakable stone is not assigned.");
-        }
-
-        if (doorObject != null)
-        {
-            doorObject.SetActive(true);
-            Debug.Log("Door object revealed. Active: " + doorObject.activeSelf);
-        }
-        else
-        {
-            Debug.LogWarning("Door object is not assigned.");
-        }
+        SetActiveOrWarn(fireObject, false, "Fire object");
+        SetActiveOrWarn(unbreakableStone, false, "Unbreakable stone");
+        SetActiveOrWarn(breakableStone, true, "Breakable stone");
+        SetActiveOrWarn(doorObject, true, "Door object");
 
         if (doorController != null)
-        {
             doorController.OpenDoor();
-            Debug.Log("Door opened.");
-        }
         else
+            Debug.LogWarning("PuzzleManager: Door controller is not assigned.");
+    }
+
+    /// <summary>
+    /// עוטף את הדפוס החוזר: אם ה-GameObject משוייך - להפעיל/לכבות אותו,
+    /// אחרת להזהיר בקונסול שהוא לא משוייך ב-Inspector.
+    /// </summary>
+    private void SetActiveOrWarn(GameObject obj, bool active, string label)
+    {
+        if (obj == null)
         {
-            Debug.LogWarning("Door controller is not assigned.");
+            Debug.LogWarning($"PuzzleManager: {label} is not assigned.");
+            return;
         }
+
+        obj.SetActive(active);
     }
 }

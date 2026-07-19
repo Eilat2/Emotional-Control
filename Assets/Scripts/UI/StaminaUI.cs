@@ -6,11 +6,11 @@ public class StaminaUI : MonoBehaviour
     [Header("Stamina Settings")]
     [SerializeField] private Stamina.StaminaType staminaType;
 
-    private Image fillImage;
+    private Image _fillImage;
 
-    void Awake()
+    private void Awake()
     {
-        fillImage = GetComponent<Image>();
+        _fillImage = GetComponent<Image>();
     }
 
     private void OnEnable()
@@ -25,12 +25,9 @@ public class StaminaUI : MonoBehaviour
 
     private void HandleStaminaChanged(Stamina.StaminaType type, float current, float max)
     {
-        if (type != staminaType)
+        if (type != staminaType || _fillImage == null)
             return;
 
-        if (fillImage == null)
-            return;
-
-        fillImage.fillAmount = current / max;
+        _fillImage.fillAmount = current / max;
     }
 }

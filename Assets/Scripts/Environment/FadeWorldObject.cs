@@ -6,11 +6,11 @@ public class FadeWorldObject : MonoBehaviour
 {
     [SerializeField] private float fadeDuration = 0.4f;
 
-    private SpriteRenderer[] spriteRenderers;
-    private Tilemap[] tilemaps;
-    private Collider2D[] colliders;
-    private Coroutine fadeRoutine;
-    private bool initialized = false;
+    private SpriteRenderer[] _spriteRenderers;
+    private Tilemap[] _tilemaps;
+    private Collider2D[] _colliders;
+    private Coroutine _fadeRoutine;
+    private bool _initialized;
 
     private void Awake()
     {
@@ -19,13 +19,14 @@ public class FadeWorldObject : MonoBehaviour
 
     private void Initialize()
     {
-        if (initialized) return;
+        if (_initialized)
+            return;
 
-        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
-        tilemaps = GetComponentsInChildren<Tilemap>(true);
-        colliders = GetComponentsInChildren<Collider2D>(true);
+        _spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+        _tilemaps = GetComponentsInChildren<Tilemap>(true);
+        _colliders = GetComponentsInChildren<Collider2D>(true);
 
-        initialized = true;
+        _initialized = true;
     }
 
     public void Show()
@@ -36,10 +37,10 @@ public class FadeWorldObject : MonoBehaviour
         SetAlpha(0f);
         SetColliders(true);
 
-        if (fadeRoutine != null)
-            StopCoroutine(fadeRoutine);
+        if (_fadeRoutine != null)
+            StopCoroutine(_fadeRoutine);
 
-        fadeRoutine = StartCoroutine(Fade(0f, 1f));
+        _fadeRoutine = StartCoroutine(Fade(0f, 1f));
     }
 
     public void Hide()
@@ -56,10 +57,10 @@ public class FadeWorldObject : MonoBehaviour
 
         SetColliders(false);
 
-        if (fadeRoutine != null)
-            StopCoroutine(fadeRoutine);
+        if (_fadeRoutine != null)
+            StopCoroutine(_fadeRoutine);
 
-        fadeRoutine = StartCoroutine(HideRoutine());
+        _fadeRoutine = StartCoroutine(HideRoutine());
     }
 
     private IEnumerator HideRoutine()
@@ -86,18 +87,20 @@ public class FadeWorldObject : MonoBehaviour
 
     private void SetAlpha(float alpha)
     {
-        foreach (SpriteRenderer sr in spriteRenderers)
+        foreach (SpriteRenderer sr in _spriteRenderers)
         {
-            if (sr == null) continue;
+            if (sr == null)
+                continue;
 
             Color c = sr.color;
             c.a = alpha;
             sr.color = c;
         }
 
-        foreach (Tilemap tilemap in tilemaps)
+        foreach (Tilemap tilemap in _tilemaps)
         {
-            if (tilemap == null) continue;
+            if (tilemap == null)
+                continue;
 
             Color c = tilemap.color;
             c.a = alpha;
@@ -107,9 +110,11 @@ public class FadeWorldObject : MonoBehaviour
 
     private void SetColliders(bool enabled)
     {
-        foreach (Collider2D col in colliders)
+        foreach (Collider2D col in _colliders)
         {
-            if (col == null) continue;
+            if (col == null)
+                continue;
+
             col.enabled = enabled;
         }
     }

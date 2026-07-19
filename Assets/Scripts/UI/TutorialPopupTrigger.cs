@@ -4,7 +4,7 @@ public class TutorialPopupTrigger : MonoBehaviour
 {
     [SerializeField] private GameObject popup;
 
-    private bool tutorialFinished = false;
+    private bool _tutorialFinished;
 
     private void Start()
     {
@@ -14,8 +14,8 @@ public class TutorialPopupTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (tutorialFinished) return;
-        if (!other.CompareTag("Player")) return;
+        if (_tutorialFinished || !other.CompareTag("Player"))
+            return;
 
         if (popup != null)
             popup.SetActive(true);
@@ -23,7 +23,8 @@ public class TutorialPopupTrigger : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
         if (popup != null)
             popup.SetActive(false);
@@ -31,7 +32,7 @@ public class TutorialPopupTrigger : MonoBehaviour
 
     public void HidePopupForever()
     {
-        tutorialFinished = true;
+        _tutorialFinished = true;
 
         if (popup != null)
             popup.SetActive(false);

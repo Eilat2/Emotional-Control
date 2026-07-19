@@ -8,12 +8,12 @@ public class ArmoredEnemyPatrol : MonoBehaviour
     [Header("Patrol Points")]
     [SerializeField] private Transform[] patrolPoints;
 
-    private Rigidbody2D rb;
-    private int currentPointIndex = 0;
+    private Rigidbody2D _rb;
+    private PatrolPointCycler _cycler;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
 
         if (enemyStats == null)
             Debug.LogError($"{gameObject.name}: EnemyStats is not assigned on ArmoredEnemyPatrol!");
@@ -22,24 +22,24 @@ public class ArmoredEnemyPatrol : MonoBehaviour
         {
             Debug.LogError($"{gameObject.name}: No patrol points assigned!");
             enabled = false;
+            return;
         }
+
+        _cycler = new PatrolPointCycler(patrolPoints);
     }
 
     private void FixedUpdate()
     {
-        if (enemyStats == null) return;
+        if (enemyStats == null)
+            return;
 
-        Transform target = patrolPoints[currentPointIndex];
-        float distanceX = Mathf.Abs(target.position.x - transform.position.x);
-
-        if (distanceX <= enemyStats.reachDistance)
-        {
-            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
-            target = patrolPoints[currentPointIndex];
-        }
+        // מרחק על ציר X בלבד - כך אויב על הקרקע לא "נתקע" בגלל
+        // הפרש גובה קטן בין נקודות הפטרול.
+        float distanceX = Mathf.Abs(_cycler.Current.position.x - transform.position.x);
+        Transform target = _cycler.AdvanceIfReached(distanceX, enemyStats.reachDistance);
 
         float direction = Mathf.Sign(target.position.x - transform.position.x);
-        rb.linearVelocity = new Vector2(direction * enemyStats.moveSpeed, rb.linearVelocity.y);
+        _rb.linearVelocity = new Vector2(direction * enemyStats.moveSpeed, _rb.linearVelocity.y);
 
         if (direction != 0)
             Flip(direction);
