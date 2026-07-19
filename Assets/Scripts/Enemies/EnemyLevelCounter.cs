@@ -7,6 +7,16 @@ public class EnemyLevelCounter : MonoBehaviour
 
     private int _enemiesAlive;
 
+    private void OnEnable()
+    {
+        GameEvents.OnEnemyDied += HandleEnemyDied;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnEnemyDied -= HandleEnemyDied;
+    }
+
     private void Start()
     {
         _enemiesAlive = FindObjectsByType<KillableEnemy>(FindObjectsSortMode.None).Length;
@@ -17,7 +27,10 @@ public class EnemyLevelCounter : MonoBehaviour
             door.SetActive(false);
     }
 
-    public void EnemyDied()
+    // מגיב לכל אויב שמת בסצנה - כולל אויבים שלא קשורים לרמה הזו
+    // בכלל, אם יש כמה EnemyLevelCounter בפרויקט (לא סביר, אבל
+    // שווה לדעת שזה event גלובלי ולא מוגבל לרמה אחת).
+    private void HandleEnemyDied()
     {
         _enemiesAlive--;
 

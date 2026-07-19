@@ -36,8 +36,10 @@ public class KillableEnemy : MonoBehaviour, IBreakable
 
         SpawnDebris();
 
-        EnemyLevelCounter counter = FindFirstObjectByType<EnemyLevelCounter>();
-        counter?.EnemyDied();
+        // לפני התיקון: FindFirstObjectByType<EnemyLevelCounter>() כאן -
+        // חיפוש מלא בסצנה בכל מוות אויב. עכשיו פשוט מודיעים דרך
+        // GameEvents, וכל מי שמתעניין (EnemyLevelCounter) נרשם בעצמו.
+        GameEvents.RaiseEnemyDied();
 
         Destroy(gameObject);
     }
